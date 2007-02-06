@@ -19,8 +19,8 @@ public class BlobTracker extends PApplet {
     
     Tracker myTracker;
     
-    static int WIDTH = 640;//1024;
-    static int HEIGHT = 480;//768;
+    static int WIDTH = 1024;
+    static int HEIGHT = 768;
     
     public void setup() {
         background(0);
