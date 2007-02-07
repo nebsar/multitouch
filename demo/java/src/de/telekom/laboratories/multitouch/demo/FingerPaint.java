@@ -18,10 +18,17 @@
 
 package de.telekom.laboratories.multitouch.demo;
 
+import static java.lang.Math.PI;
+import static java.lang.Math.cos;
+import static java.lang.Math.sin;
 import com.sun.opengl.util.Animator;
 import java.awt.Dimension;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 import javax.media.opengl.DefaultGLCapabilitiesChooser;
 import javax.media.opengl.GL;
 import javax.media.opengl.GLAutoDrawable;
@@ -37,14 +44,94 @@ import javax.swing.JFrame;
  * @version 0.1
  */
 public class FingerPaint {
+
+    private static class Brush {
+
+        private float x;
+        private float y;
+
+        private float radius = 0.01f;
+        
+        public Brush() {}
+        
+        public Brush(float x, float y) {
+            setX(x);
+            setY(y);
+        }
+
+        public float getX() {
+            return x;
+        }
+
+        public void setX(float x) {
+            this.x = x;            
+        }
+
+        public float getY() {
+            return y;
+        }
+
+        public void setY(float y) {
+            this.y = y;
+        }        
+        
+        
+        private void draw(final GL gl) {
+
+            final float x = getX(), y = getY(), radius = getRadius();            
+            
+            gl.glBegin(GL.GL_TRIANGLE_FAN);                                                                                
+
+            gl.glColor3f(0.9f, 0.9f, 1.0f);
+
+            gl.glVertex3f(x, y, 0.5f);
+
+            for(double angle=0.0; angle <= 2*PI+0.1; angle+=0.1 )
+            {                                
+                gl.glVertex3d(x-radius*cos(angle), y-radius*sin(angle), 0.5f);
+            }
+
+            gl.glEnd();                
+        }
+
+        public float getRadius() {
+            return radius;
+        }
+
+        public void setRadius(float radius) {
+            this.radius = radius;
+        }
+
+    }    
+    
+    
+    private List<Brush> brushes;
     
     /** Creates a new instance of FingerPaint */
-    public FingerPaint() {
+    public FingerPaint() {        
+        
     }
     
     
     
+    
     public static void main(String... args) {
+        
+        final List<Brush> brushes = new ArrayList<Brush>();
+        
+        Brush brush;
+        
+        //1st brush        
+        brush = new Brush();        
+        brush.setRadius(0.025f);        
+        brushes.add(brush);
+
+        //2nd brush        
+        brush = new Brush(0.25f, 0.25f); //x,y
+        brushes.add(brush);     
+
+        //3nd brush        
+        brushes.add(new Brush(0.25f, -0.25f));
         
                 
         // <editor-fold defaultstate="collapsed" desc=" OpenGL ">
@@ -64,16 +151,15 @@ public class FingerPaint {
             private Animator animator;
             
             public void init(GLAutoDrawable drawable) {
-                
                 if(animator != null) {
                     animator.stop();
-                }                
+                }
                 animator = new Animator(drawable);
                 animator.start();
                 
                 final GL gl = drawable.getGL();
                 
-                gl.glClearColor(1.0f,0.0f,0.0f,0.5f);
+                gl.glClearColor(0.4f,0.2f,0.2f,0.5f);
                 
             }
             
@@ -81,8 +167,29 @@ public class FingerPaint {
                 final GL gl = drawable.getGL();
                 
                 gl.glClear(GL.GL_COLOR_BUFFER_BIT);
+                
+                gl.glLoadIdentity();
+                
+                
+//                gl.glBegin(GL.GL_QUADS);
+//                
+//                gl.glColor3f(0.0f, 1.0f, 0.0f);
+//                
+//                gl.glVertex3f(-0.25f,  0.25f, 0.5f);
+//                gl.glVertex3f(-0.25f, -0.25f, 0.5f);
+//                gl.glVertex3f( 0.25f, -0.25f, 0.5f);
+//                gl.glVertex3f( 0.25f,  0.25f, 0.5f);                                                                
+//                
+//                gl.glEnd();
 
+                for(Brush brush : brushes) {
+                    
+                    brush.draw(gl);
+                    
+                }
+                
             }
+
             
             public void displayChanged(GLAutoDrawable drawable, boolean modeChanged, boolean deviceChanged) {
             }
@@ -96,11 +203,21 @@ public class FingerPaint {
                 
                 gl.glViewport(0, 0, width, height);
 
-//                final float h = (float) width / (float) height;                                
-//                gl.glMatrixMode(GL.GL_PROJECTION);
+                final float h = (float) width / (float) height;
+                gl.glMatrixMode(GL.GL_PROJECTION);
+                gl.glLoadIdentity();
+                
+                if(h >= 1.0f) {
+                    gl.glOrtho( -1.0f*h, 1.0f*h, -1.0f, 1.0f, 1.0f, -1.0f );
+                } else {
+                    gl.glOrtho( -1.0f, 1.0f, -1.0f/h, 1.0f/h, 1.0f, -1.0f );
+                }
+                
+                gl.glMatrixMode(GL.GL_MODELVIEW);                
+
+
 //                gl.glLoadIdentity();
 //                glu.gluPerspective(45.0f, h, 1.0, 20.0);
-//                gl.glMatrixMode(GL.GL_MODELVIEW);
 //                gl.glLoadIdentity();                
                 
             }
