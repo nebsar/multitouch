@@ -22,7 +22,10 @@ import com.illposed.osc.OSCListener;
 import com.illposed.osc.OSCMessage;
 import com.illposed.osc.OSCPortIn;
 import java.net.SocketException;
+import java.util.Collections;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * An OpenSound Control (OSC) based client, which receives frames containing a list of tracked ojects (id:float, x:float, y:float).
@@ -30,9 +33,12 @@ import java.util.Date;
  * @version 0.1
  */
 public class OSCTrackerClient {
-    
+            
+    private int max = 0;
     private final OSCPortIn inPort;
 
+    private final List<Object[]> blobFrames = new LinkedList<Object[]>();
+    
     
     /**
      * Instances the tracker, which will listen to the specified port.
@@ -56,24 +62,38 @@ public class OSCTrackerClient {
             // therefore we have to buffer and synchronize the listener callbacks            
             public void acceptMessage(Date time, OSCMessage message)
             {
+                //Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
 //                System.out.println("lala");
                 final Object[] args = message.getArguments();                
                 
-                if(args.length <= 3)
-                    return;
-                
-                System.out.println(message.getAddress() + ": " + (args.length/3));
-                
-                for(int i=0; i<args.length; i+=3) {
-
-                    final float id = (Float) args[i+2];
-                    final float x  = (Float) args[i+0];
-                    final float y  = (Float) args[i+1];
-                    
-                    System.out.println("blod: id(" + id + ") x(" + x + ") y(" + y + ")");
+                synchronized(blobFrames)
+                {
+                    blobFrames.add(args);
+                    int size = blobFrames.size();
+                    if(size > max) {
+                        max = size;
+                        //System.out.println(max);
+                    }
                 }
-            }
+            }                        
         });
+        
+        inPort.addListener("/clear", new OSCListener() {
+            
+            // Note: listing is done in another Thread, because blocking IO is used by JavaOSC, 
+            // therefore we have to buffer and synchronize the listener callbacks            
+            public void acceptMessage(Date time, OSCMessage message)
+            {
+                //Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
+//                System.out.println("lala");
+                final Object[] args = message.getArguments();                
+                
+                synchronized(blobFrames)
+                {
+                    blobFrames.add(new Object[0]);
+                }
+            }                        
+        });        
     }
     
     /**
@@ -101,6 +121,15 @@ public class OSCTrackerClient {
         } else if(!on && inPort.isListening()) {
             inPort.stopListening();
         }        
+    }
+    
+    public Object[] nextFrame() {
+        synchronized(blobFrames) {
+            if(blobFrames.isEmpty())
+                return null;
+            else
+                return blobFrames.remove(0);
+        }
     }
     
     public static void main(String... args) throws Exception
