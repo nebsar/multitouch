@@ -18,6 +18,7 @@
 
 package de.telekom.laboratories.multitouch.demo;
 
+import de.telekom.laboratories.multitouch.demo.vvvv.OSCTrackerClient;
 import java.awt.Color;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -29,6 +30,7 @@ import java.awt.Dimension;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import javax.media.opengl.DefaultGLCapabilitiesChooser;
@@ -47,11 +49,14 @@ import javax.swing.JFrame;
  */
 public class FingerPaint {
     
+    
     // <editor-fold defaultstate="collapsed" desc=" Brush ">
     
     private static class Brush {
         
         // <editor-fold defaultstate="collapsed" desc=" Attributes ">
+        
+        private int id;
         
         // center of the brush
         private boolean init = false;
@@ -62,7 +67,7 @@ public class FingerPaint {
         private float g;
         private float b;
         
-        private float radius = 0.01f;
+        private float radius = 0.02f;
         
         // </editor-fold>
         
@@ -230,6 +235,14 @@ public class FingerPaint {
         }   
         
         private static final Random RANDOM = new Random();
+
+        public int getId() {
+            return id;
+        }
+
+        public void setId(int id) {
+            this.id = id;
+        }
         
     }
     
@@ -249,7 +262,10 @@ public class FingerPaint {
                 );
     }
     
-    public static void main(String... args) {
+    public static void main(String... args) throws Exception {
+       
+        final OSCTrackerClient tracker = new OSCTrackerClient(9000);        
+        //tracker.setTracking(true);
         
         final int COLORS = 10;
         
@@ -262,27 +278,7 @@ public class FingerPaint {
 
         
         final List<Brush> brushes = new ArrayList<Brush>();
-        
-        //brushes.add(new Brush(0.25f,0.25f));
-        
-//        Brush brush;
-//        
-//        //1st brush
-//        brush = new Brush();
-//        brush.setRadius(0.025f);     
-//        setBrushColor(brush, colors[0]);
-//        brushes.add(brush);
-//        
-//        //2nd brush
-//        brush = new Brush(0.25f, 0.25f); //x,y
-//        setBrushColor(brush, colors[1]);
-//        brushes.add(brush);
-//        
-//        //3nd brush
-//        brush = new Brush(0.25f, -0.25f);
-//        setBrushColor(brush, colors[2]);
-//        brushes.add(brush);
-        
+       
         
         // <editor-fold defaultstate="collapsed" desc=" OpenGL ">
         
@@ -299,6 +295,10 @@ public class FingerPaint {
         canvas.addGLEventListener(new GLEventListener() {
             
             private Animator animator;
+            private float ratio = 1.0f;
+            private int color;
+            private final float[] bgColor = { 0.4f,0.2f,0.2f };
+            
             
             public void init(GLAutoDrawable drawable) {
                 if(animator != null) {
@@ -308,47 +308,116 @@ public class FingerPaint {
                 animator.start();
                 
                 final GL gl = drawable.getGL();
-                                
-                gl.glClearColor(0.4f,0.2f,0.2f,1.0f);
+                           
+                gl.glClearColor(0.0f,0.0f,0.0f,1.0f);//bgColor[0],bgColor[1],bgColor[2],1.0f);//
                 gl.glClear(GL.GL_COLOR_BUFFER_BIT);
                                
                 
-                gl.glBlendEquation(GL.GL_ADD);
-                //gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);  
-                gl.glBlendFuncSeparate(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA, GL.GL_ZERO, GL.GL_ONE);  
+                gl.glBlendEquation(GL.GL_FUNC_REVERSE_SUBTRACT);                
+                gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE);//_MINUS_SRC_ALPHA);  
+                //gl.glBlendEquationSeparate(GL.GL_ADD,GL.GL_REPLACE);
+                //gl.glBlendFuncSeparate(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA, GL.GL_ONE, GL.GL_ZERO);  
                 //gl.glColor4f(1.0f,1.0f,1.0f,0.5f);			// Full Brightness, 50% Alpha ( NEW )
                 
                 
             }
             
-            public void display(GLAutoDrawable drawable) {
+            public void display(GLAutoDrawable drawable) {                                
+                
+                // <editor-fold defaultstate="collapsed" desc=" Tracking ">
+                
+                Object[] data;
+                while( (data = tracker.nextFrame()) != null ) {
+                   
+                    
+                    final int[] ids = new int[data.length/3];
+                    
+                    
+                    for(int blob=0; blob < data.length-2; blob+=3) {
+                        
+                        float x  = 2.0f * (Float) data[blob+0];
+                        float y  = 2.0f * (Float) data[blob+1];
+                        
+                        if(ratio >= 1.0f) {
+                            x *= ratio;
+                        } else {
+                            y /= ratio;
+
+                        }
+                        
+                        final float id = (Float) data[blob+2];
+                        ids[blob/3] = (int) id;
+                        
+                        boolean isNew = true;
+                        
+                        for(Brush brush : brushes) {
+                            if(brush.getId() == (int) id) {
+                                brush.setLocation(x, y);
+                                isNew = false;
+                                break;
+                            }
+                        }
+                        
+                        if(isNew) {
+                            final Brush brush = new Brush(x, y);
+                            brush.setId((int)id);
+
+                            color %= colors.length;
+                            setBrushColor(brush, colors[color]);
+                            color++;                            
+                            
+                            brushes.add(brush);
+                        }                        
+                    }
+                    
+                    final Iterator<Brush> brushIt = brushes.iterator();
+                    while(brushIt.hasNext()) {
+                        final Brush brush = brushIt.next();
+                        
+                        boolean removed = true;
+                        for(int id : ids) {
+                            if(id == brush.getId()) {
+                                removed = false;
+                                break;
+                            }
+                        }
+                        
+                        if(removed) {
+                            brushIt.remove();
+                        }
+                    }
+                                        
+                }
+                
+                // </editor-fold>
+                
                 final GL gl = drawable.getGL();
                 
                 //gl.glClear(GL.GL_COLOR_BUFFER_BIT);
                 
-//                gl.glMatrixMode(GL.GL_PROJECTION);
-//                gl.glPushMatrix();
-//                gl.glLoadIdentity();
-//                
-//                gl.glEnable(GL.GL_BLEND);
-//                
-//                gl.glBegin(GL.GL_QUADS);
-//
-//                gl.glColor4f(0.4f,0.2f,0.2f,0.05f);
-//
-//                gl.glVertex3f(-1.0f,  1.0f, 0.5f);
-//                gl.glVertex3f(-1.0f, -1.0f, 0.5f);
-//                gl.glVertex3f( 1.0f, -1.0f, 0.5f);
-//                gl.glVertex3f( 1.0f,  1.0f, 0.5f);
-//
-//                gl.glEnd();
-//                
-//                gl.glDisable(GL.GL_BLEND);
-//                
-//                gl.glPopMatrix();
-//                gl.glMatrixMode(GL.GL_MODELVIEW);
-//                
-//                gl.glLoadIdentity();
+                gl.glMatrixMode(GL.GL_PROJECTION);
+                gl.glPushMatrix();
+                gl.glLoadIdentity();
+                
+                gl.glEnable(GL.GL_BLEND);
+                
+                gl.glBegin(GL.GL_QUADS);
+
+                gl.glColor4f(1.0f,1.0f,1.0f,0.005f);//bgColor[0],bgColor[1],bgColor[2],0.005f);////0.4f,0.2f,0.2f, 0.005f);
+
+                gl.glVertex3f(-1.0f,  1.0f, 0.5f);
+                gl.glVertex3f(-1.0f, -1.0f, 0.5f);
+                gl.glVertex3f( 1.0f, -1.0f, 0.5f);
+                gl.glVertex3f( 1.0f,  1.0f, 0.5f);
+
+                gl.glEnd();
+                
+                gl.glDisable(GL.GL_BLEND);
+                
+                gl.glPopMatrix();
+                gl.glMatrixMode(GL.GL_MODELVIEW);
+                
+                gl.glLoadIdentity();
                                                
                 for(Brush brush : brushes) {                    
                     brush.draw(gl);                    
@@ -369,14 +438,14 @@ public class FingerPaint {
                 
                 gl.glViewport(0, 0, width, height);
                 
-                final float h = (float) width / (float) height;
+                ratio = (float) width / (float) height;
                 gl.glMatrixMode(GL.GL_PROJECTION);
                 gl.glLoadIdentity();
                 
-                if(h >= 1.0f) {
-                    gl.glOrtho( -1.0f*h, 1.0f*h, -1.0f, 1.0f, 1.0f, -1.0f );
+                if(ratio >= 1.0f) {
+                    gl.glOrtho( -1.0f*ratio, 1.0f*ratio, -1.0f, 1.0f, 1.0f, -1.0f );
                 } else {
-                    gl.glOrtho( -1.0f, 1.0f, -1.0f/h, 1.0f/h, 1.0f, -1.0f );
+                    gl.glOrtho( -1.0f, 1.0f, -1.0f/ratio, 1.0f/ratio, 1.0f, -1.0f );
                 }
                 
                 gl.glMatrixMode(GL.GL_MODELVIEW);
