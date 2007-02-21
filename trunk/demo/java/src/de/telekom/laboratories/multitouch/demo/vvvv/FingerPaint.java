@@ -16,9 +16,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package de.telekom.laboratories.multitouch.demo;
+package de.telekom.laboratories.multitouch.demo.vvvv;
 
-import de.telekom.laboratories.multitouch.demo.vvvv.OSCTrackerClient;
 import java.awt.Color;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
