@@ -12,55 +12,18 @@ extern "C" {
 typedef std::map<FlyCaptureCameraSerialNumber, FlyCaptureContext> Connections;
 static Connections connections;
 
-//typedef enum {
-//    FORMAT_Y_8,
-//    FORMAT_Y_16,
-//    FORMAT_YUV411_8,
-//    FORMAT_YUV422_8,
-//    FORMAT_YUV444_8,
-//    FORMAT_RGB_8,
-//    FORMAT_RGB_16,
-//    
-//    FORMAT_UNKOWN
-//    
-//} Format;
-//
-//typedef enum {
-//    RESOLUTION_160_120,
-//    RESOLUTION_320_240,
-//    RESOLUTION_640_480,
-//    RESOLUTION_800_600,
-//    RESOLUTION_1024_768,
-//    RESOLUTION_1280_960,
-//    RESOLUTION_1600_1200,
-//    
-//    RESOLUTION_UNKOWN,
-//} Resolution;
-//
-//class VideoMode {
-//    Resolution resolution;
-//    Format format;
-//    
-//    VideoMode(FlyCaptureVideoMode mode) {
-//        // resolution
-//        switch(mode) {
-//            case FLYCAPTURE_VIDEOMODE_160x120YUV444:                
-//                
-//                break;
-//            case FLYCAPTURE_VIDEOMODE_320x240YUV444:
-//                break;
-//            case FLYCAPTURE_VIDEOMODE_640x480YUV411:
-//            case FLYCAPTURE_VIDEOMODE_640x480YUV422:
-//            case FLYCAPTURE_VIDEOMODE_640x480RGB:
-//            case FLYCAPTURE_VIDEOMODE_640x480Y8:
-//            case FLYCAPTURE_VIDEOMODE_640x480Y16:
-//                break;
-//                
-//                
-//        }
-//    }
-//};
-
+FlyCapturePixelFormat convertFormatIndex(unsigned int index) {
+    switch(index) {
+        case 0: // LUMINACE_8
+            return FLYCAPTURE_MONO8;
+        case 1: // LUMINACE_16
+            return FLYCAPTURE_MONO16;
+        case 2: // RED_8_GREEN_8_BLUE_8
+            return FLYCAPTURE_RGB8;
+        default:
+            return (FlyCapturePixelFormat) 0x00000001;
+    }
+}
 
     
 JNIEXPORT jint JNICALL Java_de_telekom_laboratories_capture_spi_FlyCaptureNative_deviceHandles
@@ -115,7 +78,7 @@ JNIEXPORT void JNICALL Java_de_telekom_laboratories_capture_spi_FlyCaptureNative
 
 
 JNIEXPORT jboolean JNICALL Java_de_telekom_laboratories_capture_spi_FlyCaptureNative_connect
-  (JNIEnv *env, jclass type, jlong sNumber, jobject mode)
+  (JNIEnv *env, jclass type, jlong sNumber, jobject videoMode)
 {
     const FlyCaptureCameraSerialNumber serial = (FlyCaptureCameraSerialNumber) sNumber;
       
@@ -136,8 +99,28 @@ JNIEXPORT jboolean JNICALL Java_de_telekom_laboratories_capture_spi_FlyCaptureNa
         flycaptureDestroyContext( context );
         return (jboolean) false;
     }
+        
+    jclass videomodeType = env->GetObjectClass(videoMode);
     
-    //TODO: ajdust video mode
+    jmethodID xID      = env->GetMethodID(videomodeType, "getX", "()I");
+    jmethodID yID      = env->GetMethodID(videomodeType, "getY", "()I");    
+    jmethodID widthID  = env->GetMethodID(videomodeType, "getWidth", "()I");
+    jmethodID heightID = env->GetMethodID(videomodeType, "getHeight", "()I");
+    jmethodID foramtID = env->GetMethodID(videomodeType, "getFormat", "()Lde/telekom/laboratories/capture/VideoMode$Format;");
+        
+    unsigned int x      = env->CallIntMethod(videoMode, xID);
+    unsigned int y      = env->CallIntMethod(videoMode, yID);
+    unsigned int width  = env->CallIntMethod(videoMode, widthID);
+    unsigned int height = env->CallIntMethod(videoMode, heightID); 
+    
+    jobject   formatObj  = env->CallObjectMethod(videoMode, foramtID);
+    jclass    formatType = env->GetObjectClass(formatObj);
+    
+    jmethodID ordinalID = env->GetMethodID(formatType, "ordinal", "()I");
+    unsigned int ordinal = env->CallIntMethod(formatObj, ordinalID);
+    
+    FlyCapturePixelFormat format = convertFormatIndex(ordinal);
+    
     int mode;
     for(mode=0; mode<=7; mode++) {
         
@@ -148,7 +131,7 @@ JNIEXPORT jboolean JNICALL Java_de_telekom_laboratories_capture_spi_FlyCaptureNa
        unsigned int	  uiUnitSizeVert;
        unsigned int       uiPixelFormats;
        
-       const int status = flycaptureStartCustomImage(context, mode, 
+       const int status = flycaptureQueryCustomImage(context, mode, 
                                     &bAvailable,
                                     &uiMaxImageSizeCols,
                                     &uiMaxImageSizeRows,
@@ -161,21 +144,28 @@ JNIEXPORT jboolean JNICALL Java_de_telekom_laboratories_capture_spi_FlyCaptureNa
         }
         if(!bAvailable) {
             continue;
+        } else if((x % uiUnitSizeHorz) || (y % uiUnitSizeVert) || (width % uiUnitSizeHorz) || (height % uiUnitSizeVert)) {
+            //printf("%d %d\n", uiUnitSizeHorz, uiUnitSizeVert);
+            continue;
+        } else if((x+width) > uiMaxImageSizeCols || (y+height) > uiMaxImageSizeRows) {
+            printf("%d %d <-> %d %d\n", uiMaxImageSizeCols, uiMaxImageSizeRows, (x+width), (y+height));
+            continue;
+        } else if((format & uiPixelFormats) == 0) {
+            continue;
         }
        
-        
-       
+        if(flycaptureStartCustomImage(context, mode, x, y, width, height, 100.0f, format) != FLYCAPTURE_OK) {                    
+            //printf("cannot start");
+            continue;
+        } else {
+            //printf("x: %d, y: %d, width: %d, height: %d\n", x, y, width, height);
+            connections[serial] = context;      
+            return (jboolean) true;
+        }       
     }
     
-    if(flycaptureStart(context, FLYCAPTURE_VIDEOMODE_ANY, FLYCAPTURE_FRAMERATE_ANY ) != FLYCAPTURE_OK) {        
-        flycaptureDestroyContext( context );
-        return (jboolean) false;
-    }
-      
-      
-    connections[serial] = context;
-      
-    return (jboolean) true;
+    flycaptureDestroyContext( context );
+    return (jboolean) false;
 }
 
 JNIEXPORT void JNICALL Java_de_telekom_laboratories_capture_spi_FlyCaptureNative_disconnect
@@ -216,8 +206,18 @@ JNIEXPORT jboolean JNICALL Java_de_telekom_laboratories_capture_spi_FlyCaptureNa
        return (jboolean) false;
     }
     
-    //TODO:  write to buffer
+    jlong capacity = env->GetDirectBufferCapacity(buffer);    
+    unsigned int sizeInBytes = image.iRows * image.iRowInc;    
+        
+    // shoudl never happen, but who knows
+    if(capacity < sizeInBytes) {
+        //printf("cap: %d, size: %d\n", capacity, sizeInBytes);
+        return (jboolean) false;
+    }
     
+    unsigned char* address = (unsigned char*) env->GetDirectBufferAddress(buffer);
+    memcpy(address, image.pData, sizeInBytes*sizeof(unsigned char));
+        
     return (jboolean) true;
    
 }
