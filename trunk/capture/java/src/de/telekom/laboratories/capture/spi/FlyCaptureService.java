@@ -102,13 +102,12 @@ public class FlyCaptureService extends CaptureService
                 disconnect();
             }
             
-            
-            if(FlyCaptureNative.connect(handle, mode)) {
-                this.aquire = aquire;
-            }
-            if(!isConnected()) {
+           
+            if(!FlyCaptureNative.connect(handle, mode)) {
                 throw new IllegalStateException();
             }
+            
+            this.aquire = aquire;
             
             final int bytes = mode.getWidth() * mode.getHeight() * mode.getFormat().size();
             if(buffer == null || buffer.capacity() != bytes)
@@ -130,11 +129,13 @@ public class FlyCaptureService extends CaptureService
                 throw new IllegalStateException();
             }
             
+            buffer.rewind();
             final boolean capture = FlyCaptureNative.capture(handle, buffer);
             if(!capture) {
                 disconnect();
                 throw new IllegalStateException();
-            }            
+            }
+            aquire.capture(buffer);
         }
     }
 }

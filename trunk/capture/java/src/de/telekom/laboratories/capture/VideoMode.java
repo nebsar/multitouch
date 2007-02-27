@@ -30,7 +30,15 @@ public class VideoMode {
         LUMINACE_8
         {
             public int size() { return 1; }
-        };
+        },
+        LUMINACE_16
+        {
+            public int size() { return 2; }
+        },
+        RED_8_GREEN_8_BLUE_8
+        {
+            public int size() { return 2; }
+        };        
         
         public abstract int size();
     }
@@ -68,7 +76,7 @@ public class VideoMode {
     public void setX(int x)
     throws IllegalArgumentException
     {
-        if(width < x || x < 0) {
+        if(x < 0) {
             throw new IllegalArgumentException();
         }
         
@@ -82,7 +90,7 @@ public class VideoMode {
     public void setY(int y)
     throws IllegalArgumentException
     {
-        if(height < y || y < 0) {
+        if(y < 0) {
             throw new IllegalArgumentException();
         }
         
@@ -96,7 +104,7 @@ public class VideoMode {
     public void setWidth(int width) 
     throws IllegalArgumentException
     {
-        if(width < x || width <= 0) {
+        if(width <= 0) {
             throw new IllegalArgumentException();
         }
         this.width = width;
@@ -109,7 +117,7 @@ public class VideoMode {
     public void setHeight(int height)
     throws IllegalArgumentException
     {
-        if(height < y || height <= 0) {
+        if(height <= 0) {
             throw new IllegalArgumentException();
         }     
         this.height = height;
@@ -118,7 +126,7 @@ public class VideoMode {
     public void setRegion(int x, int y, int width, int height)
     throws IllegalArgumentException
     {
-        if(x < 0 || y < 0 || x >= width || y >= height) {
+        if(x < 0 || y < 0 || width <= 0 || height <= 0) {
             throw new IllegalArgumentException();
         }
         this.x = x;
@@ -148,7 +156,7 @@ public class VideoMode {
     public void setFrameRate(float frameRate)
     throws NullPointerException 
     {
-        if(width <= 0.0f) {
+        if(frameRate <= 0.0f) {
             throw new IllegalArgumentException();
         }        
         this.frameRate = frameRate;
