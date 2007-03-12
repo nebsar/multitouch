@@ -46,7 +46,7 @@ import net.monoid.util.FPSCounter;
 public class Graphics {
     
     private final int     screen     = 0;
-    private final boolean fullscreen = false;
+    private final boolean fullscreen = true;//false;
     
     private Graphics() 
     throws IllegalStateException
@@ -140,22 +140,51 @@ public class Graphics {
         frame.setVisible(true);
     }
     
-    // <editor-fold defaultstate="collapsed" desc=" OpenGL ">
-    
-    private final void init(final GLAutoDrawable drawable) {
-        final GL gl = drawable.getGL();
+    private void dock(GL gl) {
         
-        gl.glClearColor(1.0f, 0.0f, 1.0f, 1.0f);
-        
-    }
-    private final void display(final GLAutoDrawable drawable) {
-        final GL gl = drawable.getGL();
-        
-        gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        
-        final int X = 1;
-        final int Y = 1;
+        final int steps = 16;
 
+        final float[][] points = new float[4*2*steps][];
+        
+        final float outerRadius = 1.0f;
+        final float innerRadius = 0.8f;
+        
+        for(int i=0; i<points.length; i+=2)
+        {
+            final float value = 2.0f*(float)Math.PI*(i+1)/points.length;
+            final float sin = (float) sin(value);
+            final float cos = (float) cos(value);
+            
+            points[i+0] = new float[] { cos * outerRadius, sin * outerRadius};
+            points[i+1] = new float[] { cos * innerRadius, sin * innerRadius};
+        }
+        
+        
+        //gl.glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        
+        gl.glBlendEquation(GL_FUNC_ADD);
+        gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+        
+        gl.glEnable(GL_BLEND);                
+        
+        gl.glColor4f(1.0f, 1.0f, 1.0f, 0.5f);
+        gl.glBegin(GL_TRIANGLE_STRIP);
+        
+        for(float[] point : points)
+        {
+            gl.glVertex2fv(point, 0);
+        }
+        
+        gl.glVertex2fv(points[0], 0);
+        gl.glVertex2fv(points[1], 0);
+        
+        gl.glEnd();
+        
+        gl.glDisable(GL_BLEND);
+    }
+    
+    private void mask(GL gl) {
+        
         final int steps = 16;
         
         final int outer = 4;
@@ -231,8 +260,26 @@ public class Graphics {
             }
         }
         gl.glVertex2fv(points[0], 0);
-        gl.glEnd();
+        gl.glEnd();        
+    }
+    
+    // <editor-fold defaultstate="collapsed" desc=" OpenGL ">
+    
+    private final void init(final GLAutoDrawable drawable) {
+        final GL gl = drawable.getGL();
         
+        gl.glClearColor(1.0f, 0.0f, 1.0f, 1.0f);
+        
+    }
+    private final void display(final GLAutoDrawable drawable) {
+        final GL gl = drawable.getGL();
+        
+        gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        
+
+        dock(gl);
+        
+        mask(gl);
     }
     private final void reshape(final GLAutoDrawable drawable, final int x, final int y, int width, int height) {
         final GL gl = drawable.getGL();
