@@ -164,6 +164,13 @@ JNIEXPORT jboolean JNICALL Java_de_telekom_laboratories_capture_spi_FlyCaptureNa
         }       
     }
     
+    //if(flycaptureStart(context, FLYCAPTURE_VIDEOMODE_640x480Y8, FLYCAPTURE_FRAMERATE_120) == FLYCAPTURE_OK)
+    //{
+    //    connections[serial] = context;   
+    //    return (jboolean) true;
+    //}    
+    
+    
     flycaptureDestroyContext( context );
     return (jboolean) false;
 }
