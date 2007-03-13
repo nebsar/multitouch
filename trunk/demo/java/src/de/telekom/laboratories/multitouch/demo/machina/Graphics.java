@@ -44,9 +44,11 @@ import net.monoid.util.FPSCounter;
  * @version 0.1
  */
 public class Graphics {
-    
+        
     private final int     screen     = 0;
-    private final boolean fullscreen = false;
+    private final boolean fullscreen = true;
+    
+    private Dock.Graphics dock;
     
     private Graphics() 
     throws IllegalStateException
@@ -195,56 +197,7 @@ public class Graphics {
         gl.glEnd();        
     }
     
-    // </editor-fold>
-    
-    // <editor-fold defaultstate="collapsed" desc=" dock ">
-    
-    private void dock(GL gl) {
-        
-        final int steps = 16;
-
-        final float[][] points = new float[4*2*steps][];
-        
-        final float outerRadius = 1.0f;
-        final float innerRadius = 0.85f;
-        
-        for(int i=0; i<points.length; i+=2)
-        {
-            final float value = 2.0f*(float)Math.PI*(i+1)/points.length;
-            final float sin = (float) sin(value);
-            final float cos = (float) cos(value);
-            
-            points[i+0] = new float[] { cos * outerRadius, sin * outerRadius};
-            points[i+1] = new float[] { cos * innerRadius, sin * innerRadius};
-        }
-        
-        
-        //gl.glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        
-        gl.glBlendEquation(GL_FUNC_ADD);
-        gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);//GL_ONE);
-        
-        gl.glEnable(GL_BLEND);                
-        
-        //gl.glColor4f(1.0f, 1.0f, 1.0f, 0.5f);
-        gl.glColor4f(0.98f, 0.8f, 0.01f, 0.6f);
-        
-        gl.glBegin(GL_TRIANGLE_STRIP);
-        
-        for(float[] point : points)
-        {
-            gl.glVertex2fv(point, 0);
-        }
-        
-        gl.glVertex2fv(points[0], 0);
-        gl.glVertex2fv(points[1], 0);
-        
-        gl.glEnd();
-        
-        gl.glDisable(GL_BLEND);
-    }
-    
-    // </editor-fold>
+    // </editor-fold>    
     
     // <editor-fold defaultstate="collapsed" desc=" mask ">
     
@@ -334,6 +287,10 @@ public class Graphics {
     private final void init(final GLAutoDrawable drawable) {
         final GL gl = drawable.getGL();
         
+        if(dock == null) {
+            dock = new Dock().createGraphics(16);
+        }
+        
     }
     private final void display(final GLAutoDrawable drawable) {
         final GL gl = drawable.getGL();
@@ -341,6 +298,7 @@ public class Graphics {
         gl.glClear(GL_DEPTH_BUFFER_BIT);
         
         gl.glColor4f(1.0f,1.0f,1.0f,1.0f);
+        
         gl.glBegin(GL_TRIANGLE_FAN);
         gl.glVertex2f( +1.0f, +1.0f );
         gl.glVertex2f( -1.0f, +1.0f );
@@ -349,15 +307,14 @@ public class Graphics {
         gl.glEnd();
         
         ruler(gl);
-
-        dock(gl);
+        
+        dock.draw(gl);
         
         mask(gl);
     }
     private final void reshape(final GLAutoDrawable drawable, final int x, final int y, int width, int height) {
         final GL gl = drawable.getGL();
   
-        gl.glViewport(x, y, width, height);
         gl.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         gl.glClear(GL_COLOR_BUFFER_BIT);
                 
