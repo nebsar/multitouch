@@ -46,7 +46,7 @@ import net.monoid.util.FPSCounter;
 public class Graphics {
     
     private final int     screen     = 0;
-    private final boolean fullscreen = true;//false;
+    private final boolean fullscreen = false;
     
     private Graphics() 
     throws IllegalStateException
@@ -136,9 +136,68 @@ public class Graphics {
             }
             // </editor-fold>
         }
+        
+        // </editor-fold>
                                            
         frame.setVisible(true);
     }
+
+    // <editor-fold defaultstate="collapsed" desc=" ruler ">
+    
+    private void ruler(GL gl) {
+        
+        
+        final float width = 0.30f*2, height = 0.03f*2;
+
+        final float extX = width/2.0f, extY = height / 2.0f;
+        
+        final float[][] points =
+        {
+            { +extX, +extY }, // right - top
+            { -extX, +extY }, // left  - top
+            { -extX, -extY }, // left  - bottom
+            { +extX, -extY }, // right - bottom            
+        };
+        
+        gl.glColor4f(0.5f, 0.5f, 0.5f, 1.0f);
+        gl.glBegin(GL_TRIANGLE_FAN);
+        
+        for(float[] point : points)
+        {
+            gl.glVertex2fv(point, 0);
+        }
+                
+        gl.glEnd();        
+        
+        gl.glColor4f(0.23f, 0.23f, 0.23f, 1.0f);
+        gl.glBegin(GL_LINE_STRIP);        
+        for(float[] point : points)
+        {
+            gl.glVertex2fv(point, 0);
+        }
+        gl.glVertex2fv(points[0], 0);        
+        gl.glEnd();
+        
+        
+        final int steps   = 20;
+        
+        final float step = width / (steps+1);
+        final float y = height / 3 - extY;
+                
+        gl.glBegin(GL_LINES);
+        for(int i=0; i<steps; i++)
+        {            
+            final float x = (i+1)*step - extX;
+            gl.glVertex2f(x, -extY);
+            gl.glVertex2f(x, y);
+        }
+        
+        gl.glEnd();        
+    }
+    
+    // </editor-fold>
+    
+    // <editor-fold defaultstate="collapsed" desc=" dock ">
     
     private void dock(GL gl) {
         
@@ -147,7 +206,7 @@ public class Graphics {
         final float[][] points = new float[4*2*steps][];
         
         final float outerRadius = 1.0f;
-        final float innerRadius = 0.8f;
+        final float innerRadius = 0.85f;
         
         for(int i=0; i<points.length; i+=2)
         {
@@ -163,11 +222,13 @@ public class Graphics {
         //gl.glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         
         gl.glBlendEquation(GL_FUNC_ADD);
-        gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+        gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);//GL_ONE);
         
         gl.glEnable(GL_BLEND);                
         
-        gl.glColor4f(1.0f, 1.0f, 1.0f, 0.5f);
+        //gl.glColor4f(1.0f, 1.0f, 1.0f, 0.5f);
+        gl.glColor4f(0.98f, 0.8f, 0.01f, 0.6f);
+        
         gl.glBegin(GL_TRIANGLE_STRIP);
         
         for(float[] point : points)
@@ -183,6 +244,10 @@ public class Graphics {
         gl.glDisable(GL_BLEND);
     }
     
+    // </editor-fold>
+    
+    // <editor-fold defaultstate="collapsed" desc=" mask ">
+    
     private void mask(GL gl) {
         
         final int steps = 16;
@@ -192,7 +257,7 @@ public class Graphics {
         
         final float[][] points = new float[outer+inner][];
         
-        final float border = 10000.0f;
+        final float border = 1.0f;
         points[0] = new float[] { +border, +border };
         points[1] = new float[] { -border, +border};
         points[2] = new float[] { -border, -border };
@@ -243,10 +308,9 @@ public class Graphics {
         
         // </editor-fold>
         
-        //gl.glPointSize(4.0f);
-        //gl.glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         
         gl.glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
+        //gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
         
         gl.glBegin(GL_TRIANGLE_STRIP);
         for(int j=0; j<4; j++)
@@ -263,19 +327,28 @@ public class Graphics {
         gl.glEnd();        
     }
     
+    // </editor-fold>
+    
     // <editor-fold defaultstate="collapsed" desc=" OpenGL ">
     
     private final void init(final GLAutoDrawable drawable) {
         final GL gl = drawable.getGL();
         
-        gl.glClearColor(1.0f, 0.0f, 1.0f, 1.0f);
-        
     }
     private final void display(final GLAutoDrawable drawable) {
         final GL gl = drawable.getGL();
+
+        gl.glClear(GL_DEPTH_BUFFER_BIT);
         
-        gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        gl.glColor4f(1.0f,1.0f,1.0f,1.0f);
+        gl.glBegin(GL_TRIANGLE_FAN);
+        gl.glVertex2f( +1.0f, +1.0f );
+        gl.glVertex2f( -1.0f, +1.0f );
+        gl.glVertex2f( -1.0f, -1.0f );
+        gl.glVertex2f( +1.0f, -1.0f );
+        gl.glEnd();
         
+        ruler(gl);
 
         dock(gl);
         
@@ -283,31 +356,45 @@ public class Graphics {
     }
     private final void reshape(final GLAutoDrawable drawable, final int x, final int y, int width, int height) {
         final GL gl = drawable.getGL();
-
+  
         gl.glViewport(x, y, width, height);
-        
+        gl.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        gl.glClear(GL_COLOR_BUFFER_BIT);
+                
         width  = max(1, width);
         height = max(1, height);
-                
-        final float scale = 1.0f;
-        gl.glMatrixMode(GL_PROJECTION);
-        gl.glLoadIdentity();
-        if(width >= height)
-        {
-            final float ratio = scale * (float) width / (float) height;
-            gl.glOrtho(-ratio, ratio, -scale, scale, -1.0f, 1.0f);
-        } else
-        {
-            final float ratio = scale * (float) height / (float) width;
-            gl.glOrtho(-scale, scale, -ratio, ratio, -1.0f, 1.0f);
-            
+        
+        if(width >= height) {
+            final int space = (width - height) / 2;
+            gl.glViewport(x+space, y, height, height);
+        } else {
+            final int space = (height - width) / 2;
+            gl.glViewport(x, y+space, width, width);            
         }
-        gl.glMatrixMode(GL_MODELVIEW);
+
+        // <editor-fold defaultstate="collapsed" desc=" non-square viewport ">
+                
+//        gl.glViewport(x, y, width, height);
+//        
+//        width  = max(1, width);
+//        height = max(1, height);
+//                
+//        final float scale = 1.0f;
+//        gl.glMatrixMode(GL_PROJECTION);
+//        gl.glLoadIdentity();
+//        if(width >= height)
+//        {
+//            final float ratio = scale * (float) width / (float) height;
+//            gl.glOrtho(-ratio, ratio, -scale, scale, -1.0f, 1.0f);
+//        } else
+//        {
+//            final float ratio = scale * (float) height / (float) width;
+//            gl.glOrtho(-scale, scale, -ratio, ratio, -1.0f, 1.0f);
+//            
+//        }
+//        gl.glMatrixMode(GL_MODELVIEW);
         
-        
-        
-        
-        
+        // </editor-fold>
     }
     private final void displayChanged(final GLAutoDrawable drawable, final boolean modeChanged,final  boolean deviceChanged) {
     }    
