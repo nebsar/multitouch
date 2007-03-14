@@ -18,18 +18,22 @@
 
 package de.telekom.laboratories.multitouch.demo.machina;
 
-import com.sun.jna.Pointer;
+import java.io.IOException;
+import java.nio.ByteOrder;
 import static javax.swing.JFrame.EXIT_ON_CLOSE;
 import static java.lang.Math.*;
 import static javax.media.opengl.GL.*;
 
 import com.sun.opengl.util.Animator;
-import de.telekom.laboratories.multitouch.demo.machina.win32.GDI32;
-import de.telekom.laboratories.multitouch.demo.machina.win32.User32;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
+import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
+import javax.imageio.ImageIO;
 import javax.media.opengl.GL;
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLCanvas;
@@ -44,11 +48,138 @@ import net.monoid.util.FPSCounter;
  * @version 0.1
  */
 public class Graphics {
+    
+    // <editor-fold defaultstate="collapsed" desc=" Obstacle ">
+    
+    class Obstacle {
         
+        // <editor-fold defaultstate="collapsed" desc=" Attributes ">
+        
+        private final int[] textures = new int[8];
+        private float ratio = 1.0f;
+        private final float scale = 0.1f;
+        
+        private float orientation;
+        
+        // </editor-fold>
+
+        // <editor-fold defaultstate="collapsed" desc=" Methods ">            
+        
+        public void init(GL gl) {
+            
+            final int[] images = { 8, 7, 4, 1, 2, 3, 6, 9 };
+            
+            for(int i=0; i<textures.length; i++) {
+                
+                final String resource = String.format("/exp/images/rectangle/%d.png", images[i]);
+                //System.out.println(resource);
+                
+                //final TextureData texData = TextureIO.newTextureData(Graphics.class.getResource(resource), false, "png");
+                try {
+                    final BufferedImage image = ImageIO.read(Graphics.class.getResource(resource));
+                    final int w = image.getWidth(), h = image.getHeight();
+                    ratio = (float) w / (float) h;
+                    
+                    final IntBuffer data = ByteBuffer.allocateDirect(w*h*4).order(ByteOrder.nativeOrder()).asIntBuffer();
+                    
+                    for(int y=0; y<h; y++) {
+                        for(int x=0; x<w; x++) {
+                            int pixel = image.getRGB(x,y);
+                            final java.awt.Color c = new java.awt.Color(pixel);
+                            //if(i == 0)
+                            //    System.out.printf("x(%d) y(%d): r=%d, g=%d, b=%d, a=%d\n", x, y, c.getRed(), c.getGreen(), c.getBlue(), c.getAlpha());
+                            
+                            pixel = (c.getAlpha() << 24) | c.getBlue() << 16 | c.getGreen() << 8 | c.getRed();
+                            data.put(pixel);
+                        }
+                    }
+                    data.rewind();
+                    
+                    gl.glGenTextures(1, textures, i);
+                    gl.glBindTexture(GL_TEXTURE_2D, textures[i]);
+                    gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+                    gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+                    gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+                    gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+                    gl.glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+                    gl.glBindTexture(GL_TEXTURE_2D, 0);
+                    
+                    
+                } catch(IOException e) {
+                    System.err.println(e.getMessage());
+                    e.printStackTrace();
+                }                
+            }
+        }
+        
+        public void draw(GL gl) {
+            
+            orientation += 0.0005f;
+            orientation %= (2.0f * (float) Math.PI);
+            
+            final float step  = orientation / (2.0f * (float) Math.PI);
+            float start = +(step/8);
+            final int tex = (int) (8 * (start + step)) % 8;
+            
+            gl.glMatrixMode(GL_MODELVIEW);
+            gl.glPushMatrix();
+            gl.glRotatef(orientation * 180.0f / (float) Math.PI, 0.0f, 0.0f, 1.0f);
+            
+            
+            final float extX = Math.max(1.0f, ratio) * scale, extY = Math.max(1.0f, 1.0f/ratio) * scale;
+            
+            gl.glBlendEquation(GL_FUNC_ADD);
+            gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);//GL_ONE);
+            
+            gl.glEnable(GL_BLEND);            
+            
+            gl.glEnable(GL_TEXTURE_2D);
+            gl.glBindTexture(GL_TEXTURE_2D, textures[tex]);
+            
+            gl.glColor4f(1.0f,1.0f,1.0f,1.0f);
+
+            gl.glBegin(GL_TRIANGLE_FAN);
+            
+            gl.glTexCoord2f( 1.0f, 1.0f );
+            gl.glVertex2f( +extX, +extY );
+            
+            gl.glTexCoord2f( 0.0f, 1.0f );
+            gl.glVertex2f( -extX, +extY );
+            
+            gl.glTexCoord2f( 0.0f, 0.0f );
+            gl.glVertex2f( -extX, -extY );
+            
+            gl.glTexCoord2f( 1.0f, 0.0f );
+            gl.glVertex2f( +extX, -extY);
+            
+            gl.glEnd();            
+            
+            gl.glBindTexture(GL_TEXTURE_2D, 0);
+            gl.glDisable(GL_TEXTURE_2D);
+            
+            gl.glDisable(GL_BLEND);
+            
+            gl.glPopMatrix();
+        }
+        
+        // </editor-fold>
+    }
+    
+    // </editor-fold>
+    
+        
+    // <editor-fold defaultstate="collapsed" desc=" Attributes ">
+    
     private final int     screen     = 0;
-    private final boolean fullscreen = true;
+    private final boolean fullscreen = false;
     
     private Dock.Graphics dock;
+    private Obstacle obstacle = new Obstacle();
+    
+    
+    // </editor-fold>
+        
+    // <editor-fold defaultstate="collapsed" desc=" Initializers ">    
     
     private Graphics() 
     throws IllegalStateException
@@ -144,6 +275,9 @@ public class Graphics {
         frame.setVisible(true);
     }
 
+    // </editor-fold>
+
+    
     // <editor-fold defaultstate="collapsed" desc=" ruler ">
     
     private void ruler(GL gl) {
@@ -291,6 +425,10 @@ public class Graphics {
             dock = new Dock().createGraphics(16);
         }
         
+        obstacle.init(gl);
+        
+        
+        
     }
     private final void display(final GLAutoDrawable drawable) {
         final GL gl = drawable.getGL();
@@ -306,7 +444,12 @@ public class Graphics {
         gl.glVertex2f( +1.0f, -1.0f );
         gl.glEnd();
         
-        ruler(gl);
+        
+        
+        obstacle.draw(gl);
+        
+        
+        //ruler(gl);
         
         dock.draw(gl);
         
@@ -358,7 +501,7 @@ public class Graphics {
     
     // </editor-fold>
     
-    
+        
     public static void test() {
         EventQueue.invokeLater(new Runnable() {
             public void run() {
