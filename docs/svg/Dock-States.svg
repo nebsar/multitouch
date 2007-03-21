@@ -1,0 +1,525 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://web.resource.org/cc/"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="744.09448819"
+   height="1052.3622047"
+   id="svg2"
+   sodipodi:version="0.32"
+   inkscape:version="0.45"
+   sodipodi:modified="true">
+  <defs
+     id="defs4">
+    <linearGradient
+       id="linearGradient3923">
+      <stop
+         style="stop-color:#000000;stop-opacity:1;"
+         offset="0"
+         id="stop3925" />
+      <stop
+         style="stop-color:#000000;stop-opacity:0;"
+         offset="1"
+         id="stop3927" />
+    </linearGradient>
+    <marker
+       inkscape:stockid="TriangleInL"
+       orient="auto"
+       refY="0.0"
+       refX="0.0"
+       id="TriangleInL"
+       style="overflow:visible">
+      <path
+         id="path3259"
+         d="M 5.77,0.0 L -2.88,5.0 L -2.88,-5.0 L 5.77,0.0 z "
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1.0pt;marker-start:none"
+         transform="scale(-0.8)" />
+    </marker>
+    <marker
+       inkscape:stockid="TriangleOutL"
+       orient="auto"
+       refY="0.0"
+       refX="0.0"
+       id="TriangleOutL"
+       style="overflow:visible">
+      <path
+         id="path3250"
+         d="M 5.77,0.0 L -2.88,5.0 L -2.88,-5.0 L 5.77,0.0 z "
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1.0pt;marker-start:none"
+         transform="scale(0.8)" />
+    </marker>
+    <filter
+       inkscape:collect="always"
+       id="filter3415">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="0.21673828"
+         id="feGaussianBlur3417" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       id="filter3799">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="0.24814453"
+         id="feGaussianBlur3801" />
+    </filter>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     gridtolerance="10000"
+     guidetolerance="10"
+     objecttolerance="10"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.28"
+     inkscape:cx="397.67485"
+     inkscape:cy="812.00793"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     inkscape:window-width="1187"
+     inkscape:window-height="941"
+     inkscape:window-x="103"
+     inkscape:window-y="22" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#370000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;filter:url(#filter3799);font-family:Bitstream Vera Sans"
+       x="110.50562"
+       y="130.48718"
+       id="text2160"><tspan
+         sodipodi:role="line"
+         id="tspan2162"
+         x="110.50562"
+         y="130.48718">Event = Down</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#003700;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="80.332764"
+       y="146.89343"
+       id="text2164"><tspan
+         sodipodi:role="line"
+         id="tspan2166"
+         x="80.332764"
+         y="146.89343">Position = Dock [Empty]</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="195.3125"
+       y="304.70593"
+       id="text3371"><tspan
+         sodipodi:role="line"
+         id="tspan3373"
+         x="195.3125"
+         y="304.70593"> </tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="39.0625"
+       y="28.143429"
+       id="text3449"><tspan
+         sodipodi:role="line"
+         id="tspan3451"
+         x="39.0625"
+         y="28.143429">Touch-State:</tspan><tspan
+         sodipodi:role="line"
+         x="39.0625"
+         y="43.143429"
+         id="tspan3771">- Event     := Down,Move,Up</tspan><tspan
+         sodipodi:role="line"
+         x="39.0625"
+         y="58.143429"
+         id="tspan3887">- Location := Dock[Empty, Icon], !Dock  </tspan><tspan
+         sodipodi:role="line"
+         x="39.0625"
+         y="73.143429"
+         id="tspan3459" /></text>
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#9b0000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;filter:url(#filter3799);font-family:Bitstream Vera Sans"
+       x="161.75879"
+       y="316.81628"
+       id="text3803"><tspan
+         sodipodi:role="line"
+         id="tspan3805"
+         x="161.75879"
+         y="316.81628">Event = Move</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#003700;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="115.49219"
+       y="332.44128"
+       id="text3807"><tspan
+         sodipodi:role="line"
+         id="tspan3809"
+         x="115.49219"
+         y="332.44128">Position = Dock [Empty]</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#9b0000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;filter:url(#filter3799);font-family:Bitstream Vera Sans"
+       x="298.04004"
+       y="411.59753"
+       id="text3817"><tspan
+         sodipodi:role="line"
+         id="tspan3819"
+         x="298.04004"
+         y="411.59753">Event = Move</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#009b00;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="272.08594"
+       y="428.00378"
+       id="text3821"><tspan
+         sodipodi:role="line"
+         id="tspan3823"
+         x="272.08594"
+         y="428.00378">Position = Dock [Icon]</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#9b0000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;filter:url(#filter3799);font-family:Bitstream Vera Sans"
+       x="440.32129"
+       y="316.81628"
+       id="text3825"><tspan
+         sodipodi:role="line"
+         id="tspan3827"
+         x="440.32129"
+         y="316.81628">Event = Move</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#00ff00;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="431.55469"
+       y="334.00378"
+       id="text3829"><tspan
+         sodipodi:role="line"
+         id="tspan3831"
+         x="431.55469"
+         y="334.00378">Position != Dock</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;filter:url(#filter3799);font-family:Bitstream Vera Sans"
+       x="137.32227"
+       y="538.83191"
+       id="text3833"><tspan
+         sodipodi:role="line"
+         id="tspan3835"
+         x="137.32227"
+         y="538.83191">Event = Up</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#003700;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="104.33691"
+       y="555.23816"
+       id="text3837"><tspan
+         sodipodi:role="line"
+         id="tspan3839"
+         x="104.33691"
+         y="555.23816">Position = Dock [Empty]</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;filter:url(#filter3799);font-family:Bitstream Vera Sans"
+       x="305.29102"
+       y="612.26941"
+       id="text3841"><tspan
+         sodipodi:role="line"
+         id="tspan3843"
+         x="305.29102"
+         y="612.26941">Event = Up</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#009b00;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="279.33691"
+       y="628.67566"
+       id="text3845"><tspan
+         sodipodi:role="line"
+         id="tspan3847"
+         x="279.33691"
+         y="628.67566">Position = Dock [Icon]</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;filter:url(#filter3799);font-family:Bitstream Vera Sans"
+       x="445.57227"
+       y="561.48816"
+       id="text3849"><tspan
+         sodipodi:role="line"
+         id="tspan3851"
+         x="445.57227"
+         y="561.48816">Event = Up</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#00ff00;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="431.33691"
+       y="579.45691"
+       id="text3853"><tspan
+         sodipodi:role="line"
+         id="tspan3855"
+         x="431.33691"
+         y="579.45691">Position != Dock</tspan></text>
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker-end:url(#TriangleOutL);stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 345.375,453.96534 L 345.375,579.14301"
+       id="path3857" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker-end:url(#TriangleOutL);stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 482.09375,394.7466 L 482.09375,519.92427"
+       id="path3859" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker-end:url(#TriangleOutL);stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 171.15625,370.52785 L 171.15625,495.70552"
+       id="path3861" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;marker-start:url(#TriangleInL);marker-end:url(#TriangleOutL);stroke-opacity:1"
+       d="M 274.28125,389.33093 L 241.46875,362.76843"
+       id="path3865" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;marker-start:url(#TriangleInL);marker-end:url(#TriangleOutL);stroke-opacity:1"
+       d="M 411.02498,391.81371 L 439.10002,360.28565"
+       id="path3869" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker-start:url(#TriangleInL);marker-end:url(#TriangleOutL);stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 278.31595,316.42971 L 410.9653,315.6384"
+       id="path3871" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;marker-end:url(#TriangleOutL);stroke-opacity:1"
+       d="M 138.78125,367.20593 C 82.140625,415.83874 46.984375,347.28406 46.59375,327.36218 C 46.203125,307.44031 76.28125,251.38562 137.21875,287.51843"
+       id="path3875"
+       sodipodi:nodetypes="czz" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;marker-end:url(#TriangleOutL);stroke-opacity:1"
+       d="M 519.06553,283.06245 C 574.89987,233.50603 611.1772,301.47413 611.89492,321.38691 C 612.61266,341.29968 583.45913,397.84075 521.93647,362.71354"
+       id="path3877"
+       sodipodi:nodetypes="czz" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker-end:url(#TriangleOutL);stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 375.08371,454.15052 C 407.45109,497.0953 356.55867,519.22909 342.21937,518.59762 C 327.88007,517.96615 288.96091,493.77673 317.72651,451.62467"
+       id="path3879"
+       sodipodi:nodetypes="czz" />
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#370000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;filter:url(#filter3799);font-family:Bitstream Vera Sans"
+       x="306.60254"
+       y="180.09753"
+       id="text3905"><tspan
+         sodipodi:role="line"
+         id="tspan3907"
+         x="306.60254"
+         y="180.09753">Event = Down</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#009b00;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="276.42969"
+       y="196.50378"
+       id="text3909"><tspan
+         sodipodi:role="line"
+         id="tspan3911"
+         x="276.42969"
+         y="196.50378">Position = Dock [Icon]</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#370000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;filter:url(#filter3799);font-family:Bitstream Vera Sans"
+       x="442.31738"
+       y="122.74207"
+       id="text3913"><tspan
+         sodipodi:role="line"
+         id="tspan3915"
+         x="442.31738"
+         y="122.74207">Event = Down</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#00ff00;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="437.14453"
+       y="139.14833"
+       id="text3917"><tspan
+         sodipodi:role="line"
+         id="tspan3919"
+         x="437.14453"
+         y="139.14833">Position != Dock</tspan></text>
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;marker-end:url(#TriangleOutL);stroke-opacity:1"
+       d="M 171.59375,160.95593 L 170.8125,290.64343"
+       id="path3921" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1.10603499px;stroke-linecap:butt;stroke-linejoin:miter;marker-end:url(#TriangleOutL);stroke-opacity:1"
+       d="M 346.56602,213.38849 L 345.79893,374.96494"
+       id="path3931" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1.0182848px;stroke-linecap:butt;stroke-linejoin:miter;marker-end:url(#TriangleOutL);stroke-opacity:1"
+       d="M 491.1069,150.59071 L 490.33329,286.39095"
+       id="path3933" />
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="245.3125"
+       y="88.299683"
+       id="text4035"><tspan
+         sodipodi:role="line"
+         id="tspan4037"
+         x="245.3125"
+         y="88.299683">POSSIBLE STATE TRANSITION</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="252.46875"
+       y="666.8866"
+       id="text4039"><tspan
+         sodipodi:role="line"
+         id="tspan4041"
+         x="252.46875"
+         y="666.8866">TURN STATES AND TRANSITION</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#370000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;filter:url(#filter3799);font-family:Bitstream Vera Sans"
+       x="153.91293"
+       y="702.53601"
+       id="text4169"><tspan
+         sodipodi:role="line"
+         id="tspan4171"
+         x="153.91293"
+         y="702.53601">Event = Down</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#003700;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="123.74008"
+       y="718.94226"
+       id="text4173"><tspan
+         sodipodi:role="line"
+         id="tspan4175"
+         x="123.74008"
+         y="718.94226">Position = Dock [Empty]</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#9b0000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;filter:url(#filter3799);font-family:Bitstream Vera Sans"
+       x="205.16611"
+       y="888.86511"
+       id="text4177"><tspan
+         sodipodi:role="line"
+         id="tspan4179"
+         x="205.16611"
+         y="888.86511">Event = Move</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#003700;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="158.89952"
+       y="904.49011"
+       id="text4181"><tspan
+         sodipodi:role="line"
+         id="tspan4183"
+         x="158.89952"
+         y="904.49011">Position = Dock [Empty]</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#9b0000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;filter:url(#filter3799);font-family:Bitstream Vera Sans"
+       x="400.82239"
+       y="889.11511"
+       id="text4185"><tspan
+         sodipodi:role="line"
+         id="tspan4187"
+         x="400.82239"
+         y="889.11511">Event = Move</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#009b00;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="374.86829"
+       y="905.52136"
+       id="text4189"><tspan
+         sodipodi:role="line"
+         id="tspan4191"
+         x="374.86829"
+         y="905.52136">Position = Dock [Icon]</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#9b0000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;filter:url(#filter3799);font-family:Bitstream Vera Sans"
+       x="411.07239"
+       y="709.17761"
+       id="text4193"><tspan
+         sodipodi:role="line"
+         id="tspan4195"
+         x="411.07239"
+         y="709.17761">Event = Move</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#00ff00;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="402.30579"
+       y="726.36511"
+       id="text4197"><tspan
+         sodipodi:role="line"
+         id="tspan4199"
+         x="402.30579"
+         y="726.36511">Position != Dock</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;filter:url(#filter3799);font-family:Bitstream Vera Sans"
+       x="315.10458"
+       y="1013.2245"
+       id="text4201"><tspan
+         sodipodi:role="line"
+         id="tspan4203"
+         x="315.10458"
+         y="1013.2245">Event = Up</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#003700;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="262.11923"
+       y="1029.6307"
+       id="text4205"><tspan
+         sodipodi:role="line"
+         id="tspan4207"
+         x="262.11923"
+         y="1029.6307">Position = Dock [Empty|Icon]</tspan></text>
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker-start:url(#TriangleInL);marker-end:url(#TriangleOutL);stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 358.61717,901.48798 L 315.82249,901.45823"
+       id="path4231" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.63225389px;stroke-linecap:butt;stroke-linejoin:miter;marker-end:url(#TriangleOutL);stroke-opacity:1"
+       d="M 156.69548,919.46499 C 120.88423,950.2133 98.656552,906.86928 98.409575,894.27359 C 98.162604,881.67791 117.17961,846.23712 155.70758,869.08223"
+       id="path4237"
+       sodipodi:nodetypes="czz" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker-end:url(#TriangleOutL);stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 510.1398,870.52285 C 551.25213,835.85765 576.13329,885.46485 576.28613,899.81725 C 576.43907,914.16955 554.41207,954.3521 510.75137,927.9324"
+       id="path4241"
+       sodipodi:nodetypes="czz" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;marker-end:url(#TriangleOutL);stroke-opacity:1"
+       d="M 215.00108,733.00475 L 214.21983,862.69225"
+       id="path4259" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;marker-end:url(#TriangleOutL);stroke-opacity:1"
+       d="M 225,916.83093 L 328.90625,987.1434"
+       id="path4269" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;marker-end:url(#TriangleOutL);stroke-opacity:1"
+       d="M 456.20835,917.88121 L 352.30211,988.1937"
+       id="path4271" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;marker-end:url(#TriangleOutL);stroke-opacity:1"
+       d="M 449.98612,870.70139 L 449.20487,741.01389"
+       id="path4273" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;marker-end:url(#TriangleOutL);stroke-opacity:1"
+       d="M 239.0625,869.95593 L 421.875,738.70593"
+       id="path4275" />
+  </g>
+</svg>
