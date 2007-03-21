@@ -23,44 +23,63 @@ package de.telekom.laboratories.multitouch;
  * @author Michael Nischt
  * @version 0.1
  */
-class Mass2D
+
+public final class Touch
 {
 
-    private double mass;
-    private double distX; // = 0;
-    private double distY; // = 0;
+	public static final class Creation
+	{		
+		public static final public enum Type
+		{
+			ADD,
+			SPLIT,
+			MERGE;
+		}
+		
+	}
+	
+	public static final class Destruction
+	{		
+		public enum Type
+		{
+			REMOVE,
+			SPLIT,
+			MERGE;
+		}
+		
+	}	
 
-    // mass := integral densitye dVolume
-    // see also: 
-    // http://scienceworld.wolfram.com/physics/Mass.html
-    public void integrate(double x, double y, double density)
-    {
-        mass  += density;
-        distX += density*x;
-        distY += density*y;
-    }            
-
-    public void integrate(double x, double y) 
-    {
-        mass  ++;
-        distX += x;
-        distY += y;
-    }            
-
-
-    public double getMass()
-    {
-        return mass;
-    }
-
-    public double getMassCenterX()
-    {
-        return mass / distX;
-    }
-
-    public double getMassCenterY()
-    {
-        return mass / distY;
-    } 
+	public static final class Event
+	extends EventObject
+	{
+		public static final enum Type
+		{
+			BEGIN,
+			END;
+		}
+		
+		Event(Object source)
+		{
+			super(source);
+		}	
+		
+		
+		
+	}
+	
+	public static final interface Listener extends EventListener
+	{
+		void touchStarted(Event evt);						
+		void touchFinished(Event evt);
+	}	
+	
+	public static final interface Observer
+	{
+		void tochUpdated(Touch touch);		
+	}
+			
+	void split(Touch splitted, Touch... output); // change to start observing each/all output touches 
+	void merge(Touch merged, Touch input);	     // change to start observring the merged touch
+	
 
 }
