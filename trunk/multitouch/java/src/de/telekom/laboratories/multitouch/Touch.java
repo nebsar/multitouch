@@ -18,6 +18,9 @@
 
 package de.telekom.laboratories.multitouch;
 
+import java.util.EventListener;
+import java.util.EventObject;
+
 /**
  *
  * @author Michael Nischt
@@ -29,7 +32,7 @@ public final class Touch
 
 	public static final class Creation
 	{		
-		public static final public enum Type
+		public static enum Type
 		{
 			ADD,
 			SPLIT,
@@ -52,7 +55,7 @@ public final class Touch
 	public static final class Event
 	extends EventObject
 	{
-		public static final enum Type
+		public static enum Type
 		{
 			BEGIN,
 			END;
@@ -67,19 +70,19 @@ public final class Touch
 		
 	}
 	
-	public static final interface Listener extends EventListener
+	public static interface Listener extends EventListener
 	{
 		void touchStarted(Event evt);						
 		void touchFinished(Event evt);
 	}	
 	
-	public static final interface Observer
+	public static interface Observer
 	{
 		void tochUpdated(Touch touch);		
 	}
 			
-	void split(Touch splitted, Touch... output); // change to start observing each/all output touches 
-	void merge(Touch merged, Touch input);	     // change to start observring the merged touch
+	protected abstract void split(Touch splitted, Touch... output); // change to start observing each/all output touches 
+	protected abstract void merge(Touch merged, Touch input);	     // change to start observring the merged touch
 	
 
 }
