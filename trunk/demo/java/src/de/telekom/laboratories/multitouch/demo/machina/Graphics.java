@@ -433,7 +433,7 @@ public class Graphics {
     private final void display(final GLAutoDrawable drawable) {
         final GL gl = drawable.getGL();
 
-        gl.glClear(GL_DEPTH_BUFFER_BIT);
+        gl.glClear(GL_COLOR_BUFFER_BIT);
         
         gl.glColor4f(1.0f,1.0f,1.0f,1.0f);
         
@@ -444,8 +444,7 @@ public class Graphics {
         gl.glVertex2f( +1.0f, -1.0f );
         gl.glEnd();
         
-        
-        
+                
         obstacle.draw(gl);
         
         
@@ -457,10 +456,15 @@ public class Graphics {
     }
     private final void reshape(final GLAutoDrawable drawable, final int x, final int y, int width, int height) {
         final GL gl = drawable.getGL();
-  
+          
+        // <editor-fold defaultstate="collapsed" desc=" square viewport ">
+        
+        //gl.glViewport(x, y, width, height);
+        
         gl.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         gl.glClear(GL_COLOR_BUFFER_BIT);
-                
+        
+        
         width  = max(1, width);
         height = max(1, height);
         
@@ -471,28 +475,30 @@ public class Graphics {
             final int space = (height - width) / 2;
             gl.glViewport(x, y+space, width, width);            
         }
+        
+        // </editor-fold>
 
         // <editor-fold defaultstate="collapsed" desc=" non-square viewport ">
                 
-//        gl.glViewport(x, y, width, height);
-//        
-//        width  = max(1, width);
-//        height = max(1, height);
-//                
-//        final float scale = 1.0f;
-//        gl.glMatrixMode(GL_PROJECTION);
-//        gl.glLoadIdentity();
-//        if(width >= height)
-//        {
-//            final float ratio = scale * (float) width / (float) height;
-//            gl.glOrtho(-ratio, ratio, -scale, scale, -1.0f, 1.0f);
-//        } else
-//        {
-//            final float ratio = scale * (float) height / (float) width;
-//            gl.glOrtho(-scale, scale, -ratio, ratio, -1.0f, 1.0f);
-//            
-//        }
-//        gl.glMatrixMode(GL_MODELVIEW);
+        //gl.glViewport(x, y, width, height);
+        //
+        //width  = max(1, width);
+        //height = max(1, height);
+        //
+        //final float scale = 1.0f;
+        //gl.glMatrixMode(GL_PROJECTION);
+        //gl.glLoadIdentity();
+        //if(width >= height)
+        //{
+        //    final float ratio = scale * (float) width / (float) height;
+        //    gl.glOrtho(-ratio, ratio, -scale, scale, -1.0f, 1.0f);
+        //} else
+        //{
+        //    final float ratio = scale * (float) height / (float) width;
+        //    gl.glOrtho(-scale, scale, -ratio, ratio, -1.0f, 1.0f);
+        //
+        //}
+        //gl.glMatrixMode(GL_MODELVIEW);
         
         // </editor-fold>
     }
