@@ -24,22 +24,58 @@ import java.util.Collection;
  * @author Michael Nischt
  * @version 0.1
  */
-public abstract class TouchDevice {
+public abstract class TouchSurface {
+    
+    public interface State {
+        double at(int x, int y);
+    }
+
     
     private final Collection<TouchListener> listeners = new ArrayList<TouchListener>();
     
-    public TouchDevice() {
+    
+    private final int width, height;
+    private final double[] pressure;
+    
+    
+    public TouchSurface(int width, int height) throws IllegalArgumentException {
+        if(width < 1 || height < 1) {
+            throw new IllegalArgumentException();
+        }
+        this.width  = width;
+        this.height = height;
+        
+        pressure = new double[width * height];
     }
+    
+    public int getWidth() {
+        return width;
+    }
+    
+    public int getHeight() {
+        return height;
+    }
+    
+    public void update(State state) { // readAndDispatch();
+        final int width = this.width, height = this.height;
+        
+        for(int y=0; y<height; y++) {
+            final int offset = y*width;
+            for(int x=0; x<width; x++) {
+                pressure[offset+x] = state.at(x,y);
+            }
+        }
+        
+        
+    }
+    
     
 //    protected void fireXXX(TouchEvent e) {
 //        for(TouchListener l : listeners) {
 //            //l.xxx(e);
 //        }
 //    }
-    
-    
-    public abstract void update(); // readAndDispatch();
-    
+        
     
     public void addTouchListener(TouchListener l) {
         listeners.add( l );
@@ -52,6 +88,4 @@ public abstract class TouchDevice {
     public TouchListener[] getTouchListeners() {
         return listeners.toArray( new TouchListener[ listeners.size() ] ) ;//0] );
     }
-    
-    
 }

@@ -25,13 +25,13 @@ import java.util.EventObject;
  */
 public class TouchEvent extends EventObject {
     
-    public TouchEvent(TouchDevice source) {
+    public TouchEvent(TouchSurface source) {
         super(source);
     }
 
     @Override
-    public TouchDevice getSource() {
-        return (TouchDevice) super.getSource();
+    public TouchSurface getSource() {
+        return (TouchSurface) super.getSource();
     }
     
 }
