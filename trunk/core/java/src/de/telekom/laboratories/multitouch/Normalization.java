@@ -28,119 +28,184 @@ package de.telekom.laboratories.multitouch;
  * @author Michael Nischt
  * @version 0.1
  */
-public class Normalization {
+public abstract class Normalization {    
     
-    static class Float1D {
-        private final int steps;
+    public abstract int getOffset();
+    public abstract int getStepCount();
+    
+    public double getStepSize() {
+        return 1.0 / getStepCount();
+    }
+    
+    public abstract double normalize(int value);
+    
+    public abstract int inverse(double norm);
+    public abstract int inverse(double norm, double[] factor, int index)
+    throws NullPointerException, ArrayIndexOutOfBoundsException;
+
+    public static Normalization unsafe(int range) 
+    throws IllegalArgumentException {
+        return new To(range);
+    }
+
+    public static Normalization wrapped(int range)
+    throws IllegalArgumentException {
+        return new ToWrapped(range);        
+    }
+    
+    public static Normalization repeated(int range)
+    throws IllegalArgumentException {
+        return new ToRepeated(range);
+    }
+    
+    public static Normalization unsafe(int from, int to) 
+    throws IllegalArgumentException {
+        return new FromTo(from, to);
+    }
+
+    public static Normalization wrapped(int from, int to)
+    throws IllegalArgumentException {
+        return new FromToWrapped(from, to);        
+    }
+    
+    public static Normalization repeated(int from, int to)
+    throws IllegalArgumentException {
+        return new FromToRepeated(from, to);
+    }    
+    
+    
+    public static double normalize(int steps, int value) {
+        return value / (double) (steps);
+    }
+
+    public static int inverse(int steps, double norm) {
+        return (int) Math.floor( norm * steps );
+    }
+    
+    
+    static class To extends Normalization {        
         
-        private Float1D(final int length) throws IllegalArgumentException {
+        protected final int steps;
+        
+        To(final int length) throws IllegalArgumentException {
             if(length <= 0) {
                 throw new IllegalArgumentException();
             }
             this.steps = (length-1);
-        }
-       
-        public float getStepSize() {
-            return 1.0f / steps;
-        }
+        }       
         
-        public int getStepCount() {
+        @Override
+        public int getOffset() {
+            return 0;
+        }         
+        
+        @Override
+        public final int getStepCount() {
             return steps;
-        }          
+        }        
+
+        @Override
+        public double normalize(int value) {
+            return normalize(steps, clamp( value ) );
+        }
+
+        @Override
+        public int inverse(double norm) {
+            return clamp ( inverse( steps, norm ) );
+        }        
         
-        // normalize ( denormalize( n, factor ) ) + factor * stepSize = id (n) = n 
-        public int denormalize(float normalized, float[] outFactor, int index) throws NullPointerException, ArrayIndexOutOfBoundsException {
-            final int denorm = denormalize(normalized);
-            outFactor[index] = ( normalized - normalize( denorm ) ) * steps;
-            return denorm;
+        protected int clamp(int value) {
+            return value;
         }
-        public int denormalize(float normalized) {
-            int denormalized =  (int) Math.floor( normalized * steps );
-            //clamp
-            denormalized = Math.max(0, Math.min(denormalized, steps) );
-             //repeat
-            denormalized %= (steps+1);
-            
-            return denormalized;
-        }
-        public float normalize(int denormalized) {
-            //clamp
-            denormalized = Math.max(0, Math.min(denormalized, steps) );
-            //repeat
-            denormalized %= (steps+1);
-            
-            return denormalized / (float) (steps);
-        }
+
+        @Override
+        public int inverse(double norm, double[] factor, int index) {
+            final int invNorm = inverse( norm );
+            factor[index] = ( norm - normalize(steps, invNorm) ) * steps;
+            return invNorm;        
+        }       
     } 
     
-    static class Float1D2 {
-        private final int offset, steps;
-        
-        private Float1D2(final int start, final int end) throws IllegalArgumentException {
+
+
+    static class ToWrapped extends To {
+
+        ToWrapped(final int count) { super(count); }
+
+        public double normalize(int value) {
+            value = Math.max(0, Math.min(value, steps) );
+            return super.normalize( value );
+
+        }
+
+        @Override
+        public int clamp(int value) {
+            return Math.max(0, Math.min( value, steps) );
+        }                                    
+    }
+
+    static class ToRepeated extends To {
+
+        ToRepeated(final int count) { super(count); }
+
+        @Override
+        public int clamp(int value) {
+            return value % (steps+1);            
+        }     
+    }    
+    
+    static class FromTo extends To {
+
+        protected final int offset;
+
+        FromTo(final int start, final int end) throws IllegalArgumentException {
+            super( (end-start) );
             this.offset = start;
-            this.steps = (end-start)-1;
-            if(steps <= 0) {
-                throw new IllegalArgumentException();
-            }
-            
-        }
-        
-        public float getStepSize() {
-            return 1.0f / steps;
-        }
-        
-        public int getStepCount() {
-            return steps;
-        }        
-        
-        // normalize ( denormalize( n, factor ) ) + factor * stepSize = id (n) = n 
-        public int denormalize(float normalized, float[] outFactor, int index) throws NullPointerException, ArrayIndexOutOfBoundsException {
-            final int denorm = denormalize(normalized);
-            outFactor[index] = ( normalized - normalize( denorm ) ) * steps;
-            return denorm;
-        }        
-        
-        public int denormalize(float normalized) {
-            int denormalized =  (int) Math.floor( (normalized * steps) );
-            //clamp
-            denormalized = Math.max(0, Math.min(denormalized, steps) );
-             //repeat
-            denormalized %= (steps+1);
-            
-            return denormalized + offset;
-        }
-        
-        public float normalize(int denormalized) {
-            denormalized -= offset;
-            //clamp
-            denormalized = Math.max(0, Math.min(denormalized, steps) );
-            //repeat
-            denormalized = (denormalized) % (steps+1);
-            
-            return ( denormalized / (float) steps );
-        }
-    }   
-    
+        }       
 
-    
-    public static void main(String... args) {
-        
-        final float[] norms = { 0.0f, 0.5f, 1.0f };
-        final int[] denorms = { 4, 8 };
-        
-        Float1D2 f = new Float1D2(4, 8);
-        //Float1D2 f = new Float1D2(0, 4);
-        //Float1D f = new Float1D(4);
+        @Override
+        public int getOffset() {
+            return offset;
+        }         
 
-        final float[] factor = new float[1];
-        for(int i=0; i<3; i++) {
-            final float norm = norms[i];
-            final int denorm  = f.denormalize(norm, factor, 0);
-            System.out.printf("Norm: %f -> DeNorm: %d (Factor: %f) -> Norm: %f\n", norm, denorm, factor[0], f.normalize(denorm) + factor[0]*f.getStepSize());            
+        @Override
+        public double normalize(int value) {
+            return super.normalize( value - offset );
+        }
+
+        @Override
+        public int inverse(double norm) {
+            return super.inverse( norm ) + offset;
         }
         
+        @Override
+        public int inverse(double norm, double[] factor, int index) {
+            final int invNorm = super.inverse(norm, factor, index);
+            factor[index] += offset;
+            return invNorm;
+        }       
         
+    }    
+    
         
+    static class FromToWrapped extends FromTo {
+
+        FromToWrapped(final int start, final int end) { super(start, end); }
+
+        @Override
+        public int clamp(int value) {
+            return Math.max(0, Math.min( value, steps) );
+        }                                     
+    }
+
+    static class FromToRepeated extends FromTo {
+
+        FromToRepeated(final int start, final int end) { super(start, end); }
+
+        @Override
+        public int clamp(int value) {
+            return value % (steps+1);            
+        }       
     }
     
 }
