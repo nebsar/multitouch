@@ -26,8 +26,17 @@ package de.telekom.laboratories.multitouch;
 public class BlobColoring {
     
     public interface Blobs {
-        boolean at(int x, int y);
+        boolean get(int x, int y);
     }
+    
+    public interface Labels {
+        int label();
+        
+        int x();
+        int y();
+        
+        void set(int x, int y, int label);
+    }    
     
     private final int width, height;
     private final boolean[] blobs;
@@ -58,9 +67,11 @@ public class BlobColoring {
         for(int y=0; y<height; y++) {
             final int offset = y*width;
             for(int x=0; x<width; x++) {
-                blobs[offset+x] = state.at(x,y);
+                blobs[offset+x] = state.get(x,y);
             }
         }
+        
+        foo();
     }    
     
     
