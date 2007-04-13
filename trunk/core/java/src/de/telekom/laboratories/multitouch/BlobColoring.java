@@ -18,14 +18,27 @@
 
 package de.telekom.laboratories.multitouch;
 
+
+
+
 /**
  *
  * @author Michael Nischt
  * @version 0.1
  */
-public class BlobColoring {
+public class BlobColoring { 
     
+    //Input: Scanlines, 2 form a step, there are (height-1) steps, with each length equals to (width)
+    public interface ScanLine {
+        void copy(boolean[] target);
+    }
+    
+
     public interface Blobs {
+        
+    }
+    
+    public interface Image {
         boolean get(int x, int y);
     }
     
@@ -39,8 +52,9 @@ public class BlobColoring {
     }    
     
     private final int width, height;
-    private final boolean[] blobs;
+    private final boolean[][] scanLines;
     
+    private final boolean[] blobs;    
     
     public BlobColoring(int width, int height) throws IllegalArgumentException {
         if(width < 1 || height < 1) {
@@ -50,6 +64,8 @@ public class BlobColoring {
         this.height = height;
         
         blobs = new boolean[width * height];
+        
+        scanLines = new boolean[2][width];
     }
     
     public int getWidth() {
@@ -61,7 +77,7 @@ public class BlobColoring {
     }
     
     
-    public void update(Blobs state) { // readAndDispatch();
+    public void update(Image state) { // readAndDispatch();
         final int width = this.width, height = this.height;
         
         for(int y=0; y<height; y++) {
@@ -172,6 +188,18 @@ public class BlobColoring {
                 }
             }
         }        
+    }
+    
+    
+    public static void main(String... args) {
+        
+        final BlobColoring blobColoring = new BlobColoring( 8, 8 );
+
+        
+        
+        
+        
+        
     }
     
 }
