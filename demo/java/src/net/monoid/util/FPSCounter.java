@@ -108,7 +108,7 @@ public class FPSCounter {
     private int averageFrameCount = 100;
     
     // flag to indicate the counter has been started
-    private boolean started = true;
+    private boolean started;// = true;
     
     private long lastTime;          // last system nanos measured
     private long frameCount;        // elapsed frames since the last averageFrameCount occurence
@@ -156,6 +156,15 @@ public class FPSCounter {
      */
     public void setAverageFrameCount(int avgFrameCount) {
         this.averageFrameCount = avgFrameCount;
+    }
+    
+    
+    /**
+     * Returns <code>true</code>, if the counter has been started.
+     * @return <code>true</code>, if the counter has been started.
+     */
+    public boolean isCounting() {
+        return started;
     }
     
     /**
