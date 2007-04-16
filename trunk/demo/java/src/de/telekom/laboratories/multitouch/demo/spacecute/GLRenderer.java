@@ -64,6 +64,7 @@ public class GLRenderer {
     private Mask mask = new Mask();
     private Background background = new Background();    
     private Ship ship = new Ship();
+    private Cute cute = new Cute();
     private Planet planet = new Planet();
     private Title title = new Title();
 
@@ -259,7 +260,9 @@ public class GLRenderer {
         
         //ship.render(gl, width, height);
         
-        planet.render(gl, width, height);
+        //planet.render(gl, width, height);
+        
+        cute.render(gl, width, height);
         
         //title.render(gl, width, height);
         
@@ -272,6 +275,167 @@ public class GLRenderer {
     }
         
 }
+
+
+// <editor-fold defaultstate="collapsed" desc=" Cute ">
+
+class Cute {
+    
+    // <editor-fold defaultstate="collapsed" desc=" Varaibles ">
+        
+    final int cute = 5;
+    
+    private int program, sizeLOC, centerLOC;
+    private int vBuffer;
+    private final int[] textures = new int[6];
+    
+    // </editor-fold>
+    
+    // <editor-fold defaultstate="collapsed" desc=" Initializers ">    
+    
+    public Cute() {
+    }
+    
+    // </editor-fold>
+    
+    // <editor-fold defaultstate="collapsed" desc=" Methods ">
+    
+    private int arrayBuffer(GL gl) {
+
+        final int vertices = 4;
+
+        final float ext = 0.5f;//1.0f
+        
+        final FloatBuffer vertexData = ByteBuffer.allocateDirect( 4*(2+2) * vertices ).order(nativeOrder()).asFloatBuffer();
+        vertexData.put( 1.0f ).put( 0.0f );
+        vertexData.put( +ext ).put( +ext );
+        vertexData.put( 0.0f ).put( 0.0f );
+        vertexData.put( -ext ).put( +ext );
+        vertexData.put( 0.0f ).put( 1.0f );
+        vertexData.put( -ext ).put( -ext );
+        vertexData.put( 1.0f ).put( 1.0f );
+        vertexData.put( +ext ).put( -ext );
+        vertexData.rewind();
+
+        final int[] buffers = new int[1];
+        gl.glGenBuffers(1, buffers, 0);
+
+        final int vBuffer = buffers[0];
+        gl.glBindBuffer(GL_ARRAY_BUFFER, vBuffer);
+        gl.glBufferData(GL_ARRAY_BUFFER, vertexData.capacity()*4, vertexData, GL_STATIC_DRAW);
+        gl.glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
+
+        return vBuffer;
+    }    
+    
+    private int texture(GL gl, int cute) {
+
+        final String[] cuties = { "SuseSaturn", "MilaMercury", "JuleJupiter", "PiyaPluto", "VeraVenus", "MikaMars" };
+        
+        final URL texURL = Title.class.getResource("/com/lostgarden/spacecute/cuties/" + cuties[cute] + ".png");
+        try {
+              final Texture tex = TextureIO.newTexture( texURL, true, "png" );// false, "png");
+              tex.setTexParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);//GL_LINEAR);
+              tex.setTexParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+              tex.setTexParameteri(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+              tex.setTexParameteri(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+              return tex.getTextureObject();
+        } catch(IOException ioe) {
+            throw new GLException(String.format("Error loading: %s", texURL.toExternalForm()), ioe);
+        }
+    }
+    
+    private int program(GL gl) {
+        final URL vertURL = Mask.class.getResource( "/de/telekom/laboratories/multitouch/demo/spacecute/Cute.vert" );
+        final URL fragURL = Mask.class.getResource( "/de/telekom/laboratories/multitouch/demo/spacecute/Cute.frag" );
+        return GLUtils.program(gl, vertURL, fragURL);
+    }    
+    
+    public void render(GL gl, int width, int height) {        
+       
+        // <editor-fold defaultstate="collapsed" desc=" Init ">
+        
+        if(!gl.glIsTexture(textures[cute])) {
+            textures[cute] = texture(gl, cute);
+        }
+        
+        if(!gl.glIsProgram(program)) {
+            program = program(gl);
+            gl.glUseProgram(program);
+            {
+                final int texLOC = gl.glGetUniformLocation( program, "texture" );
+                if(texLOC >= 0) {
+                    final int texUnit = 0;
+                    gl.glUniform1i(texLOC, 0); // Texture-Unit: 0
+                }
+                
+                sizeLOC = gl.glGetUniformLocation( program, "size" );
+                centerLOC = gl.glGetUniformLocation( program, "center" );
+            }
+            gl.glUseProgram(GL_NONE);
+        }  
+        
+        if(!gl.glIsBuffer(vBuffer)) {
+            vBuffer = arrayBuffer(gl);
+        }       
+        
+        // </editor-fold>        
+        
+
+        gl.glEnable(GL_BLEND);
+        gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        gl.glBlendEquation(GL_ADD);
+
+
+
+        gl.glUseProgram( program );
+
+        final float[] size = { 0.260f, 0.295f };
+        if(sizeLOC >= 0) {
+            gl.glUniform2fv(sizeLOC, 1, size, 0);
+        }
+        final float[] center = { -0.0f, -0.0f };
+        
+        if(centerLOC >= 0) {
+            gl.glUniform2fv(centerLOC, 1, center, 0);
+        }        
+        
+        final int texture = textures[cute];
+        final int vertices = 4;
+
+        gl.glEnableClientState(GL_VERTEX_ARRAY);
+        gl.glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
+        gl.glBindBuffer(GL_ARRAY_BUFFER, vBuffer);
+        gl.glTexCoordPointer(2, GL_FLOAT, (2+2)*4, 0);
+        gl.glVertexPointer(2, GL_FLOAT, (2+2)*4, 2*4);
+
+        
+        
+        //gl.glActiveTexture(GL_TEXTURE0); // Texture-Unit: 0
+        gl.glBindTexture(GL_TEXTURE_2D, texture);
+               
+        gl.glDrawArrays(GL_TRIANGLE_FAN, 0 , vertices);
+
+        
+        gl.glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
+
+        gl.glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+        gl.glDisableClientState(GL_VERTEX_ARRAY);
+
+        gl.glBindTexture(GL_TEXTURE_2D, GL_NONE);
+
+
+        gl.glUseProgram( GL_NONE );
+
+        gl.glDisable(GL_BLEND);        
+        
+    }
+    
+    // </editor-fold> 
+}
+
+// </editor-fold>
 
 // <editor-fold defaultstate="collapsed" desc=" Ship ">
 
