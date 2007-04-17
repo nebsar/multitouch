@@ -256,18 +256,26 @@ public class GLRenderer {
         gl.glEnd();
         
                 
-        //background.render(gl, width, height );
-        
-        //ship.render(gl, width, height);
-        
-        //planet.render(gl, width, height);
-        
-        cute.render(gl, width, height);
-        
-        //title.render(gl, width, height);
+        objects(gl, width, height);
         
         mask.render(gl, width, height);
+
+    }
+    
+    private void objects(GL gl, int width, int height) {
+        //background.render(gl, width, height );
         
+        float x,y,orientation;
+                
+        planet.render(gl, GLGameUtils.transform(x=y=orientation=0.0f, y, orientation),
+                          GLGameUtils.transform(x=+0.5f, y, orientation));
+        
+        ship.render(gl, GLGameUtils.transform(x=y=-0.4f,y,orientation=-1.0f));
+        
+        cute.render(gl, GLGameUtils.transform(x=y=+0.5f,y, orientation=0.0f),
+                        GLGameUtils.transform(x=-0.5f,  y, orientation=0.1f));
+        
+        //title.render(gl, width, height);                        
     }
     
     public static void main(String... args) {
@@ -283,11 +291,16 @@ class Cute {
     
     // <editor-fold defaultstate="collapsed" desc=" Varaibles ">
         
-    final int cute = 5;
+    private int cute = 5;
+    private final float[] transform = new float[16];
     
-    private int program, sizeLOC, centerLOC;
+
+    private int program, transformLOC; //positionLOC, orientationLOC;
     private int vBuffer;
     private final int[] textures = new int[6];
+    
+    private final String[] cuties = { "SuseSaturn", "MilaMercury", "JuleJupiter", "PiyaPluto", "VeraVenus", "MikaMars" };        
+    private final float ext = 0.1f, ratio = 0.260f / 0.295f;
     
     // </editor-fold>
     
@@ -300,49 +313,14 @@ class Cute {
     
     // <editor-fold defaultstate="collapsed" desc=" Methods ">
     
-    private int arrayBuffer(GL gl) {
-
-        final int vertices = 4;
-
-        final float ext = 0.5f;//1.0f
-        
-        final FloatBuffer vertexData = ByteBuffer.allocateDirect( 4*(2+2) * vertices ).order(nativeOrder()).asFloatBuffer();
-        vertexData.put( 1.0f ).put( 0.0f );
-        vertexData.put( +ext ).put( +ext );
-        vertexData.put( 0.0f ).put( 0.0f );
-        vertexData.put( -ext ).put( +ext );
-        vertexData.put( 0.0f ).put( 1.0f );
-        vertexData.put( -ext ).put( -ext );
-        vertexData.put( 1.0f ).put( 1.0f );
-        vertexData.put( +ext ).put( -ext );
-        vertexData.rewind();
-
-        final int[] buffers = new int[1];
-        gl.glGenBuffers(1, buffers, 0);
-
-        final int vBuffer = buffers[0];
-        gl.glBindBuffer(GL_ARRAY_BUFFER, vBuffer);
-        gl.glBufferData(GL_ARRAY_BUFFER, vertexData.capacity()*4, vertexData, GL_STATIC_DRAW);
-        gl.glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
-
-        return vBuffer;
+    private int arrayBuffer(GL gl) {       
+        final float extX = ext*ratio, extY = ext;        
+        return GLGameUtils.rectangleArrayBuffer(gl, extX, extY);
     }    
     
-    private int texture(GL gl, int cute) {
-
-        final String[] cuties = { "SuseSaturn", "MilaMercury", "JuleJupiter", "PiyaPluto", "VeraVenus", "MikaMars" };
-        
+    private int texture(GL gl, int cute) {        
         final URL texURL = Title.class.getResource("/com/lostgarden/spacecute/cuties/" + cuties[cute] + ".png");
-        try {
-              final Texture tex = TextureIO.newTexture( texURL, true, "png" );// false, "png");
-              tex.setTexParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);//GL_LINEAR);
-              tex.setTexParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-              tex.setTexParameteri(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-              tex.setTexParameteri(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-              return tex.getTextureObject();
-        } catch(IOException ioe) {
-            throw new GLException(String.format("Error loading: %s", texURL.toExternalForm()), ioe);
-        }
+        return GLGameUtils.loadTexture(gl, texURL, true, "png");
     }
     
     private int program(GL gl) {
@@ -351,8 +329,8 @@ class Cute {
         return GLUtils.program(gl, vertURL, fragURL);
     }    
     
-    public void render(GL gl, int width, int height) {        
-       
+    public void render(GL gl, Transform... instances) {        
+               
         // <editor-fold defaultstate="collapsed" desc=" Init ">
         
         if(!gl.glIsTexture(textures[cute])) {
@@ -368,9 +346,9 @@ class Cute {
                     final int texUnit = 0;
                     gl.glUniform1i(texLOC, 0); // Texture-Unit: 0
                 }
-                
-                sizeLOC = gl.glGetUniformLocation( program, "size" );
-                centerLOC = gl.glGetUniformLocation( program, "center" );
+                //positionLOC = gl.glGetUniformLocation( program, "position" );
+                //orientationLOC = gl.glGetUniformLocation( program, "orientation" );
+                transformLOC = gl.glGetUniformLocation( program, "transform" );
             }
             gl.glUseProgram(GL_NONE);
         }  
@@ -386,19 +364,7 @@ class Cute {
         gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         gl.glBlendEquation(GL_ADD);
 
-
-
         gl.glUseProgram( program );
-
-        final float[] size = { 0.260f, 0.295f };
-        if(sizeLOC >= 0) {
-            gl.glUniform2fv(sizeLOC, 1, size, 0);
-        }
-        final float[] center = { -0.0f, -0.0f };
-        
-        if(centerLOC >= 0) {
-            gl.glUniform2fv(centerLOC, 1, center, 0);
-        }        
         
         final int texture = textures[cute];
         final int vertices = 4;
@@ -411,12 +377,16 @@ class Cute {
         gl.glVertexPointer(2, GL_FLOAT, (2+2)*4, 2*4);
 
         
-        
-        //gl.glActiveTexture(GL_TEXTURE0); // Texture-Unit: 0
-        gl.glBindTexture(GL_TEXTURE_2D, texture);
-               
-        gl.glDrawArrays(GL_TRIANGLE_FAN, 0 , vertices);
+        for(Transform instance : instances) {
+            instance.to(transform);
+            if(transformLOC >= 0) {
+                gl.glUniformMatrix4fv(transformLOC, 1, true, transform, 0);
+            }
+            //gl.glActiveTexture(GL_TEXTURE0); // Texture-Unit: 0
+            gl.glBindTexture(GL_TEXTURE_2D, texture);
 
+            gl.glDrawArrays(GL_TRIANGLE_FAN, 0 , vertices);
+        }
         
         gl.glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
 
@@ -443,11 +413,23 @@ class Ship {
     
     // <editor-fold defaultstate="collapsed" desc=" Varaibles ">
         
-    final int ship = 0;
+    private int ship = 0;
     
-    private int program, sizeLOC, centerLOC;
-    private int vBuffer;
+    private final float[] transform = new float[16];
+    
+    
+    private int program, transformLOC;
+    private int[] vBuffers = new int [3];
     private final int[][] textures = new int[3][3];
+    
+    // rocket, beetle, octopus
+    private final String[] ships = { "rocket", "beetle", "octopus" };    
+    private final float[] ext    = {     0.1f,     0.1f,     0.1f  };
+    private final float[] ratio  = { 0.719f / 0.238f, 0.465f / 0.271f, 0.547f / 0.249f };
+    
+    private final String[] types = { "Moving", "Still", "Shadow" };
+
+    
     
     // </editor-fold>
     
@@ -460,50 +442,15 @@ class Ship {
     
     // <editor-fold defaultstate="collapsed" desc=" Methods ">
     
-    private int arrayBuffer(GL gl) {
-
-        final int vertices = 4;
-
-        final float ext = 0.15f;//1.0f
-        
-        final FloatBuffer vertexData = ByteBuffer.allocateDirect( 4*(2+2) * vertices ).order(nativeOrder()).asFloatBuffer();
-        vertexData.put( 1.0f ).put( 0.0f );
-        vertexData.put( +ext ).put( +ext );
-        vertexData.put( 0.0f ).put( 0.0f );
-        vertexData.put( -ext ).put( +ext );
-        vertexData.put( 0.0f ).put( 1.0f );
-        vertexData.put( -ext ).put( -ext );
-        vertexData.put( 1.0f ).put( 1.0f );
-        vertexData.put( +ext ).put( -ext );
-        vertexData.rewind();
-
-        final int[] buffers = new int[1];
-        gl.glGenBuffers(1, buffers, 0);
-
-        final int vBuffer = buffers[0];
-        gl.glBindBuffer(GL_ARRAY_BUFFER, vBuffer);
-        gl.glBufferData(GL_ARRAY_BUFFER, vertexData.capacity()*4, vertexData, GL_STATIC_DRAW);
-        gl.glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
-
-        return vBuffer;
+    private int arrayBuffer(GL gl, int ship) {
+        final float ext = this.ext[ship];
+        final float extX = ext*ratio[ship], extY = ext;
+        return GLGameUtils.rectangleArrayBuffer(gl, extX, extY);
     }    
     
-    private int texture(GL gl, int ship, int type) {
-
-        final String[] ships = { "rocket", "beetle", "octopus" };
-        final String[] types = { "Moving", "Still", "Shadow" };
-        
+    private int texture(GL gl, int ship, int type) {        
         final URL texURL = Title.class.getResource("/com/lostgarden/spacecute/ships/" + ships[ship] + "/" + types[type] + ".png");
-        try {
-              final Texture tex = TextureIO.newTexture( texURL, true, "png" );// false, "png");
-              tex.setTexParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);//GL_LINEAR);
-              tex.setTexParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-              tex.setTexParameteri(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-              tex.setTexParameteri(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-              return tex.getTextureObject();
-        } catch(IOException ioe) {
-            throw new GLException(String.format("Error loading: %s", texURL.toExternalForm()), ioe);
-        }
+        return GLGameUtils.loadTexture(gl, texURL, true, "png");
     }
     
     private int program(GL gl) {
@@ -512,7 +459,7 @@ class Ship {
         return GLUtils.program(gl, vertURL, fragURL);
     }    
     
-    public void render(GL gl, int width, int height) {        
+    public void render(GL gl, Transform... instances) {        
 
         final int[] shipTextures = textures[ship];        
         
@@ -532,20 +479,19 @@ class Ship {
                 if(texLOC >= 0) {
                     final int texUnit = 0;
                     gl.glUniform1i(texLOC, 0); // Texture-Unit: 0
-                }
-                
-                sizeLOC = gl.glGetUniformLocation( program, "size" );
-                centerLOC = gl.glGetUniformLocation( program, "center" );
+                }                
+                transformLOC = gl.glGetUniformLocation( program, "transform" );
             }
             gl.glUseProgram(GL_NONE);
         }  
         
-        if(!gl.glIsBuffer(vBuffer)) {
-            vBuffer = arrayBuffer(gl);
+        if(!gl.glIsBuffer(vBuffers[ship])) {
+            vBuffers[ship] = arrayBuffer(gl, ship);
         }       
         
         // </editor-fold>        
         
+        final int vBuffer = vBuffers[ship];
 
         gl.glEnable(GL_BLEND);
         gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -555,17 +501,6 @@ class Ship {
 
         gl.glUseProgram( program );
 
-        final float[][] sizes = 
-        {            
-            { 0.719f, 0.238f },
-            { 0.465f, 0.271f },
-            { 0.547f, 0.249f },
-        };
-        if(sizeLOC >= 0) {
-            gl.glUniform2fv(sizeLOC, 1, sizes[ship], 0);
-        }
-        
-        
         final int vertices = 4;
 
         gl.glEnableClientState(GL_VERTEX_ARRAY);
@@ -575,35 +510,46 @@ class Ship {
         gl.glTexCoordPointer(2, GL_FLOAT, (2+2)*4, 0);
         gl.glVertexPointer(2, GL_FLOAT, (2+2)*4, 2*4);
 
-        
-        final float[] center = { -0.01f, -0.015f };
-        
-        if(centerLOC >= 0) {
-            gl.glUniform2fv(centerLOC, 1, center, 0);
-        }        
-        
-        //gl.glActiveTexture(GL_TEXTURE0); // Texture-Unit: 0
-        gl.glBindTexture(GL_TEXTURE_2D, shipTextures[2]);
-               
-        gl.glDrawArrays(GL_TRIANGLE_FAN, 0 , vertices);
+                
+        for(Transform instance : instances) {
+            instance.to(transform);
+            
+            { // first pass: shadow
+                if(transformLOC >= 0) {
+                    gl.glMatrixMode(GL_MODELVIEW);
+                    gl.glPushMatrix();
+                    gl.glLoadIdentity();
+                    gl.glTranslatef(0.0f, -0.05f, 0.0f); // shadow
+                    gl.glMultTransposeMatrixf(transform, 0);
+                    gl.glGetFloatv(GL_TRANSPOSE_MODELVIEW_MATRIX, transform, 0);
+                    gl.glPopMatrix();                    
+                    gl.glUniformMatrix4fv(transformLOC, 1, true, transform, 0);
+                }        
 
-        if(centerLOC >= 0) {
-            gl.glUniform2f(centerLOC, 0.0f, 0.0f);
-        }          
-        
-        //gl.glActiveTexture(GL_TEXTURE0); // Texture-Unit: 0
-        gl.glBindTexture(GL_TEXTURE_2D, shipTextures[0]);
-               
-        gl.glDrawArrays(GL_TRIANGLE_FAN, 0 , vertices);
-        
-        
+                //gl.glActiveTexture(GL_TEXTURE0); // Texture-Unit: 0
+                gl.glBindTexture(GL_TEXTURE_2D, shipTextures[2]);
+
+                gl.glDrawArrays(GL_TRIANGLE_FAN, 0 , vertices);
+            }
+
+            instance.to(transform);
+            { // second pass: ship (still or moving                
+                if(transformLOC >= 0) {
+                    gl.glUniformMatrix4fv(transformLOC, 1, true, transform, 0);
+                }          
+
+                //gl.glActiveTexture(GL_TEXTURE0); // Texture-Unit: 0
+                gl.glBindTexture(GL_TEXTURE_2D, shipTextures[0]);
+
+                gl.glDrawArrays(GL_TRIANGLE_FAN, 0 , vertices);
+            }
+        }
         gl.glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
 
         gl.glDisableClientState(GL_TEXTURE_COORD_ARRAY);
         gl.glDisableClientState(GL_VERTEX_ARRAY);
 
         gl.glBindTexture(GL_TEXTURE_2D, GL_NONE);
-
 
         gl.glUseProgram( GL_NONE );
 
@@ -624,7 +570,9 @@ class Planet {
     
     // <editor-fold defaultstate="collapsed" desc=" Varaibles ">
         
-    private int program, sizeLOC, centerLOC;;
+    private final float[] transform = new float[16];    
+    
+    private int program, transformLOC;
     private int vBuffer;
     private final int[] textures = new int[2];
     
@@ -640,49 +588,15 @@ class Planet {
     // <editor-fold defaultstate="collapsed" desc=" Methods ">
     
     private int arrayBuffer(GL gl) {
-
-        final int vertices = 4;
-
-        final float ext = 1.0f;
-        
-        final FloatBuffer vertexData = ByteBuffer.allocateDirect( 4*(2+2) * vertices ).order(nativeOrder()).asFloatBuffer();
-        vertexData.put( 1.0f ).put( 0.0f );
-        vertexData.put( +ext ).put( +ext );
-        vertexData.put( 0.0f ).put( 0.0f );
-        vertexData.put( -ext ).put( +ext );
-        vertexData.put( 0.0f ).put( 1.0f );
-        vertexData.put( -ext ).put( -ext );
-        vertexData.put( 1.0f ).put( 1.0f );
-        vertexData.put( +ext ).put( -ext );
-        vertexData.rewind();
-
-        final int[] buffers = new int[1];
-        gl.glGenBuffers(1, buffers, 0);
-
-        final int vBuffer = buffers[0];
-        gl.glBindBuffer(GL_ARRAY_BUFFER, vBuffer);
-        gl.glBufferData(GL_ARRAY_BUFFER, vertexData.capacity()*4, vertexData, GL_STATIC_DRAW);
-        gl.glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
-
-        return vBuffer;
+        final float ext = 0.2f;
+        final float extX = ext, extY = ext;
+        return GLGameUtils.rectangleArrayBuffer(gl, extX, extY);
     }    
     
     private int texture(GL gl, int type) {
-
-        final String[] types = { "Planet", "Shadow" };
-        
+        final String[] types = { "Planet", "Shadow" };        
         final URL texURL = Title.class.getResource("/com/lostgarden/spacecute/planets/green/" + types[type] + ".png");
-
-        try {
-              final Texture tex = TextureIO.newTexture( texURL, false, "png" );
-              tex.setTexParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-              tex.setTexParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-              tex.setTexParameteri(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-              tex.setTexParameteri(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-              return tex.getTextureObject();
-        } catch(IOException ioe) {
-            throw new GLException(String.format("Error loading: %s", texURL.toExternalForm()), ioe);
-        }
+        return GLGameUtils.loadTexture(gl, texURL, true, "png");
     }
     
     private int program(GL gl) {
@@ -691,7 +605,7 @@ class Planet {
         return GLUtils.program(gl, vertURL, fragURL);
     }    
     
-    public void render(GL gl, int width, int height) {
+    public void render(GL gl, Transform... instances) {
         
         // <editor-fold defaultstate="collapsed" desc=" Init ">
         
@@ -710,8 +624,7 @@ class Planet {
                     final int texUnit = 0;
                     gl.glUniform1i(texLOC, 0); // Texture-Unit: 0
                 }
-                sizeLOC = gl.glGetUniformLocation( program, "size" );
-                centerLOC = gl.glGetUniformLocation( program, "center" );                
+                transformLOC = gl.glGetUniformLocation( program, "transform" );
             }
             gl.glUseProgram(GL_NONE);
         }  
@@ -731,15 +644,6 @@ class Planet {
 
         gl.glUseProgram( program );
         
-        if(sizeLOC >= 0) {
-            gl.glUniform2f(sizeLOC, 0.25f, 0.25f);
-        }        
-
-        //gl.glActiveTexture(GL_TEXTURE0); // Texture-Unit: 0
-        gl.glBindTexture(GL_TEXTURE_2D, textures[0]);
-
-
-
         final int vertices = 4;
 
         gl.glEnableClientState(GL_VERTEX_ARRAY);
@@ -750,32 +654,42 @@ class Planet {
         gl.glVertexPointer(2, GL_FLOAT, (2+2)*4, 2*4);
 
         
-        final float[] center = { -0.0f, -0.075f };
-        
-        if(centerLOC >= 0) {
-            gl.glUniform2fv(centerLOC, 1, center, 0);
-        }        
-        
-        //gl.glActiveTexture(GL_TEXTURE0); // Texture-Unit: 0
-        gl.glBindTexture(GL_TEXTURE_2D, textures[1]);        
-        
-        gl.glDrawArrays(GL_TRIANGLE_FAN, 0 , vertices);
+        for(Transform instance : instances) {
+            instance.to(transform);
+            
+            { // first pass: shadow
+                if(transformLOC >= 0) {
+                    gl.glMatrixMode(GL_MODELVIEW);
+                    gl.glPushMatrix();
+                    gl.glLoadIdentity();
+                    gl.glTranslatef(0.0f, -0.05f, 0.0f); // shadow
+                    gl.glMultTransposeMatrixf(transform, 0);
+                    gl.glGetFloatv(GL_TRANSPOSE_MODELVIEW_MATRIX, transform, 0);
+                    gl.glPopMatrix();                    
+                    gl.glUniformMatrix4fv(transformLOC, 1, true, transform, 0);           
+                }      
 
-        
-        if(centerLOC >= 0) {
-            gl.glUniform2f(centerLOC, 0.0f, 0.0f);
-        }        
-        
-        //gl.glActiveTexture(GL_TEXTURE0); // Texture-Unit: 0
-        gl.glBindTexture(GL_TEXTURE_2D, textures[0]);        
-        
-        gl.glDrawArrays(GL_TRIANGLE_FAN, 0 , vertices);
-        
-        
-        
+                //gl.glActiveTexture(GL_TEXTURE0); // Texture-Unit: 0
+                gl.glBindTexture(GL_TEXTURE_2D, textures[1]);
+
+                gl.glDrawArrays(GL_TRIANGLE_FAN, 0 , vertices);
+            }
+
+            instance.to(transform);            
+            { // second pass: ship (still or moving                
+                if(transformLOC >= 0) {                    
+                    gl.glUniformMatrix4fv(transformLOC, 1, true, transform, 0);
+                }          
+
+                //gl.glActiveTexture(GL_TEXTURE0); // Texture-Unit: 0
+                gl.glBindTexture(GL_TEXTURE_2D, textures[0]);
+
+                gl.glDrawArrays(GL_TRIANGLE_FAN, 0 , vertices);
+            }    
+        }
+
         
         gl.glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
-
 
         gl.glDisableClientState(GL_TEXTURE_COORD_ARRAY);
         gl.glDisableClientState(GL_VERTEX_ARRAY);
@@ -1262,9 +1176,173 @@ class Mask {
 
 // </editor-fold>
 
+
+class Transform {
+    // row-major    
+    private final float[] matrix;
+    private final int offset;
+
+    public Transform() {
+        this.matrix = new float[] {
+            1.0f, 0.0f, 0.0f, 0.0f, 
+            0.0f, 1.0f, 0.0f, 0.0f, 
+            0.0f, 0.0f, 1.0f, 0.0f, 
+            0.0f, 0.0f, 0.0f, 1.0f, 
+        };
+        this.offset = 0;
+    }
+
+    public Transform(float[] matrix) {
+        this(matrix, 0);
+    }
+    
+    public Transform(float[] matrix, int offset) {
+        if(offset < 0 ||matrix.length<offset+16) {
+            throw new IllegalArgumentException();
+        }
+        this.matrix = matrix;
+        this.offset = offset;
+    }
+    
+    public Transform from(float x, float y, float orientation) {
+        float cos = (float) cos(orientation);
+        float sin = (float) sin(orientation);
+
+        FloatBuffer.wrap(matrix, offset, 16)
+        .put( cos ). put( sin ). put( 0 ). put( x )
+        .put(-sin ). put( cos ). put( 0 ). put( y )
+        .put(  0  ). put(  0  ). put( 1 ). put( 0 )
+        .put(  0  ). put(  0  ). put( 0 ). put( 1 );
+
+        return this;
+    }    
+
+    public Transform from(float x, float y) {            
+        FloatBuffer.wrap(matrix, offset, 16)
+        .put(  1  ). put(  0  ). put( 0 ). put( x )
+        .put(  0  ). put(  1  ). put( 0 ). put( y )
+        .put(  0  ). put(  0  ). put( 1 ). put( 0 )
+        .put(  0  ). put(  0  ). put( 0 ). put( 1 );
+
+        return this;
+    }
+    
+    public Transform from(float orientation) {
+        float cos = (float) cos(orientation);
+        float sin = (float) sin(orientation);
+
+        FloatBuffer.wrap(matrix, offset, 16)
+        .put( cos ). put( sin ). put( 0 ). put( 0 )
+        .put(-sin ). put( cos ). put( 0 ). put( 0 )
+        .put(  0  ). put(  0  ). put( 1 ). put( 0 )
+        .put(  0  ). put(  0  ). put( 0 ). put( 1 );
+
+        return this;
+    }
+    
+    public void to(float[] matrix) {
+        to(matrix, 0);
+    }
+    public void to(float[] matrix, int offset) {
+        System.arraycopy(this.matrix, this.offset, matrix, offset, 16);
+    }
+}
+
+
+// <editor-fold defaultstate="collapsed" desc=" GLGameUtils ">
+
+class GLGameUtils {    
+            
+    public static Transform transform(float x, float y) {
+        return new Transform().from(x, y);
+    }
+
+    public static Transform transform(float orientation) {
+        return new Transform().from(orientation);
+    }
+
+    public static Transform transform(float x, float y, float orientation) {
+        return new Transform().from(x, y, orientation);
+    }
+    
+    
+    public static int rectangleArrayBuffer(GL gl, float extX, float extY) throws GLException {
+        final int vertices = 4;
+
+        final float ext = 0.15f;//1.0f
+        
+        final FloatBuffer vertexData = ByteBuffer.allocateDirect( 4*(2+2) * vertices ).order(nativeOrder()).asFloatBuffer();
+        vertexData.put( 1.0f  ).put( 0.0f  );
+        vertexData.put( +extX ).put( +extY );
+        vertexData.put( 0.0f  ).put( 0.0f  );
+        vertexData.put( -extX ).put( +extY );
+        vertexData.put( 0.0f  ).put( 1.0f  );
+        vertexData.put( -extX ).put( -extY );
+        vertexData.put( 1.0f  ).put( 1.0f  );
+        vertexData.put( +extX ).put( -extY );
+        vertexData.rewind();
+        
+        final int[] buffers = new int[1];
+        gl.glGenBuffers(1, buffers, 0);
+
+        final int vBuffer = buffers[0];
+        gl.glBindBuffer(GL_ARRAY_BUFFER, vBuffer);
+        gl.glBufferData(GL_ARRAY_BUFFER, vertexData.capacity()*4, vertexData, GL_STATIC_DRAW);
+        gl.glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
+
+        return vBuffer;
+    }    
+    
+    public static int loadTexture(GL gl, URL texURL, boolean mipmap, String fileType) throws GLException{
+        try {
+              final Texture tex = TextureIO.newTexture( texURL, mipmap, fileType);
+              if(mipmap) {
+                tex.setTexParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+              } else {
+                  tex.setTexParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+              }
+              tex.setTexParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+              tex.setTexParameteri(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+              tex.setTexParameteri(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+              return tex.getTextureObject();
+        } catch(IOException ioe) {
+            throw new GLException(String.format("Error loading: %s", texURL.toExternalForm()), ioe);
+        }        
+    }
+}
+
+// </editor-fold>
+
 // <editor-fold defaultstate="collapsed" desc=" GLUtils ">
 
 class GLUtils {
+    
+    public static int rectangleArrayBuffer(GL gl, float extX, float extY) throws GLException {
+        final int vertices = 4;
+
+        final float ext = 0.15f;//1.0f
+        
+        final FloatBuffer vertexData = ByteBuffer.allocateDirect( 4*(2+2) * vertices ).order(nativeOrder()).asFloatBuffer();
+        vertexData.put( 1.0f  ).put( 0.0f  );
+        vertexData.put( +extX ).put( +extY );
+        vertexData.put( 0.0f  ).put( 0.0f  );
+        vertexData.put( -extX ).put( +extY );
+        vertexData.put( 0.0f  ).put( 1.0f  );
+        vertexData.put( -extX ).put( -extY );
+        vertexData.put( 1.0f  ).put( 1.0f  );
+        vertexData.put( +extX ).put( -extY );
+        vertexData.rewind();
+        
+        final int[] buffers = new int[1];
+        gl.glGenBuffers(1, buffers, 0);
+
+        final int vBuffer = buffers[0];
+        gl.glBindBuffer(GL_ARRAY_BUFFER, vBuffer);
+        gl.glBufferData(GL_ARRAY_BUFFER, vertexData.capacity()*4, vertexData, GL_STATIC_DRAW);
+        gl.glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
+
+        return vBuffer;
+    }
     
     public static String source(String resource, ClassLoader finder) throws GLException {
         final URL url = finder.getResource(resource);
