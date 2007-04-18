@@ -18,6 +18,8 @@ package de.telekom.laboratories.multitouch.demo.spacecute;
 
 import com.sun.opengl.util.texture.TextureData;
 import com.sun.opengl.util.texture.TextureIO;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.IOException;
 import static java.lang.Math.*;
 import java.nio.ByteBuffer;
@@ -50,6 +52,7 @@ import java.nio.charset.Charset;
 import javax.media.opengl.GLException;
 
 import net.monoid.util.FPSCounter;
+import net.monoid.util.RangeWarp;
 
 
 /**
@@ -67,6 +70,9 @@ public class GLRenderer {
     private Cute cute = new Cute();
     private Planet planet = new Planet();
     private Title title = new Title();
+    
+    final Camera cam = new Camera();
+
 
     // </editor-fold>
     
@@ -76,7 +82,7 @@ public class GLRenderer {
         
         final Runnable init = new Runnable() {
             public void run() {
-                final boolean fullscreen = false;
+                final boolean fullscreen = true;
                 final int screen = 0;
                 final int width = 768, height = 768;
                 
@@ -198,6 +204,39 @@ public class GLRenderer {
                 
                 frame.setVisible(true);
                 
+                canvas.addKeyListener(new KeyListener() {
+                    public void keyPressed(KeyEvent e) {
+                        if(e.getKeyCode() == KeyEvent.VK_LEFT){
+                            cam.setX( cam.getX() - 0.0075f);
+                        }
+                        if(e.getKeyCode() == KeyEvent.VK_RIGHT){
+                            cam.setX( cam.getX() + 0.0075f);
+                        }
+                        if(e.getKeyCode() == KeyEvent.VK_UP){
+                            cam.setY( cam.getY() + 0.0075f);
+                        }
+                        if(e.getKeyCode() == KeyEvent.VK_DOWN){
+                            cam.setY( cam.getY() - 0.0075f);
+                        }
+                        if(e.getKeyCode() == KeyEvent.VK_PAGE_UP){
+                            cam.setZoom( cam.getZoom() + 0.0075f);
+                        }
+                        if(e.getKeyCode() == KeyEvent.VK_PAGE_DOWN){
+                            cam.setZoom( cam.getZoom() - 0.0075f);
+                        }
+                        if(e.getKeyCode() == KeyEvent.VK_INSERT){
+                            cam.setOrientation( cam.getOrientation() + 0.002f);
+                        }
+                        if(e.getKeyCode() == KeyEvent.VK_DELETE){
+                            cam.setOrientation( cam.getOrientation() - 0.002f);
+                        }
+                    }
+                    public void keyReleased(KeyEvent e) {
+                    }
+                    public void keyTyped(KeyEvent e) {
+                    }
+                });
+                
                 // </editor-fold>
             }
         };
@@ -263,7 +302,35 @@ public class GLRenderer {
     }
     
     private void objects(GL gl, int width, int height) {
+                
+        gl.glMatrixMode(GL_MODELVIEW);
+        gl.glPushMatrix();
         
+        
+        final float[] viewMatrix  = new float[16];
+        final float[] modelMatrix = new float[16];
+        
+        {            
+            final float x = -cam.getX(), y = -cam.getY();
+            final float orientation = -cam.getOrientation() * (float) PI;
+            final float zoom = (float) new RangeWarp(-1.0f, 1.0f).warpTo(cam.getZoom(), 0.25f, 1.0f);
+            
+            gl.glLoadIdentity(); 
+            
+            gl.glTranslatef( x, y, 0.0f);
+            gl.glRotatef(orientation / (float)PI * 180.0f, 0.0f, 0.0f, 1.0f);            
+            gl.glScalef(zoom, zoom, 1.0f);  
+            gl.glGetFloatv(GL_TRANSPOSE_MODELVIEW_MATRIX, viewMatrix, 0);
+            
+        }
+        
+        background.render(gl, new Transform(viewMatrix) );
+
+        
+        
+        
+       
+
 //        final float[] m = new float[16];
 //        Transform t = new Transform(m);
 //        gl.glMatrixMode(GL_MODELVIEW);
@@ -274,18 +341,23 @@ public class GLRenderer {
 //        gl.glGetFloatv(GL_TRANSPOSE_MODELVIEW_MATRIX, m, 0);
 //        System.out.println( t.getRotation() );
         
-        float x,y,orientation;
         
-        background.render(gl, GLGameUtils.transform(x=y=orientation=0.2f, y, orientation=0.3f) );
+        
         
         
                 
-        planet.render(gl, GLGameUtils.transform(x=+0.5f, y=-0.2f, orientation=-1.07f));
+//        planet.render(gl, GLGameUtils.transform(x=+0.5f, y=-0.0f, orientation=+0.0f),
+//                          GLGameUtils.transform(x=+0.5f, y=-0.0f, orientation=+0.37f),
+//                            GLGameUtils.transform(x=+0.5f, y=-0.0f, orientation=+0.75f),
+//                            GLGameUtils.transform(x=+0.5f, y=-0.0f, orientation=+1.12f),
+//                            GLGameUtils.transform(x=+0.5f, y=-0.0f, orientation=+1.57f));
+//        
+//        ship.render(gl, GLGameUtils.transform(x=y=-0.4f,y,orientation=-1.0f));
+//        
+//        cute.render(gl, GLGameUtils.transform(x=y=+0.5f,y, orientation=0.0f),
+//                        GLGameUtils.transform(x=-0.5f,  y, orientation=0.1f));
         
-        ship.render(gl, GLGameUtils.transform(x=y=-0.4f,y,orientation=-1.0f));
-        
-        cute.render(gl, GLGameUtils.transform(x=y=+0.5f,y, orientation=0.0f),
-                        GLGameUtils.transform(x=-0.5f,  y, orientation=0.1f));
+        gl.glPopMatrix();
         
         //title.render(gl, width, height);                        
     }
@@ -303,7 +375,7 @@ class Cute {
     
     // <editor-fold defaultstate="collapsed" desc=" Varaibles ">
         
-    private int cute = 5;
+    public int cute = 0;
     private final float[] transform = new float[16];
     
 
@@ -425,10 +497,11 @@ class Ship {
     
     // <editor-fold defaultstate="collapsed" desc=" Varaibles ">
         
-    private int ship = 0;
+    public int ship = 0;
     
     private final float[] transform = new float[16];
-    
+    private float[] scale = new float[2];
+
     
     private int program, transformLOC;
     private int[] vBuffers = new int [3];
@@ -436,7 +509,7 @@ class Ship {
     
     // rocket, beetle, octopus
     private final String[] ships = { "rocket", "beetle", "octopus" };    
-    private final float[] ext    = {     0.1f,     0.1f,     0.1f  };
+    private final float[] ext    = {     0.086f,     0.1f,     0.1f  };
     private final float[] ratio  = { 0.719f / 0.238f, 0.465f / 0.271f, 0.547f / 0.249f };
     
     private final String[] types = { "Still", "Moving", "Shadow" };
@@ -522,16 +595,17 @@ class Ship {
         gl.glTexCoordPointer(2, GL_FLOAT, (2+2)*4, 0);
         gl.glVertexPointer(2, GL_FLOAT, (2+2)*4, 2*4);
 
-                
+            
         for(Transform instance : instances) {
             instance.to(transform);
+            instance.getScale(scale);
             
             { // first pass: shadow
                 if(transformLOC >= 0) {
                     gl.glMatrixMode(GL_MODELVIEW);
                     gl.glPushMatrix();
                     gl.glLoadIdentity();
-                    gl.glTranslatef(0.0f, -0.05f, 0.0f); // shadow
+                    gl.glTranslatef(0.0f*scale[0], -0.05f*scale[1], 0.0f); // shadow
                     gl.glMultTransposeMatrixf(transform, 0);
                     gl.glGetFloatv(GL_TRANSPOSE_MODELVIEW_MATRIX, transform, 0);
                     gl.glPopMatrix();                    
@@ -581,6 +655,7 @@ class Planet {
     // <editor-fold defaultstate="collapsed" desc=" Varaibles ">
         
     private final float[] transform = new float[16];    
+    private final float[] scale = new float[2];
     
     private int program, transformLOC;
     private int vBuffer;
@@ -669,15 +744,15 @@ class Planet {
             final float rot = instance.getRotation();
             
             instance.to(transform);            
-            
+            instance.getScale(scale);
             { // first pass: shadow
                 if(transformLOC >= 0) {
                     gl.glMatrixMode(GL_MODELVIEW);
                     gl.glPushMatrix();
-                    gl.glLoadIdentity();
-                    gl.glTranslatef(0.0f, -0.05f, 0.0f); // shadow
-                    gl.glRotatef(180.0f*rot/(float)PI, 0,0,1);                    
+                    gl.glLoadIdentity();                    
+                    gl.glTranslatef(0.0f*scale[0], -0.05f*scale[1], 0.0f); // shadow                    
                     gl.glMultTransposeMatrixf(transform, 0);                    
+                    gl.glRotatef(180.0f*rot/(float)PI, 0,0,1);                    
                     gl.glGetFloatv(GL_TRANSPOSE_MODELVIEW_MATRIX, transform, 0);
                     gl.glPopMatrix();                    
                     gl.glUniformMatrix4fv(transformLOC, 1, true, transform, 0);           
@@ -695,8 +770,8 @@ class Planet {
                     gl.glMatrixMode(GL_MODELVIEW);
                     gl.glPushMatrix();                    
                     gl.glLoadIdentity();
-                    gl.glRotatef(180.0f*rot/(float)PI, 0,0,1);
                     gl.glMultTransposeMatrixf(transform, 0);                    
+                    gl.glRotatef(180.0f*rot/(float)PI, 0,0,1);                    
                     gl.glGetFloatv(GL_TRANSPOSE_MODELVIEW_MATRIX, transform, 0);
                     gl.glPopMatrix();
                     gl.glUniformMatrix4fv(transformLOC, 1, true, transform, 0);
@@ -729,18 +804,14 @@ class Planet {
 
 // </editor-fold>
 
+// <editor-fold defaultstate="collapsed" desc=" Star ">
 
-// <editor-fold defaultstate="collapsed" desc=" Background ">
-
-class Background {        
-        
-    
+class Star {        
+            
     // <editor-fold defaultstate="collapsed" desc=" Varaibles ">
         
     private final float[] transform = new float[16];    
-    
-    private int stars;
-    
+        
     private int program, transformLOC;
     private int vBuffer;
     private int texture;
@@ -749,7 +820,7 @@ class Background {
         
     // <editor-fold defaultstate="collapsed" desc=" Initializers ">    
     
-    public Background() {
+    public Star() {
     }
     
     // </editor-fold>    
@@ -758,50 +829,9 @@ class Background {
     
     private int arrayBuffer(GL gl) {
 
-        final int X=0, Y=1, SIZE=2;
-
-        final float[][] stars = {
-            { +0.0f, +0.0f, 0.1f  },
-            { +0.0f, +0.5f, 0.15f  },
-            { -0.2f, +0.5f, 0.1f  },
-        };    
-                      
-        
-        this.stars = stars.length;
-        
-        final int vertices = 4*stars.length; 
-        final int vSize = 4*(2+2);//size(float)*(x,y + u,v)
-        
-        final FloatBuffer vertexData = ByteBuffer.allocateDirect( vertices*vSize).order(nativeOrder()).asFloatBuffer();
-
-        // NOTE: hardware instancing with mixed streams  would be nice, 
-        // but only available in D3D yet
-        for(float[] star : stars)
-        {            
-            final float x = star[X], y = star[Y];
-            final float ext = 0.5f*star[SIZE];
-                        
-            vertexData.put( 1.0f  ).put( 0.0f  );
-            vertexData.put( x+ext ).put( y+ext );
-            vertexData.put( 0.0f  ).put( 0.0f  );
-            vertexData.put( x-ext ).put( y+ext );
-            vertexData.put( 0.0f  ).put( 1.0f  );
-            vertexData.put( x-ext ).put( y-ext );
-            vertexData.put( 1.0f  ).put( 1.0f  );
-            vertexData.put( x+ext ).put( y-ext );
-        }
-        
-        vertexData.rewind();
-
-        final int[] buffers = new int[1];
-        gl.glGenBuffers(1, buffers, 0);
-
-        final int vBuffer = buffers[0];
-        gl.glBindBuffer(GL_ARRAY_BUFFER, vBuffer);
-        gl.glBufferData(GL_ARRAY_BUFFER, vertexData.capacity()*4, vertexData, GL_STATIC_DRAW);
-        gl.glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
-
-        return vBuffer;
+        final float ext = 1.0f;
+        final float extX = ext, extY = ext;
+        return GLGameUtils.rectangleArrayBuffer(gl, extX, extY);
     }    
     
     private int texture(GL gl) {
@@ -815,7 +845,7 @@ class Background {
         return GLUtils.program(gl, vertURL, fragURL);
     }    
     
-    public void render(GL gl, Transform instance) {
+    public void render(GL gl, Transform... instances) {
        // <editor-fold defaultstate="collapsed" desc=" Init ">
         
         if(!gl.glIsTexture(texture)) {
@@ -858,23 +888,26 @@ class Background {
         gl.glTexCoordPointer(2, GL_FLOAT, (2+2)*4, 0);
         gl.glVertexPointer(2, GL_FLOAT, (2+2)*4, 2*4);
                    
+        //gl.glActiveTexture(GL_TEXTURE0); // Texture-Unit: 0
+        gl.glBindTexture(GL_TEXTURE_2D, texture);
 
-        {
-            instance.to(transform);
-            
+        for(Transform instance : instances) {
             if(transformLOC >= 0) {                    
+                instance.to(transform);
+                final float rot =instance.getRotation();
+                gl.glMatrixMode(GL_MODELVIEW);
+                gl.glPushMatrix();                    
+                //gl.glLoadIdentity();                
+                //gl.glRotatef(180.0f*rot/(float)PI, 0,0,1);
+                //gl.glMultTransposeMatrixf(transform, 0);                    
+                gl.glLoadTransposeMatrixf(transform, 0);
+                gl.glRotatef(180.0f*rot/(float)PI, 0,0,1);
+                gl.glGetFloatv(GL_TRANSPOSE_MODELVIEW_MATRIX, transform, 0);
+                gl.glPopMatrix();
                 gl.glUniformMatrix4fv(transformLOC, 1, true, transform, 0);
-            }          
-
-            //gl.glActiveTexture(GL_TEXTURE0); // Texture-Unit: 0
-            gl.glBindTexture(GL_TEXTURE_2D, texture);
-
-            for(int i=0; i<stars; i++) {
-                gl.glDrawArrays(GL_TRIANGLE_FAN, 4*i , 4);
             }
-        }    
-
-        
+            gl.glDrawArrays(GL_TRIANGLE_FAN, 0 , 4);
+        }
         gl.glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
 
         gl.glDisableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -893,6 +926,313 @@ class Background {
 }
 
 // </editor-fold>   
+
+
+// <editor-fold defaultstate="collapsed" desc=" Background ">
+
+class Background {        
+        
+    // <editor-fold defaultstate="collapsed" desc=" Varaibles ">
+    
+    private final Star star = new Star();
+    private final float[][] transforms = new float[2][16];
+        
+    // x,y,size
+    final float[][] stars = {
+        { +0.0f, +0.0f, 0.1f  },
+        { +0.0f, +0.5f, 0.15f  },
+        { -0.2f, +0.5f, 0.1f  },
+        { +0.0f, -0.5f, 0.1f  },
+        { +0.0f, -1.0f, 0.2f  },
+        { +0.2f,  1.1f, 0.08f  },
+    };        
+    
+    private final Planet planet = new Planet();
+    
+    // x,y,size
+    final float[][] planets = {
+        { +1.0f, +0.0f, 1.0f  },
+        { -.5f, -0.2f, 1.0f  },
+        { -1.5f, 1.2f, 1.2f  },
+    }; 
+    
+    private final Ship ship = new Ship();
+    
+    // x,y,size
+    final float[][] ships = {
+        { -1.0f, -.5f, 0.0f  },
+        {  .5f, +0.7f, 1.0f  },
+        {  1.5f, 1.8f, -1.2f  },
+        { -1.0f, 0.8f, -0.5f  },
+        {  1.0f, -1.6f, 0.0f  },
+        {  -2.0f, -0.6f, 0.0f  },
+    };     
+    
+    private final Cute cute = new Cute();
+    
+    // </editor-fold>
+        
+    // <editor-fold defaultstate="collapsed" desc=" Initializers ">    
+    
+    public Background() {
+    }
+    
+    // </editor-fold>    
+    
+    // <editor-fold defaultstate="collapsed" desc=" Methods ">
+    
+    // <editor-fold defaultstate="collapsed" desc=" Old ">
+    
+//    private int arrayBuffer(GL gl) {
+//
+//        final int X=0, Y=1, SIZE=2;
+//
+//
+//                      
+//        
+//        this.stars = stars.length;
+//        
+//        final int vertices = 4*stars.length; 
+//        final int vSize = 4*(2+2);//size(float)*(x,y + u,v)
+//        
+//        final FloatBuffer vertexData = ByteBuffer.allocateDirect( vertices*vSize).order(nativeOrder()).asFloatBuffer();
+//
+//        // NOTE: hardware instancing with mixed streams  would be nice, 
+//        // but only available in D3D yet
+//        for(float[] star : stars)
+//        {            
+//            final float x = star[X], y = star[Y];
+//            final float ext = 0.5f*star[SIZE];
+//                        
+//            vertexData.put( 1.0f  ).put( 0.0f  );
+//            vertexData.put( x+ext ).put( y+ext );
+//            vertexData.put( 0.0f  ).put( 0.0f  );
+//            vertexData.put( x-ext ).put( y+ext );
+//            vertexData.put( 0.0f  ).put( 1.0f  );
+//            vertexData.put( x-ext ).put( y-ext );
+//            vertexData.put( 1.0f  ).put( 1.0f  );
+//            vertexData.put( x+ext ).put( y-ext );
+//        }
+//        
+//        vertexData.rewind();
+//
+//        final int[] buffers = new int[1];
+//        gl.glGenBuffers(1, buffers, 0);
+//
+//        final int vBuffer = buffers[0];
+//        gl.glBindBuffer(GL_ARRAY_BUFFER, vBuffer);
+//        gl.glBufferData(GL_ARRAY_BUFFER, vertexData.capacity()*4, vertexData, GL_STATIC_DRAW);
+//        gl.glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
+//
+//        return vBuffer;
+//    }    
+//    
+//    private int texture(GL gl) {
+//        final URL texURL = Title.class.getResource("/com/lostgarden/spacecute/background/" + "Star" + ".png");
+//        return GLGameUtils.loadTexture(gl, texURL, true, "png");
+//    }    
+//    
+//    private int program(GL gl) {
+//        final URL vertURL = Mask.class.getResource( "/de/telekom/laboratories/multitouch/demo/spacecute/Star.vert" );
+//        final URL fragURL = Mask.class.getResource( "/de/telekom/laboratories/multitouch/demo/spacecute/Star.frag" );
+//        return GLUtils.program(gl, vertURL, fragURL);
+//    }    
+    
+    // </editor-fold>
+    
+    public void render(GL gl, Transform instance) {
+       // <editor-fold defaultstate="collapsed" desc=" Init ">
+        
+//        if(!gl.glIsTexture(texture)) {
+//            texture = texture(gl);
+//        }
+//        
+//        if(!gl.glIsProgram(program)) {
+//            program = program(gl);
+//            gl.glUseProgram(program);
+//            {
+//                final int texLOC = gl.glGetUniformLocation( program, "texture" );
+//                if(texLOC >= 0) {
+//                    final int texUnit = 0;
+//                    gl.glUniform1i(texLOC, 0); // Texture-Unit: 0
+//                }
+//                transformLOC = gl.glGetUniformLocation( program, "transform" );
+//            }
+//            gl.glUseProgram(GL_NONE);
+//        }  
+//        
+//        if(!gl.glIsBuffer(vBuffer)) {
+//            vBuffer = arrayBuffer(gl);
+//        }       
+//        
+        // </editor-fold>        
+        
+        // <editor-fold defaultstate="collapsed" desc=" Old ">
+//        gl.glEnable(GL_BLEND);
+//        gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+//        gl.glBlendEquation(GL_ADD);
+//
+//
+//
+//        gl.glUseProgram( program );
+//        
+//        gl.glEnableClientState(GL_VERTEX_ARRAY);
+//        gl.glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+//
+//        gl.glBindBuffer(GL_ARRAY_BUFFER, vBuffer);
+//        gl.glTexCoordPointer(2, GL_FLOAT, (2+2)*4, 0);
+//        gl.glVertexPointer(2, GL_FLOAT, (2+2)*4, 2*4);
+//                   
+//
+//        {
+//            instance.to(transform);
+//            
+//            if(transformLOC >= 0) {                    
+//                gl.glUniformMatrix4fv(transformLOC, 1, true, transform, 0);
+//            }          
+//
+//            //gl.glActiveTexture(GL_TEXTURE0); // Texture-Unit: 0
+//            gl.glBindTexture(GL_TEXTURE_2D, texture);
+//
+//            for(int i=0; i<stars; i++) {
+//                gl.glDrawArrays(GL_TRIANGLE_FAN, 4*i , 4);
+//            }
+//        }    
+//
+//        
+//        gl.glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
+//
+//        gl.glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+//        gl.glDisableClientState(GL_VERTEX_ARRAY);
+//
+//        gl.glBindTexture(GL_TEXTURE_2D, GL_NONE);
+//
+//
+//        gl.glUseProgram( GL_NONE );
+//
+//        gl.glDisable(GL_BLEND);        
+                
+        // </editor-fold>        
+        
+        final int X=0, Y=1, SIZE=2;
+        
+        instance.to(transforms[0]);
+        
+        for(float[] s : stars) {
+            final float x = s[X], y=s[Y];
+            final float size = s[SIZE];    
+            
+            final Transform t = new Transform(this.transforms[1]).from(x,y,size,size);
+            gl.glMatrixMode(GL_MODELVIEW);
+            gl.glPushMatrix();
+            gl.glLoadTransposeMatrixf(transforms[0], 0);
+            gl.glMultTransposeMatrixf(transforms[1], 0);
+            gl.glGetFloatv(GL_TRANSPOSE_MODELVIEW_MATRIX, transforms[1], 0);
+            gl.glPopMatrix();
+            star.render(gl, t);
+
+        }
+        
+        for(float[] p : planets) {
+            final float x = p[X], y=p[Y];
+            final float size = p[SIZE];    
+            
+            final Transform t = new Transform(this.transforms[1]).from(x,y,size,size);
+            gl.glMatrixMode(GL_MODELVIEW);
+            gl.glPushMatrix();
+            gl.glLoadTransposeMatrixf(transforms[0], 0);
+            gl.glMultTransposeMatrixf(transforms[1], 0);
+            gl.glGetFloatv(GL_TRANSPOSE_MODELVIEW_MATRIX, transforms[1], 0);
+            gl.glPopMatrix();
+            planet.render(gl, t);
+
+        }     
+        
+        for(int i=0; i<ships.length ; i++) {
+            final float x = ships[i][X], y=ships[i][Y];
+            final float rot = ships[i][SIZE];   
+            
+            final Transform t = new Transform(this.transforms[1]).from(x,y,rot);
+            gl.glMatrixMode(GL_MODELVIEW);
+            gl.glPushMatrix();
+            gl.glLoadTransposeMatrixf(transforms[0], 0);
+            gl.glMultTransposeMatrixf(transforms[1], 0);
+            gl.glGetFloatv(GL_TRANSPOSE_MODELVIEW_MATRIX, transforms[1], 0);
+            ship.ship = i % 3;
+            ship.render(gl, t);
+            
+
+            if(ship.ship == 0) {
+                gl.glTranslatef(-0.0449f,0.11f,0.0f);
+            } else if(ship.ship == 1) {
+                gl.glTranslatef(-0.002f,0.148f,0.0f);
+            } else {
+                gl.glTranslatef(0.05f,0.13f,0.0f);
+            }
+            
+            gl.glGetFloatv(GL_TRANSPOSE_MODELVIEW_MATRIX, transforms[1], 0);
+            cute.cute = i % 6;
+            
+            cute.render(gl, t);
+            gl.glPopMatrix();
+            
+        }
+        
+    }
+    
+    // </editor-fold> 
+}
+
+// </editor-fold>   
+
+// <editor-fold defaultstate="collapsed" desc=" Camera ">
+
+class Camera {
+    
+    private float x, y, orientation, zoom;
+    
+    Camera() {}
+    Camera(float x, float y, float orientation, float zoom) {
+        this.setX(x); this.setY(y);
+        this.setOrientation(orientation);
+        this.setZoom(zoom);
+    }
+
+    public float getX() {
+        return x;
+    }
+
+    public void setX(float x) {
+        this.x = x;//max(-1.0f, min(x, 1.0f) );
+    }
+
+    public float getY() {
+        return y;
+    }
+
+    public void setY(float y) {
+        this.y = y;//max(-1.0f, min(y, 1.0f) );
+    }
+
+    public float getOrientation() {
+        return orientation;
+    }
+
+    public void setOrientation(float orientation) {
+        this.orientation = max(-1.0f, min(orientation, 1.0f) );
+    }
+
+    public float getZoom() {
+        return zoom;
+    }
+
+    public void setZoom(float zoom) {
+        this.zoom = max(-1.0f, min(zoom, 1.0f) );
+    }
+    
+}
+
+// </editor-fold>  
 
 // <editor-fold defaultstate="collapsed" desc=" Title ">
 
@@ -1297,6 +1637,30 @@ class Transform {
     
     // <editor-fold defaultstate="collapsed" desc=" Methods ">
     
+    public Transform from(float x, float y, float sx, float sy) {
+        FloatBuffer.wrap(matrix, offset, 16)
+        .put(  sx ). put(  0  ). put( 0 ). put( x )
+        .put(  0  ). put(  sy ). put( 0 ). put( y )
+        .put(  0  ). put(  0  ). put( 1 ). put( 0 )
+        .put(  0  ). put(  0  ). put( 0 ). put( 1 );
+
+        return this;
+    }
+
+    
+    public Transform from(float x, float y, float orientation, float sx, float sy) {
+        float cos = (float) cos(orientation);
+        float sin = (float) sin(orientation);
+
+        FloatBuffer.wrap(matrix, offset, 16)
+        .put( cos*sx ). put(   sin  ). put( 0 ). put( x )
+        .put(  -sin  ). put( cos*sy ). put( 0 ). put( y )
+        .put(    0   ). put(    0   ). put( 1 ). put( 0 )
+        .put(    0   ). put(    0   ). put( 0 ). put( 1 );
+
+        return this;
+    }    
+    
     public Transform from(float x, float y, float orientation) {
         float cos = (float) cos(orientation);
         float sin = (float) sin(orientation);
@@ -1331,6 +1695,26 @@ class Transform {
         .put(  0  ). put(  0  ). put( 0 ). put( 1 );
 
         return this;
+    }
+    
+    
+    public float[] getScale(float[] scale) {        
+        final float norm = matrix[offset+15];
+        if(abs(norm) < 0.000001f) {
+            scale[0] = scale[1] = 0.0f;
+            return scale;
+        }     
+        
+        final float invNorm = 1.0f / norm;
+        { // x
+            final float x = matrix[offset+0], y = matrix[offset+4], z = matrix[offset+12];
+            scale[0] = (float)sqrt(x*x + y*y + z*z) * invNorm;
+        }        
+        { // y
+            final float x = matrix[offset+1], y = matrix[offset+5], z = matrix[offset+13];
+            scale[1] = (float)sqrt(x*x + y*y + z*z) * invNorm;
+        }
+        return scale;
     }
     
     public float getRotation() {
