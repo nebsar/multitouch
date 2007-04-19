@@ -50,7 +50,7 @@ class InertiaTensor2D
         final double dX = x-massX, dY = y-massY;
         mXX += density * dX*dX;
         mXY += density * dX*dY;
-        mYY += density * dY*dY;                
+        mYY += density * dY*dY;   // mYY -= density * dY*dY;
     }
 
     public void integrate(double x, double y)
@@ -64,7 +64,7 @@ class InertiaTensor2D
         final double dX = x-massX, dY = y-massY;
         mXX += dX*dX;
         mXY += dX*dY;
-        mYY += dY*dY;                
+        mYY += dY*dY;    // mYY -= dY*dY;
     }
 
     public double orientation()
