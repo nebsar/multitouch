@@ -35,23 +35,41 @@ public class LabelsTest {
     
     // <editor-fold defaultstate="collapsed" desc=" Attributes ">
     
+//    private final static int[][] image =
+//    {
+//        {  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 },
+//        {  0,  1,  0,  1,  0,  2,  2,  2,  0,  3,  3,  3,  0 },
+//        {  0,  1,  0,  1,  0,  2,  0,  0,  0,  3,  0,  3,  0 },
+//        {  0,  1,  0,  1,  0,  2,  2,  2,  0,  3,  3,  3,  0 },
+//        {  0,  1,  0,  1,  0,  0,  0,  2,  0,  3,  0,  3,  0 },
+//        {  0,  1,  1,  1,  0,  2,  2,  2,  0,  3,  0,  3,  0 },
+//        {  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 },  
+//    };
+//    
+//    private final static int[][] bounds =
+//    {
+//        {  1,  1,  3,  5 },
+//        {  5,  1,  7,  5 },
+//        {  9,  1, 11,  5 },
+//    };    
+//    
+    
     private final static int[][] image =
     {
-        {  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 },
-        {  0,  1,  0,  1,  0,  2,  2,  2,  0,  3,  3,  3,  0 },
-        {  0,  1,  0,  1,  0,  2,  0,  0,  0,  3,  0,  3,  0 },
-        {  0,  1,  0,  1,  0,  2,  2,  2,  0,  3,  3,  3,  0 },
-        {  0,  1,  0,  1,  0,  0,  0,  2,  0,  3,  0,  3,  0 },
-        {  0,  1,  1,  1,  0,  2,  2,  2,  0,  3,  0,  3,  0 },
-        {  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 },  
+        {  0,  0,  0,  0,  0,  0,  0 },
+        {  0,  1,  1,  1,  1,  1,  0 },
+        {  0,  1,  0,  0,  0,  1,  0 },
+        {  0,  1,  0,  2,  0,  1,  0 },
+        {  0,  1,  0,  0,  0,  1,  0 },
+        {  0,  1,  1,  1,  1,  1,  0 },
+        {  0,  0,  0,  0,  0,  0,  0 },  
     };
     
     private final static int[][] bounds =
     {
-        {  1,  1,  3,  5 },
-        {  5,  1,  7,  5 },
-        {  9,  1, 11,  5 },
-    };    
+        {  1,  1,  5,  5 },
+        {  3,  3,  3,  3 },
+    };      
     
     // </editor-fold> 
         
@@ -74,8 +92,8 @@ public class LabelsTest {
         
         final Labels labels = new Labels(copy);
         assertEquals(labels.getCount(), 0);        
-        assertEquals(labels.count(), 3);
-        assertEquals(labels.getCount(), 3);
+        assertEquals(labels.count(), bounds.length);
+        assertEquals(labels.getCount(), bounds.length);
         assertTrue(
             "Update doesn't behave as identity for a neutral image", 
             Arrays.deepEquals(image, copy)
