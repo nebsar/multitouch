@@ -16,7 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package de.telekom.laboratories.multitouch;
+package de.telekom.laboratories.multitouch.util;
 
 import java.util.Arrays;
 import junit.framework.JUnit4TestAdapter;
