@@ -62,7 +62,7 @@ public class Labels {
     
     // <editor-fold defaultstate="collapsed" desc=" Methods ">
     
-    public int update() {
+    public int count() {
         current = 0;
         
         int[] line = image[0];
@@ -108,6 +108,35 @@ public class Labels {
         }
         return count;        
     }    
+    
+    public int[][] bounds() {                
+        final int count = count();
+        final int minX = 0, minY = 1, maxX = 2, maxY = 3;
+        
+        final int[][] bounds = new int[count][4];
+        for(int i=0; i<bounds.length; i++) {
+            final int[] b = bounds[i];
+            b[minX] = b[minY] = Integer.MAX_VALUE;
+            b[maxX] = b[maxY] = Integer.MIN_VALUE;
+        }
+
+        for(int y=0; y<image.length; y++) {
+            final int[] line = image[y];
+            for(int x=0; x<line.length; x++) {
+                final int pixel = line[x];
+                if(pixel > 0) {                    
+                    final int[] b = bounds[pixel-1];
+                    
+                    b[minX] = Math.min(b[minX], x);
+                    b[maxX] = Math.max(x, b[maxX]);
+                    b[minY] = Math.min(b[minY], y);
+                    b[maxY] = Math.max(y, b[maxY]);                    
+                }
+            }
+        }        
+        
+        return bounds;
+    }
     
     private int apply() {
         ++current;        
