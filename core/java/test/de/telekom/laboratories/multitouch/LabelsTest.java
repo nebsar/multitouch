@@ -46,6 +46,13 @@ public class LabelsTest {
         {  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 },  
     };
     
+    private final static int[][] bounds =
+    {
+        {  1,  1,  3,  5 },
+        {  5,  1,  7,  5 },
+        {  9,  1, 11,  5 },
+    };    
+    
     // </editor-fold> 
         
     // <editor-fold defaultstate="collapsed" desc=" Initializers ">
@@ -58,7 +65,7 @@ public class LabelsTest {
     // <editor-fold defaultstate="collapsed" desc=" Methods ">
     
     @Test
-    public void testLabels() {
+    public void testCount() {
 
         final int[][] copy = image.clone();
         for(int i=0; i<copy.length; i++) {
@@ -67,13 +74,32 @@ public class LabelsTest {
         
         final Labels labels = new Labels(copy);
         assertEquals(labels.getCount(), 0);        
-        assertEquals(labels.update(), 3);
+        assertEquals(labels.count(), 3);
         assertEquals(labels.getCount(), 3);
         assertTrue(
             "Update doesn't behave as identity for a neutral image", 
             Arrays.deepEquals(image, copy)
         );
     }
+    
+    @Test
+    public void testBounds() {
+
+        final int[][] copy = image.clone();
+        for(int i=0; i<copy.length; i++) {
+            copy[i] = image[i].clone();
+        }
+        
+        final Labels labels = new Labels(copy);
+        assertEquals(labels.getCount(), 0);
+        final int[][] b = labels.bounds();
+        Arrays.deepEquals(bounds, b);        
+        assertEquals(labels.getCount(), bounds.length);
+        assertTrue(
+            "Update doesn't behave as identity for a neutral image", 
+            Arrays.deepEquals(image, copy)
+        );
+    }    
     
     private static void print(int[][] image) {
         for(int[] line : image) {
