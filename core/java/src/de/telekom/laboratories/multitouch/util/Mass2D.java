@@ -23,7 +23,7 @@ package de.telekom.laboratories.multitouch.util;
  * @author Michael Nischt
  * @version 0.1
  */
-class Mass2D
+public class Mass2D
 {
 
     private double mass;
@@ -35,6 +35,8 @@ class Mass2D
     // http://scienceworld.wolfram.com/physics/Mass.html
     public void integrate(double x, double y, double density)
     {
+        density = Math.abs(density);
+        
         mass  += density;
         distX += density*x;
         distY += density*y;
@@ -55,12 +57,12 @@ class Mass2D
 
     public double getMassCenterX()
     {
-        return mass / distX;
+        return distX / mass;
     }
 
     public double getMassCenterY()
     {
-        return mass / distY;
+        return distY / mass;
     } 
 
 }
