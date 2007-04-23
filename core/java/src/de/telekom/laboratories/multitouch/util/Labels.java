@@ -54,9 +54,9 @@ public class Labels {
     
     // <editor-fold defaultstate="collapsed" desc=" Properties ">
     
-    public int getCount() {
-        return current;
-    }
+//    public int getCount() {
+//        return current;
+//    }
     
     // </editor-fold>
     
