@@ -19,10 +19,11 @@
 package de.telekom.laboratories.multitouch.util;
 
 
-import de.telekom.laboratories.multitouch.Shape2D; // public, protected:
+import de.telekom.laboratories.multitouch.util.Shape2D; // public, protected:
+import de.telekom.laboratories.multitouch.util.Shape2D; // public, protected:
 import java.util.Arrays; // private, internal
 
-
+import static de.telekom.laboratories.multitouch.util.Shape2D.Transform.translate;
 
 /**
  * A class which can compute all (derived) moments of a two-dimensional shape up to a specified degree upon the following formulas:<br/>
@@ -40,8 +41,8 @@ import java.util.Arrays; // private, internal
  * @author Michael Nischt
  * @version 0.1
  */
-public class Moments2D {
-    
+public class Moments2D
+{    
     // <editor-fold defaultstate="collapsed" desc=" Attributes ">
     
     private final double[][] moments;
@@ -127,9 +128,7 @@ public class Moments2D {
             
             private final double[] tmp = new double[getDegrees()+1];
             
-            public void point(double x, double y) {
-                point(x,y,1.0);
-            }
+            @Override
             public void point(double x, double y, double intensity) {
                 
                 for(int j=1; j<tmp.length; j++) {
@@ -164,30 +163,30 @@ public class Moments2D {
     }
     
     
-    /**
-     * Calculates all moments up the the maximal {@link Moments2D#getDegrees degree} for a given shape, 
-     * relative to the specified point.
-     * @param shape the shape for which the moments are calculated
-     * @param x the x-coordinate of the reference point
-     * @param y the y-coordinate of the reference point
-     * @throws java.lang.NullPointerException if <code>shape</code> is <code>null</code>
-     */
-    public void from(Shape2D shape, double x, double y) {
-        from(new TranslatedShape2D(shape, -x, -y));
-    }
-    
-    /**
-     * Calculates all moments up the the maximal {@link Moments2D#getDegrees degree} for a given shape, 
-     * relative to the specified point and normalizes them, if desired
-     * @param shape the shape for which the moments are calculated
-     * @param x the x-coordinate of the reference point
-     * @param y the y-coordinate of the reference point
-     * @param normalize if <code>true</code>, all moments will be normalized
-     * @throws java.lang.NullPointerException if <code>shape</code> is <code>null</code>
-     */
-    public void from(Shape2D shape, double x, double y, boolean normalize) {
-        from(new TranslatedShape2D(shape, -x, -y), normalize);
-    }    
+//    /**
+//     * Calculates all moments up the the maximal {@link Moments2D#getDegrees degree} for a given shape, 
+//     * relative to the specified point.
+//     * @param shape the shape for which the moments are calculated
+//     * @param x the x-coordinate of the reference point
+//     * @param y the y-coordinate of the reference point
+//     * @throws java.lang.NullPointerException if <code>shape</code> is <code>null</code>
+//     */
+//    public void from(Shape2D shape, double x, double y) {
+//        from( translate(-x, -y).shape(shape) );
+//    }
+//    
+//    /**
+//     * Calculates all moments up the the maximal {@link Moments2D#getDegrees degree} for a given shape, 
+//     * relative to the specified point and normalizes them, if desired
+//     * @param shape the shape for which the moments are calculated
+//     * @param x the x-coordinate of the reference point
+//     * @param y the y-coordinate of the reference point
+//     * @param normalize if <code>true</code>, all moments will be normalized
+//     * @throws java.lang.NullPointerException if <code>shape</code> is <code>null</code>
+//     */
+//    public void from(Shape2D shape, double x, double y, boolean normalize) {
+//        from( translate(-x, -y).shape(shape) , normalize);
+//    }    
     
     /**
      * Calculates all moments of the specified degree for a given shape.
@@ -214,7 +213,7 @@ public class Moments2D {
      * or moments has no enough remaining space.
      * @throws java.lang.NullPointerException if <code>moments</code> is <code>null</code>
      */
-    public static void from(Shape2D shape, int degree, final double[] moments, final int offset) 
+    private static void from(Shape2D shape, int degree, final double[] moments, final int offset) 
     throws IllegalArgumentException, NullPointerException {
         
         if(degree < 0 || offset < 0 || moments.length < (offset+degree)) {
@@ -223,11 +222,9 @@ public class Moments2D {
                 
         final double[] tmp = new double[degree+1];
         
-        shape.points(new Shape2D.Points() {
+        shape.points(new Shape2D.Points() {            
             
-            public void point(double x, double y) {
-                point(x,y,1.0);
-            }
+            @Override            
             public void point(double x, double y, double intensity) {
                 
                 for(int j=1; j<tmp.length; j++) {
@@ -260,7 +257,7 @@ public class Moments2D {
     public static double from(Shape2D shape, int x, int y) 
             throws IllegalArgumentException, NullPointerException {
         
-        class Moment implements Shape2D.Points {
+        class Moment extends Shape2D.Points {
             private final int mX, mY;
             private double value;
             
@@ -271,10 +268,8 @@ public class Moments2D {
                 this.mX = mX;
                 this.mY = mY;
             }
-            
-            public void point(double x, double y) {
-                point(x,y,1.0);
-            }
+        
+            @Override
             public void point(double x, double y, double intensity) {
                 
                 double tmp = intensity;
@@ -310,9 +305,7 @@ public class Moments2D {
             
             private final double[] tmp = new double[getDegrees()+1];
             
-            public void point(double x, double y) {
-                point(x,y,1.0);
-            }
+            @Override
             public void point(double x, double y, double intensity) {
                 x -= cX; y -= cY;
                 
@@ -331,85 +324,7 @@ public class Moments2D {
         });
     }
     
-    // </editor-fold>
-    
-    
-    // <editor-fold defaultstate="collapsed" desc=" TranslatedShape2D ">
-    
-    private static class TranslatedShape2D implements Shape2D {
-        
-        // <editor-fold defaultstate="collapsed" desc=" Attributes ">
-        
-        private final Shape2D original;
-        private final double offX, offY;
-        
-        // </editor-fold>
-        
-        // <editor-fold defaultstate="collapsed" desc=" Initializers ">
-        
-        public TranslatedShape2D(Shape2D original, double offX, double offY)
-                throws NullPointerException {
-            if(original == null) {
-                throw new NullPointerException();
-            }
-            this.original = original;
-            this.offX = offX;
-            this.offY = offY;
-        }
-        
-        // </editor-fold>
-        
-        // <editor-fold defaultstate="collapsed" desc=" Properties ">
-        
-        public double getMinX() {
-            return original.getMinX() + offX;
-        }
-        
-        public double getMinY() {
-            return original.getMinY() + offY;
-        }
-        
-        public double getMaxX() {
-            return original.getMaxX() + offX;
-        }
-        
-        public double getMaxY() {
-            return original.getMaxY() + offY;
-        }
-        
-        // </editor-fold>
-        
-        // <editor-fold defaultstate="collapsed" desc=" Methods ">
-        
-        public void points(Shape2D.Points points) {
-            class TranslatedPoints implements Shape2D.Points {
-                
-                private final Shape2D.Points original;
-                
-                public TranslatedPoints(Shape2D.Points original)
-                        throws NullPointerException {
-                    if(original == null) {
-                        throw new NullPointerException();
-                    }
-                    this.original = original;
-                }
-                
-                public void point(double x, double y) {
-                    original.point(x+offX, y+offY);
-                }
-                public void point(double x, double y, double intensity) {
-                    original.point(x+offX, y+offY, intensity);
-                }
-            }
-            
-            original.points(new TranslatedPoints(points));
-        }
-        
-        // </editor-fold>    
-    }
-    
-    // </editor-fold>    
-        
+    // </editor-fold>  
     
     // <editor-fold defaultstate="collapsed" desc=" main(..) ">
     
@@ -466,8 +381,7 @@ public class Moments2D {
 //        System.out.println();              
 //    }
     
-    // </editor-fold>
-    
+    // </editor-fold>   
 }
 
 
