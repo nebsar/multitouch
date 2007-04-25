@@ -103,7 +103,6 @@ public class GLGallery
 
             if(!gl.glIsBuffer(buffer)) {
                 final float ext = 1.0f;
-                final float extX = ext, extY = ext;
                 
                 final FloatBuffer vertexData = ByteBuffer.allocateDirect( vSize * vCount ).order(nativeOrder()).asFloatBuffer();
                 vertexData.put( +ext ).put( +ext );

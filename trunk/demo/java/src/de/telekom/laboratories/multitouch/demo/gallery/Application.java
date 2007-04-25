@@ -16,7 +16,11 @@
 
 package de.telekom.laboratories.multitouch.demo.gallery;
 
+import de.telekom.laboratories.capture.Aquire;
+import de.telekom.laboratories.capture.Device;
+import de.telekom.laboratories.capture.VideoMode;
 import static java.lang.Math.*;
+import java.nio.ByteBuffer;
 import static javax.media.opengl.GL.*;
 
 
@@ -41,7 +45,7 @@ import net.monoid.util.FPSCounter;
  */
 public final class Application {
     
-    private final GLMain renderer = new GLMain();
+    private final GLMain renderer = new GLMain();   
     
     // <editor-fold defaultstate="collapsed" desc=" Initializer ">
     
@@ -50,8 +54,8 @@ public final class Application {
         final Runnable init = new Runnable() {
             public void run() {
                 final boolean fullscreen = false;//true;
-                final int screen = 0;
-                final int width = 768, height = 768;
+                final int screen = 1;//0;
+                final int width = 1024, height = 768;
                 
                 // <editor-fold defaultstate="collapsed" desc=" FPSCounter ">
                 
@@ -189,6 +193,24 @@ public final class Application {
     // </editor-fold>            
     
     public static void main(String... args) {
+        
+//        Device[] cameras = Device.Registry.getLocalRegistry().getDevices();
+//        if(cameras.length == 0) {
+//            System.out.println("No cameras found!");
+//            return;
+//        }
+//        
+//        camera.connect(new VideoMode(), new Aquire() {
+//            public void capture(ByteBuffer buffer) {
+//                System.out.println("aquire");
+//            }
+//        });
+//        
+//        camera.capture();
+//        camera.capture();
+//        camera.capture();
+//        
+        
         new Application();
     }    
 }
