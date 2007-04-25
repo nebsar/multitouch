@@ -182,19 +182,20 @@ JNIEXPORT jboolean JNICALL Java_de_telekom_laboratories_capture_spi_FlyCaptureNa
     bool supported = false;
     FlyCaptureFrameRate frameRate;
     
-    if( !supported && (flycaptureCheckVideoMode(context, camera1VideoMode, FLYCAPTURE_FRAMERATE_30, &supported ) != FLYCAPTURE_OK)) {
+    if( flycaptureCheckVideoMode(context, camera1VideoMode, FLYCAPTURE_FRAMERATE_30, &supported ) != FLYCAPTURE_OK) {
         flycaptureDestroyContext( context );        
         return (jboolean) false;
-    } else {
+    } 
+    if(supported) {
         frameRate = FLYCAPTURE_FRAMERATE_30;
-    }
-
-    if( !supported && (flycaptureCheckVideoMode(context, camera1VideoMode, FLYCAPTURE_FRAMERATE_15, &supported ) != FLYCAPTURE_OK)) {
-        flycaptureDestroyContext( context );        
-        return (jboolean) false;
     } else {
-        frameRate = FLYCAPTURE_FRAMERATE_15;
-    }     
+        if( !supported && (flycaptureCheckVideoMode(context, camera1VideoMode, FLYCAPTURE_FRAMERATE_15, &supported ) != FLYCAPTURE_OK)) {
+            flycaptureDestroyContext( context );        
+            return (jboolean) false;
+        } else {
+            frameRate = FLYCAPTURE_FRAMERATE_15;
+        }     
+    }
     
     
 //    FlyCaptureVideoMode vMode = FLYCAPTURE_VIDEOMODE_ANY;
