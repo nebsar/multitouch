@@ -222,8 +222,8 @@ public class Techniques {
                 
                 // <editor-fold defaultstate="collapsed" desc=" Capture ">
 
-                final VideoMode captureMode = new VideoMode(0, 0, 1032, 776,//128, 0, 768, 768, //0, 0, 640, 480, //80, 0, 480, 480, 
-                                                            VideoMode.Format.LUMINACE_8, 1.0f);                
+                final VideoMode captureMode = null;//ew VideoMode(0, 0, 1032, 776,//128, 0, 768, 768, //0, 0, 640, 480, //80, 0, 480, 480, 
+                                                     //       VideoMode.Format.LUMINACE_8, 1.0f);                
                 
                 final class Capture implements  Aquire {
                     
