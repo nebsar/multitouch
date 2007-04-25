@@ -41,7 +41,7 @@ public class FlyCaptureService extends CaptureService
     public FlyCaptureService()
     {
         try {
-            System.load("C:\\nischt.michael\\Code\\FlyCaptureServiceNative\\dist\\FlyCaptrueService.dll");
+            System.load("C:\\nischt.michael\\Code\\Multitouch\\Capture.Win32\\dist\\FlyCaptrueService.dll");        
         } catch (Exception e) {
             System.out.println(e.getMessage());
             e.printStackTrace();

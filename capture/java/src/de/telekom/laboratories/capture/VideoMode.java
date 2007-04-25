@@ -43,8 +43,8 @@ public class VideoMode {
         public abstract int size();
     }
     
-    private int x;
-    private int y;
+    //private int x;
+    //private int y;
     private int width;
     private int height;
     private Format format;
@@ -58,44 +58,48 @@ public class VideoMode {
     public VideoMode(int width, int height, Format format, float frameRate) 
     throws NullPointerException, IllegalArgumentException
     {
-        this(0, 0, width, height, format, frameRate);
-    }
-    
-    public VideoMode(int x, int y, int width, int height, Format format, float frameRate)
-    throws NullPointerException, IllegalArgumentException
-    {
-        this.setRegion(x, y, width, height);
+        this.setWidth(width);
+        this.setHeight(height);
         this.setFormat(format);
         this.setFrameRate(frameRate);        
+        //this(0, 0, width, height, format, frameRate);
     }
     
-    public int getX() {
-        return x;
-    }
-
-    public void setX(int x)
-    throws IllegalArgumentException
-    {
-        if(x < 0) {
-            throw new IllegalArgumentException();
-        }
-        
-        this.x = x;
-    }
-
-    public int getY() {
-        return y;
-    }
-
-    public void setY(int y)
-    throws IllegalArgumentException
-    {
-        if(y < 0) {
-            throw new IllegalArgumentException();
-        }
-        
-        this.y = y;
-    }    
+//    public VideoMode(int x, int y, int width, int height, Format format, float frameRate)
+//    throws NullPointerException, IllegalArgumentException
+//    {
+//        this.setRegion(x, y, width, height);
+//        this.setFormat(format);
+//        this.setFrameRate(frameRate);        
+//    }
+//    
+//    public int getX() {
+//        return x;
+//    }
+//
+//    public void setX(int x)
+//    throws IllegalArgumentException
+//    {
+//        if(x < 0) {
+//            throw new IllegalArgumentException();
+//        }
+//        
+//        this.x = x;
+//    }
+//
+//    public int getY() {
+//        return y;
+//    }
+//
+//    public void setY(int y)
+//    throws IllegalArgumentException
+//    {
+//        if(y < 0) {
+//            throw new IllegalArgumentException();
+//        }
+//        
+//        this.y = y;
+//    }    
     
     public int getWidth() {
         return width;
@@ -123,17 +127,17 @@ public class VideoMode {
         this.height = height;
     }
 
-    public void setRegion(int x, int y, int width, int height)
-    throws IllegalArgumentException
-    {
-        if(x < 0 || y < 0 || width <= 0 || height <= 0) {
-            throw new IllegalArgumentException();
-        }
-        this.x = x;
-        this.y = y;
-        this.height = height;
-        this.width = width;        
-    }
+//    public void setRegion(int x, int y, int width, int height)
+//    throws IllegalArgumentException
+//    {
+//        if(x < 0 || y < 0 || width <= 0 || height <= 0) {
+//            throw new IllegalArgumentException();
+//        }
+//        this.x = x;
+//        this.y = y;
+//        this.height = height;
+//        this.width = width;        
+//    }
     
     public Format getFormat() {
         return format;
