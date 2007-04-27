@@ -127,10 +127,14 @@ public class Labels {
                 if(pixel > 0) {                    
                     final int[] b = bounds[pixel-1];
                     
-                    b[minX] = Math.min(b[minX], x);
-                    b[maxX] = Math.max(x, b[maxX]);
-                    b[minY] = Math.min(b[minY], y);
-                    b[maxY] = Math.max(y, b[maxY]);                    
+                    if(x < b[minX]) { b[minX] = x; }
+                    if(y < b[minY]) { b[minY] = y; }
+                    if(x > b[maxX]) { b[maxX] = x; }
+                    if(y > b[maxY]) { b[maxY] = y; }
+                    //b[minX] = Math.min(b[minX], x);
+                    //b[maxX] = Math.max(x, b[maxX]);
+                    //b[minY] = Math.min(b[minY], y);
+                    //b[maxY] = Math.max(y, b[maxY]);
                 }
             }
         }        
