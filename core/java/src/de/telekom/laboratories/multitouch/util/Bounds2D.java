@@ -74,17 +74,11 @@ public class Bounds2D
     
     public void union(double x, double y)
     {
-        if(x < minX) {
-            minX = x;
-        } else if(x > maxX) {
-            maxX = x;
-        }
+        if(x < minX) { minX = x; }
+        if(x > maxX) { maxX = x; }
         
-        if(y < minY) {
-            minY = y;
-        } else if(y > maxY) {
-            maxY = y;
-        }        
+        if(y < minY) { minY = y; }
+        if(y > maxY) { maxY = y; }
     }
 //    {
 //        minX = Math.min(minX, x);
