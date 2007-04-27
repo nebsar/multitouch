@@ -36,19 +36,37 @@ import javax.media.opengl.GL;
 public class Video {
     
     public enum Format {
-        LUMINANCE_8 {
-            int gl() { return GL_LUMINANCE8; }
-            int size() { return 1; }
-        },         
-        LUMINANCE_16 
-        {
-            int gl() { return GL_LUMINANCE16; }
-            int size() { return 2; }
-        };          
+        LUMINANCE {
+            public int size() { return 1; }
+            int glFormat()   { return GL_LUMINANCE; }
+            int glType()     { return GL_UNSIGNED_BYTE; } 
+            int glInternal() { return GL_LUMINANCE; }
+        },
+        LUMINANCE_ALPHA {
+            public int size() { return 2; }
+            int glFormat()   { return GL_LUMINANCE_ALPHA; }
+            int glType()     { return GL_UNSIGNED_BYTE; } 
+            int glInternal() { return GL_LUMINANCE_ALPHA; }
+        },
+        RGB {
+            public int size() { return 3; }
+            int glFormat()   { return GL_RGB; }
+            int glType()     { return GL_UNSIGNED_BYTE; } 
+            int glInternal() { return GL_RGB; }
+        },
+        RGBA {
+            public int size() { return 4; }
+            int glFormat()   { return GL_RGBA; }
+            int glType()     { return GL_UNSIGNED_BYTE; } 
+            int glInternal() { return GL_RGBA; }
+        };
         
-        abstract int size(); //in bytes
-        abstract int gl();   // opengl's internalFormat
+        public abstract int size(); // in bytes
+        abstract int glFormat();    // opengl's pixel format
+        abstract int glType();      // opengl's pixel type
+        abstract int glInternal();  // opengl's internal format
     }
+  
     
     public interface Stream {
         void to(Video video, ByteBuffer data);
@@ -141,6 +159,8 @@ public class Video {
         
         // </editor-fold>
         
+        // <editor-fold defaultstate="collapsed" desc=" vertex-buffer ">
+        
         if(!gl.glIsBuffer(pixelBuffer)) {
             final int[] ref = new int[1];
             gl.glGenBuffers(1, ref, 0);
@@ -150,6 +170,10 @@ public class Video {
             gl.glBufferData(GL_PIXEL_UNPACK_BUFFER_ARB, width*height*format.size(), null, GL_DYNAMIC_DRAW);
             gl.glBindTexture(GL_PIXEL_UNPACK_BUFFER_ARB, GL_NONE);
         }
+        
+        // </editor-fold>
+        
+        // <editor-fold defaultstate="collapsed" desc=" texture ">
         
         if(!gl.glIsTexture(texture)) {
             final int[] ref = new int[1];
@@ -168,10 +192,25 @@ public class Video {
             // pass NULL for the image data leaves the texture image
             // unspecified.
             gl.glBindBuffer(GL_PIXEL_UNPACK_BUFFER_ARB, GL_NONE);
-            gl.glTexImage2D(GL_TEXTURE_2D, 0, format.gl(), width, height, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, null);
+            gl.glTexImage2D(GL_TEXTURE_2D, 0, format.glInternal(), width, height, 0, format.glFormat(), format.glType(), null);
+                        
+            final int[] value = new int[1];
+            gl.glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_LUMINANCE_SIZE, value, 0);
+            System.out.println("Luminance: " + value[0]);
+            gl.glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_RED_SIZE, value, 0);
+            System.out.println("Red: " + value[0]);
+            gl.glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_GREEN_SIZE, value, 0);
+            System.out.println("Green: " + value[0]);
+            gl.glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_BLUE_SIZE, value, 0);
+            System.out.println("Blue: " + value[0]);
+
             
             gl.glBindTexture(GL_TEXTURE_2D, GL_NONE);
         }
+        
+        // </editor-fold>
+        
+        // <editor-fold defaultstate="collapsed" desc=" update ">
                 
         synchronized(this) 
         {
@@ -185,14 +224,16 @@ public class Video {
 
                 gl.glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER_ARB);
 
-                gl.glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_LUMINANCE, GL_UNSIGNED_BYTE, 0);
+                gl.glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, format.glFormat(), format.glType(), 0);
 
                 gl.glBindBuffer(GL_PIXEL_UNPACK_BUFFER_ARB, GL_NONE);
                 gl.glBindTexture(GL_TEXTURE_2D, GL_NONE);                
     
                 stream = null;                
             }            
-        }           
+        } 
+        
+        // </editor-fold>
         
         gl.glUseProgram(program);                               
 
@@ -220,3 +261,4 @@ public class Video {
         gl.glUseProgram(0);          
     }
 }
+

@@ -31,6 +31,7 @@ import javax.media.opengl.GL;
 import de.telekom.laboratories.multitouch.demo.opengl.Mask;
 import static de.telekom.laboratories.multitouch.demo.opengl.ProgramUtils.*;
 import de.telekom.laboratories.multitouch.demo.opengl.Video;
+import de.telekom.laboratories.multitouch.util.Labels;
 
 
 /**
@@ -39,14 +40,19 @@ import de.telekom.laboratories.multitouch.demo.opengl.Video;
  */
 public class GLMain {
     
-    private final Mask mask = new Mask();    
+    private final Mask mask = new Mask();
     private final GLGallery gallery = new GLGallery();
-
-    private final Video video = new Video(1024, 768, Video.Format.LUMINANCE_8);
+    
+    private final Video video = new Video(768, 768, Video.Format.LUMINANCE);
     private Device camera;
-    private byte[] data = new byte[1024 * 768];
+    private final byte[] data = new byte[768 * 768];
     private boolean capture = true;
-
+    
+    private final byte[] diff = new byte[768 * 768];
+    
+    final int[][] image = new int[768][768];
+    private final Labels labels = new Labels(image);
+    
     public GLMain() {
         try {
             final Video.Stream stream = new Video.Stream() {
@@ -57,112 +63,187 @@ public class GLMain {
                     }
                 }
             };
-                        
+            
             final Device cam = Device.Registry.getLocalRegistry().getDevices()[0];
             cam.connect(
                 new VideoMode(1024, 768, VideoMode.Format.LUMINACE_8, 1.0f),
                 new Aquire() {
-                   public void capture(ByteBuffer buffer) {
-                           buffer.get(data);
-                           video.update(stream);
-                   }
-                }
-                );
-             camera = cam;
-
-             final Thread t = new Thread("Multitouch.Demo.Capture") {
-                 @Override public void run() 
-                 {
-                    camera.capture();
-                    while(true) {
-                        synchronized(GLMain.this) {                       
-                            if(capture) {                            
-                                capture = false;
-                                cam.capture();
-                            }                        
-                        }                            
+                int index = 0;
+                public void capture(ByteBuffer buffer) {
+                    if(index++ == 100) {
+                        for(int i=0; i<768; i++) {
+                            buffer.position(i*1024 + (1024-768)/2);
+                            buffer.get(diff, i*768, 768);
+                        }
                     }
-                 }
-             };
-             t.setDaemon(true);
-             t.setPriority((Thread.NORM_PRIORITY + Thread.MAX_PRIORITY)/2);
-             t.start();
-             
-        } catch(Exception e) {}
-    }
-
-    public void render(GL gl, int width, int height) 
-    {           
-        
-        gl.glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-        gl.glShadeModel(GL_SMOOTH);        
+                    for(int i=0; i<768; i++) {
+                        buffer.position(i*1024 + (1024-768)/2);
+                        buffer.get(data, i*768, 768);
+                    }
+                    for(int y=0; y<768; y++) {
+                        final int off = y*768;
+                        for(int x=0; x<768; x++) {
+                            final int index =  off+x;
+                            data[index] = (byte) Math.max( 0, (0xFF & data[index]) - (0xFF & diff[index]) );
+                        }
+                    }
+                    
+                    int sum = 0;
+                    for(int y=0; y<768; y++) {
+                        final int[] row = image[y];
+                        final int off = y*768;
+                        for(int x=0; x<768; x++) {
+                            final int value = (0xff & data[off+x]);
+                            if(value > 40) {
+                                row[x] = value;
+                                sum ++;
+                            } else {
+                                row[x] = 0;
+                            }
+                        }
+                    }
+//                        System.out.println(sum);
+                    sum = 0;
+                    int index = 0;
+                    final int[][] bounds = labels.bounds();
+                    for(int[] b : bounds) {
+                        index++;
+                        int width  = (b[2]-b[0]);
+                        int height = (b[3]-b[1]);
+                        if(width > 5 && height > 5) {
+                            System.out.printf("%d %d %d %d\n", b[0], b[1], b[2], b[3]);
+                            sum++;
+                        } else {
+                            for(int y=b[1]; y<b[3]; y++) {
+                                final int[] row = image[y];
+                                for(int x=b[1]; x<b[2]; x++) {
+                                    if(row[x] == index) {
+                                        row[x] = 0;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if(sum > 0) {
+                        System.out.println(sum + " / " + bounds.length);
+                        System.out.println("------------------------------");
+                    }// else {
+                    //    System.out.println("------ missed ------");
+                    //}
+                    
+//
+//                        int blobs = bounds.length;
+//
+//                        float factor = 1.0f;
+//                        if(blobs < 256) {
+//                            factor = 255.0f / blobs;
+//                        }
+                        for(int y=0; y<768; y++) {
+                            final int[] row = image[y];
+                            final int off = y*768;
+                            for(int x=0; x<768; x++) {
+                                data[off+x] = (row[x] > 0) ? (byte) 255 :0;
+                            }
+                        }
+                    
+                    video.update(stream);
+                }});
+                camera = cam;
                 
-        gl.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        gl.glClearDepth(1.0f);
-        gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+                final Thread t = new Thread("Multitouch.Demo.Capture") {
+                    @Override public void run() {
+                        camera.capture();
+                        while(true) {
+                            synchronized(GLMain.this) {
+                                if(capture) {
+                                    capture = false;
+                                    cam.capture();
+                                }
+                            }
+                        }
+                    }
+                };
+                t.setDaemon(true);
+                t.setPriority((Thread.NORM_PRIORITY + Thread.MAX_PRIORITY)/2);
+                t.start();
+                
+            } catch(Exception e) {}
+        }
+        
+        public void render(GL gl, int width, int height) {
             
-        gl.glDepthMask(true);
-                
-        
-        final int x = 0, y = 0;
-        width  = max(1, width);
-        height = max(1, height);        
-
-        // <editor-fold defaultstate="collapsed" desc=" normal viewport ">
-        
-        gl.glViewport(x, y, width, height);
-        
-        // </editor-fold>            
-                        
-        if(width >= height) {
-            final int space = (width - height) / 2;
-            gl.glScissor(x+space, y, height, height);
-        } else {
-            final int space = (height - width) / 2;
-            gl.glScissor(x, y+space, width, width);
-        }
-        gl.glEnable(GL_SCISSOR_TEST);
-        
-        video.render(gl);
-        
-        gl.glDisable(GL_SCISSOR_TEST);
-        
-        // <editor-fold defaultstate="collapsed" desc=" square viewport ">
-                        
-        if(width >= height) {
-            final int space = (width - height) / 2;
-            gl.glViewport(x+space, y, height, height);
-        } else {
-            final int space = (height - width) / 2;
-            gl.glViewport(x, y+space, width, width);
-        }
-        
-        // </editor-fold>        
-        
-                
-//        {   // optional
+            gl.glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+            gl.glShadeModel(GL_SMOOTH);
+            
+            gl.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+            gl.glClearDepth(1.0f);
+            gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            
+            gl.glDepthMask(true);
+            
+            
+            final int x = 0, y = 0;
+            width  = max(1, width);
+            height = max(1, height);
+            
+//        // <editor-fold defaultstate="collapsed" desc=" normal viewport with scissor">
+//
+//        gl.glViewport(x, y, width, height);
+//
+//        // </editor-fold>
+//
+//        if(width >= height) {
+//            final int space = (width - height) / 2;
+//            gl.glScissor(x+space, y, height, height);
+//        } else {
+//            final int space = (height - width) / 2;
+//            gl.glScissor(x, y+space, width, width);
+//        }
+//        gl.glEnable(GL_SCISSOR_TEST);
+//
+//        video.render(gl);
+//
+//        gl.glDisable(GL_SCISSOR_TEST);
+            
+            // <editor-fold defaultstate="collapsed" desc=" square viewport ">
+            
+            if(width >= height) {
+                final int space = (width - height) / 2;
+                gl.glViewport(x+space, y, height, height);
+            } else {
+                final int space = (height - width) / 2;
+                gl.glViewport(x, y+space, width, width);
+            }
+            
+            // </editor-fold>
+            
+            video.render(gl);
+            
+            {   // optional
 //            gl.glMatrixMode(GL_PROJECTION);
 //            gl.glLoadIdentity();
 //            gl.glMatrixMode(GL_MODELVIEW);
 //            gl.glLoadIdentity();
 //
 //            //gl.glColor4f(101/255f, 139/255f, 169/255f, 1.0f);
-//            gl.glColor4f(223/255f, 223/255f, 223/255f, 1.0f);
+//            //gl.glColor4f(223/255f, 223/255f, 223/255f, 1.0f);
+//            gl.glColor4f(1f, 1f, 1f, 1.0f);
+//            //gl.glColor4f(0f, 0f, 0f, 1.0f);
 //            gl.glBegin(GL_TRIANGLE_FAN);
 //            gl.glVertex2f( +1.0f, +1.0f );
 //            gl.glVertex2f( -1.0f, +1.0f );
 //            gl.glVertex2f( -1.0f, -1.0f );
 //            gl.glVertex2f( +1.0f, -1.0f );
 //            gl.glEnd();
-//        }
+            }
+            
+            gl.glDepthMask(false);
+            
+            gallery.render(gl);
+            
+            gl.glDepthMask(true);
+            
+            mask.render(gl);
+        }
         
-        gl.glDepthMask(false);        
-        
-        //gallery.render(gl);
-        
-        gl.glDepthMask(true);
-        
-        //mask.render(gl);        
-    }    
-    
-}
+    }

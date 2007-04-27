@@ -19,6 +19,7 @@ package de.telekom.laboratories.multitouch.demo.gallery;
 import de.telekom.laboratories.capture.Aquire;
 import de.telekom.laboratories.capture.Device;
 import de.telekom.laboratories.capture.VideoMode;
+import de.telekom.laboratories.multitouch.util.Labels;
 import static java.lang.Math.*;
 import java.nio.ByteBuffer;
 import static javax.media.opengl.GL.*;
@@ -45,7 +46,7 @@ import net.monoid.util.FPSCounter;
  */
 public final class Application {
     
-    private final GLMain renderer = new GLMain();   
+    private final GLMain renderer = new GLMain();       
     
     // <editor-fold defaultstate="collapsed" desc=" Initializer ">
     
@@ -53,8 +54,8 @@ public final class Application {
         
         final Runnable init = new Runnable() {
             public void run() {
-                final boolean fullscreen = false;//true;
-                final int screen = 1;//0;
+                final boolean fullscreen = false;
+                final int screen = 1;
                 final int width = 1024, height = 768;
                 
                 // <editor-fold defaultstate="collapsed" desc=" FPSCounter ">
