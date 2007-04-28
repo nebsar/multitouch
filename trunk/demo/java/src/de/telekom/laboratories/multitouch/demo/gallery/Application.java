@@ -211,7 +211,7 @@ public final class Application {
 //        camera.capture();
 //        camera.capture();
 //        
-        
+
         new Application();
     }    
 }
