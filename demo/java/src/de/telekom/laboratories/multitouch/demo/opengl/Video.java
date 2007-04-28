@@ -20,6 +20,7 @@ package de.telekom.laboratories.multitouch.demo.opengl;
 
 import static java.lang.String.*;
 import static java.nio.ByteOrder.*;
+import java.nio.ByteOrder;
 import static javax.media.opengl.GL.*;
 import static de.telekom.laboratories.multitouch.demo.opengl.ProgramUtils.*;
 
@@ -159,7 +160,7 @@ public class Video {
         
         // </editor-fold>
         
-        // <editor-fold defaultstate="collapsed" desc=" vertex-buffer ">
+        // <editor-fold defaultstate="collapsed" desc=" pixel-buffer ">
         
         if(!gl.glIsBuffer(pixelBuffer)) {
             final int[] ref = new int[1];
@@ -193,17 +194,6 @@ public class Video {
             // unspecified.
             gl.glBindBuffer(GL_PIXEL_UNPACK_BUFFER_ARB, GL_NONE);
             gl.glTexImage2D(GL_TEXTURE_2D, 0, format.glInternal(), width, height, 0, format.glFormat(), format.glType(), null);
-                        
-            final int[] value = new int[1];
-            gl.glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_LUMINANCE_SIZE, value, 0);
-            System.out.println("Luminance: " + value[0]);
-            gl.glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_RED_SIZE, value, 0);
-            System.out.println("Red: " + value[0]);
-            gl.glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_GREEN_SIZE, value, 0);
-            System.out.println("Green: " + value[0]);
-            gl.glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_BLUE_SIZE, value, 0);
-            System.out.println("Blue: " + value[0]);
-
             
             gl.glBindTexture(GL_TEXTURE_2D, GL_NONE);
         }
@@ -229,6 +219,13 @@ public class Video {
                 gl.glBindBuffer(GL_PIXEL_UNPACK_BUFFER_ARB, GL_NONE);
                 gl.glBindTexture(GL_TEXTURE_2D, GL_NONE);                
     
+                // Non-PBO Code
+                //final ByteBuffer data = ByteBuffer.allocateDirect(width*height*format.size()).order(ByteOrder.nativeOrder());
+                //stream.to(this, data);
+                //data.rewind();
+                //gl.glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, format.glFormat(), format.glType(), data);
+                //gl.glBindTexture(GL_TEXTURE_2D, GL_NONE);                                
+                
                 stream = null;                
             }            
         } 
