@@ -51,7 +51,8 @@ public class GLMain {
     
     private boolean capture = true;
     
-    private final byte[] diff = new byte[768 * 768];
+    private final byte[] diff   = new byte[768 * 768];
+    private final byte[] mirror = new byte[768 * 768];
     
     final int[][] image = new int[768][768];
     private final Labels labels = new Labels(image);
@@ -69,7 +70,7 @@ public class GLMain {
         };
         
         try {
-            
+            final boolean m = true;
             final Device cam = Device.Registry.getLocalRegistry().getDevices()[0];
             
             final Aquire aquire = new Aquire() {
@@ -80,13 +81,35 @@ public class GLMain {
                     if(index++ == 100) {
                         for(int i=0; i<768; i++) {
                             buffer.position(i*1024 + (1024-768)/2);
-                            buffer.get(diff, i*768, 768);
+                            buffer.get(mirror, i*768, 768);
+                        }
+                        if(m) {
+                            for(int y=0; y<768; y++) {
+                                final int off = y*768;
+                                for(int x=0; x<768; x++) {
+                                    diff[off+x] = mirror[off-x+767];
+                                }
+                            }
+                        } else {
+                            System.arraycopy(mirror, 0, diff, 0, diff.length);
                         }
                     }
                     for(int i=0; i<768; i++) {
                         buffer.position(i*1024 + (1024-768)/2);
-                        buffer.get(data, i*768, 768);
+                        buffer.get(mirror, i*768, 768);
                     }
+                    
+                    if(m) {
+                        for(int y=0; y<768; y++) {
+                            final int off = y*768;
+                            for(int x=0; x<768; x++) {
+                                data[off+x] = mirror[off-x+767];
+                            }
+                        }
+                    } else {
+                        System.arraycopy(mirror, 0, data, 0, data.length);
+                    }
+                    
                     for(int y=0; y<768; y++) {
                         final int off = y*768;
                         for(int x=0; x<768; x++) {
@@ -96,13 +119,14 @@ public class GLMain {
                     }
                     
                     int sum = 0;
+                    final int threshold = 20;
                     for(int y=0; y<768; y++) {
                         final int[] row = image[y];
                         final int off = y*768;
                         for(int x=0; x<768; x++) {
                             final int value = (0xff & data[off+x]);
-                            if(value > 20) {
-                                row[x] = value;//(int) (value * 255.0f / (20+(0xFF & diff[index]))) ; //value;
+                            if(value > threshold) {
+                                row[x] = (int) (value * 255.0f / (threshold+(0xFF & diff[index]))) ; //value;
                                 sum ++;
                             } else {
                                 row[x] = 0;
@@ -119,7 +143,7 @@ public class GLMain {
                         int width  = (b[2]-b[0]);
                         int height = (b[3]-b[1]);                        
                         if(width > 10 && height > 10) {                            
-                            System.out.printf("%d %d %d %d\n", b[0], b[1], b[2], b[3]);                            
+                            //System.out.printf("%d %d %d %d\n", b[0], b[1], b[2], b[3]);                            
                             sum++;
                         } else {
                         for(int y=b[1]; y<=b[3]; y++) {
@@ -134,8 +158,8 @@ public class GLMain {
                     }
                     
 //                    if(sum > 0) {
-                        System.out.println(sum + " / " + bounds.length);
-                        System.out.println("------------------------------");
+                       // System.out.println(sum + " / " + bounds.length);
+                        //System.out.println("------------------------------");
 //                    }// else {
                     //    System.out.println("------ missed ------");
                     //}
@@ -211,7 +235,7 @@ public class GLMain {
 //        }
 //        gl.glEnable(GL_SCISSOR_TEST);
 //
-//        video.render(gl);
+        video.render(gl);
 //
 //        gl.glDisable(GL_SCISSOR_TEST);
         
@@ -227,7 +251,7 @@ public class GLMain {
         
         // </editor-fold>
         
-        video.render(gl);
+       // video.render(gl);
         
         {   // optional
 //            gl.glMatrixMode(GL_PROJECTION);
@@ -235,9 +259,9 @@ public class GLMain {
 //            gl.glMatrixMode(GL_MODELVIEW);
 //            gl.glLoadIdentity();
 //
-//            //gl.glColor4f(101/255f, 139/255f, 169/255f, 1.0f);
+//            gl.glColor4f(101/255f, 139/255f, 169/255f, 1.0f);
 //            //gl.glColor4f(223/255f, 223/255f, 223/255f, 1.0f);
-//            gl.glColor4f(1f, 1f, 1f, 1.0f);
+//            //gl.glColor4f(1f, 1f, 1f, 1.0f);
 //            //gl.glColor4f(0f, 0f, 0f, 1.0f);
 //            gl.glBegin(GL_TRIANGLE_FAN);
 //            gl.glVertex2f( +1.0f, +1.0f );

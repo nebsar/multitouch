@@ -54,7 +54,7 @@ public final class Application {
         
         final Runnable init = new Runnable() {
             public void run() {
-                final boolean fullscreen = false;
+                final boolean fullscreen = true;
                 final int screen = 1;
                 final int width = 1024, height = 768;
                 
