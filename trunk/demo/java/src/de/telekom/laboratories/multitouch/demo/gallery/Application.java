@@ -46,17 +46,47 @@ import net.monoid.util.FPSCounter;
  */
 public final class Application {
     
-    private final GLMain renderer = new GLMain();       
-    
+    private final GLMain renderer = new GLMain();    
+        
     // <editor-fold defaultstate="collapsed" desc=" Initializer ">
     
     public Application() {
         
+        final int width = 768, height = 768;
+        final boolean fullscreen = true;
+        final int screen = 1;
+               
+        // <editor-fold defaultstate="collapsed" desc=" Vision ">
+        
+        try {
+            final Device[] cameras = Device.Registry.getLocalRegistry().getDevices();
+            
+            //final Device camera = cameras[0];            
+            
+            final Thread t = new Thread("Multitouch.Demo.Capture") {
+                @Override public void run() {
+                    final VideoMode mode = new VideoMode(width, height, VideoMode.Format.LUMINACE_8, 30.0f);
+                    //camera.connect(mode, aquire);
+                    //while(true) {
+                    //    camera.capture();
+                    //}
+                }
+            };
+            t.setDaemon(true);
+            t.setPriority((Thread.NORM_PRIORITY + Thread.MAX_PRIORITY)/2);
+            //t.start();            
+            
+            
+        } catch(Exception e) {
+            throw new RuntimeException("Could not initialize vision", e);
+        }
+        
+        // </editor-fold>
+        
+        // <editor-fold defaultstate="collapsed" desc=" Graphics ">
+        
         final Runnable init = new Runnable() {
             public void run() {
-                final boolean fullscreen = true;
-                final int screen = 1;
-                final int width = 1024, height = 768;
                 
                 // <editor-fold defaultstate="collapsed" desc=" FPSCounter ">
                 
@@ -186,32 +216,16 @@ public final class Application {
             try {
                 EventQueue.invokeAndWait(init);
             } catch(Exception e) {
-                throw new RuntimeException("Could not initialize graphcis", e);
+                throw new RuntimeException("Could not initialize graphics", e);
             }
         }
+        
+        // </editor-fold>
     }
     
-    // </editor-fold>            
+    // </editor-fold>
     
     public static void main(String... args) {
-        
-//        Device[] cameras = Device.Registry.getLocalRegistry().getDevices();
-//        if(cameras.length == 0) {
-//            System.out.println("No cameras found!");
-//            return;
-//        }
-//        
-//        camera.connect(new VideoMode(), new Aquire() {
-//            public void capture(ByteBuffer buffer) {
-//                System.out.println("aquire");
-//            }
-//        });
-//        
-//        camera.capture();
-//        camera.capture();
-//        camera.capture();
-//        
-
         new Application();
     }    
 }
