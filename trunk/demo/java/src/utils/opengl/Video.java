@@ -16,13 +16,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package de.telekom.laboratories.multitouch.demo.opengl;
+package utils.opengl;
 
 import static java.lang.String.*;
 import static java.nio.ByteOrder.*;
 import java.nio.ByteOrder;
 import static javax.media.opengl.GL.*;
-import static de.telekom.laboratories.multitouch.demo.opengl.ProgramUtils.*;
+import static utils.opengl.ProgramUtils.*;
 
 
 import java.nio.ByteBuffer;

@@ -7,12 +7,12 @@
  * and open the template in the editor.
  */
 
-package de.telekom.laboratories.multitouch.demo.opengl;
+package utils.opengl;
 
 import static java.lang.Math.*;
 import static java.nio.ByteOrder.*;
 import static javax.media.opengl.GL.*;
-import static de.telekom.laboratories.multitouch.demo.opengl.ProgramUtils.program;
+import static utils.opengl.ProgramUtils.program;
 
 
 import java.net.URL;

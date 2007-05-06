@@ -16,7 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package de.telekom.laboratories.multitouch.demo.vvvv;
+package demo.vvvv;
 
 import com.illposed.osc.OSCListener;
 import com.illposed.osc.OSCMessage;
