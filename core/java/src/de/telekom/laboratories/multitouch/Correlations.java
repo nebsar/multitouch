@@ -121,9 +121,9 @@ final public class Correlations {
                 }                      
 
                 {
-                    final List<Nearest<Touch, Quality>> tmp = currentList;
-                    lastList = currentList;
+                    final List<Nearest<Touch, Quality>> tmp = currentList;                    
                     currentList = lastList;
+                    lastList = tmp;
 
                     currentList.clear ();
                     for(Nearest n : lastList)
