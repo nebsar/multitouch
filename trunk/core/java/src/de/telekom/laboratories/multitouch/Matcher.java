@@ -1,4 +1,6 @@
 /*
+ * Copyright (C) 2007 Deutsche Telekom AG Laboratories
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
@@ -11,35 +13,21 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-
 package de.telekom.laboratories.multitouch;
 
+import java.util.Comparator;
+
 /**
- *
+ * 
+ * @param Touch 
+ * @param Quality 
  * @author Michael Nischt
  * @version 0.1
  */
-public interface TouchShape {
-    
-    void begin(int[] bounds);
-    void end();    
-    // sequenceTypes:
-    // (top-botton (left-right) )
-    // (top-botton (right-left) )
-    // (botton-top (left-right) )
-    // (botton-top (right-left) )
-        
-    
-
-    //void iterate(int x, int y, double pressure);
-    
-    // only changes are called !!
-    // vs.
-    // changes or more are called ??
-    void x(int y);
-    void y(int x);
-    // also for pressure (could be nice for constant shapes)
-    void pressure(double pressure);    
+public interface Matcher<Touch, Quality> extends Comparator<Quality>
+{
+    // returns null, if no match..
+    Quality match(Touch a, Touch b);
 }
