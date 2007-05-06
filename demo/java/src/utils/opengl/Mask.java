@@ -9,6 +9,7 @@
 
 package utils.opengl;
 
+import static java.lang.String.format;
 import static java.lang.Math.*;
 import static java.nio.ByteOrder.*;
 import static javax.media.opengl.GL.*;
@@ -131,8 +132,9 @@ public class Mask {
         // <editor-fold defaultstate="collapsed" desc=" program ">
         
         if( !gl.glIsProgram( program ) ) {
-            final URL vertURL = Mask.class.getResource( "/de/telekom/laboratories/multitouch/demo/opengl/Mask.vert" );
-            final URL fragURL = Mask.class.getResource( "/de/telekom/laboratories/multitouch/demo/opengl/Mask.frag" );
+            final String path = this.getClass().getPackage().getName().replace(".", "/");                    
+            final URL vertURL = Mask.class.getResource( format("/%s/%s.vert", path, "Mask") );
+            final URL fragURL = Mask.class.getResource( format("/%s/%s.frag", path, "Mask") );
             program = ProgramUtils.program(gl, vertURL, fragURL);
             colorLOC = gl.glGetUniformLocation(program, "color");
         }

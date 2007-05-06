@@ -33,6 +33,9 @@ import javax.media.opengl.GL;
 import javax.media.opengl.GLException;
 import com.sun.opengl.util.texture.Texture;
 import com.sun.opengl.util.texture.TextureIO;
+import java.util.ArrayList;
+import java.util.Collection;
+import static java.util.Arrays.asList;
 import utils.opengl.Mask;
 import utils.opengl.Video;
 
@@ -40,56 +43,7 @@ import utils.opengl.Video;
  * @author Michael Nischt
  * @version 0.1
  */
-class GLRenderer {
-        
-//    public final static class Image {
-//        private final float posX, posY, posZ;
-//        private final float extX, extY, rotZ;
-//        
-//        private Image(Builder builder) {
-//            this.posX = builder.posX; this.posY = builder.posY; this.posZ = builder.posZ;
-//            this.extX = abs(builder.extX); this.extY = abs(builder.extY); this.rotZ = builder.rotZ % 1.0f;
-//        }                
-//        
-//        public static class Builder {
-//            private float posX, posY, posZ;
-//            private float extX=0.1f, extY=0.1f, rotZ;
-//            
-//            Builder() {}
-//            
-//            Builder position(float x, float y, float z) {
-//                posX = x; posY = y; posZ = z; 
-//                return this;                
-//            }
-//
-//            Builder orientation(float amount) {
-//                rotZ = amount; 
-//                return this;                
-//            }
-//                        
-//            Builder extent(float x, float y) {
-//                extX = x; extY = y; 
-//                return this;                
-//            }
-//            
-//            Image instance() { return new Image(this); }
-//        }
-//        
-//        public void gl(GL gl, float[] transform) {
-//            gl.glMatrixMode(GL_MODELVIEW);
-//            gl.glPushMatrix();
-//            
-//            gl.glLoadIdentity();
-//            gl.glTranslatef(posX, posY, posZ);
-//            gl.glRotatef(rotZ*360.0f, 0.0f, 0.0f, 1.0f);
-//            gl.glScalef(extX, extY, 1.0f);
-//            
-//            gl.glGetFloatv(GL_TRANSPOSE_MODELVIEW_MATRIX, transform, 0);            
-//            gl.glPopMatrix();            
-//        }
-//    }
-    
-            
+class GLRenderer {        
     
     // <editor-fold defaultstate="collapsed" desc=" Images ">
     
@@ -101,7 +55,7 @@ class GLRenderer {
         {
             "Play",
             "Preview-Shadow",
-            "Preview"
+            //"Preview"
         };        
         
         // resources
@@ -123,7 +77,10 @@ class GLRenderer {
         
         // <editor-fold defaultstate="collapsed" desc=" Methods ">
         
-        public void render(GL gl, Object... instances) {
+        public void render(GL gl, Image... instances) {
+            render ( gl, asList(instances) );
+        }
+        public void render(GL gl, Iterable<? extends Image> instances) {
             
             final int vSize  = 4*2; //size(float)*(2)
             final int vCount = 4;
@@ -205,17 +162,17 @@ class GLRenderer {
             
             // <editor-fold defaultstate="collapsed" desc=" instances ">
             
-            for(Object instance : instances) 
+            for(Image instance : instances) 
             {                
-                final int texture = 0;
+                final int content = instance.getContent();
+                final int texture = (content >= 0) ? (content % (this.textures.length-1) + 1) : 0;
                 
                 gl.glMatrixMode(GL_MODELVIEW);
                 gl.glLoadIdentity();
                 if(textures.length > 0) {
-                    gl.glTranslatef(0.2f, 0.2f, 0.0f);
-                    gl.glRotatef(90.0f, 0.0f, 0.0f, 1.0f);
-                    final float[] size = {0.15f, 0.15f };
-                    gl.glScalef(size[0], size[1], 1.0f);
+                    gl.glTranslated(instance.getCenterX(), instance.getCenterY(), 0.0);
+                    gl.glRotated(instance.getOrientation() * 180.0, 0.0, 0.0, 1.0);
+                    gl.glScaled(instance.getExtentX(), instance.getExtentY(), 1.0);
                 }
                 gl.glGetFloatv(GL_TRANSPOSE_MODELVIEW_MATRIX, transform, 0);
                                 
@@ -246,7 +203,6 @@ class GLRenderer {
     // </editor-fold>
 
     
-    
     // <editor-fold defaultstate="collapsed" desc=" Variables ">
     
     final private Images images = new Images();    
@@ -266,11 +222,29 @@ class GLRenderer {
         this.scene = scene;
     }
     
-    // </editor-fold>
+    // </editor-fold>    
     
     // <editor-fold defaultstate="collapsed" desc=" Methods ">
     
-    public void render(GL gl, int width, int height) {
+    @SuppressWarnings("unchecked")
+    public void render(GL gl, int width, int height) {                
+        
+        final Collection<Image> rImages = new ArrayList<Image>();
+                
+        rImages.add(new Image(-1, 0.2, 0.2));        
+        {
+            final Scene.Content content = new Scene.Content()
+            {
+                public void addImage(Image image)
+                {
+                    if(image != null) {
+                        rImages.add(image);
+                    }
+                }            
+            };
+            
+            scene.render(content);
+        }
         
         gl.glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
         gl.glShadeModel(GL_SMOOTH);
@@ -326,7 +300,7 @@ class GLRenderer {
         gl.glBlendEquation(GL_FUNC_ADD);
         gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
             
-        images.render(gl, 0, 1, 1);
+        images.render(gl, rImages);
         
         gl.glDisable(GL_DEPTH_TEST);
         gl.glDisable(GL_BLEND);
