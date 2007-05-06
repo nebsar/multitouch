@@ -1,4 +1,6 @@
 /*
+ * Copyright (C) 2007 Deutsche Telekom AG Laboratories
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
@@ -11,12 +13,15 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
 package demo.gallery;
 
 import static java.lang.Math.*;
+import static java.util.Arrays.asList;
+import static java.util.Collections.unmodifiableList;
+import static java.util.Collections.unmodifiableList;
 import static javax.media.opengl.GL.*;
 
 import java.awt.Dimension;
@@ -36,6 +41,7 @@ import net.monoid.util.FPSCounter;
 
 import de.telekom.laboratories.capture.Device;
 import de.telekom.laboratories.capture.VideoMode;
+import java.util.List;
 
 
 
@@ -57,11 +63,25 @@ public final class Application
     
     public static void main (String... args)
     {
-        final Scene scene = new Scene ()
+        final Image[] images = 
         {
-            public void render (Content content)
+            new Image(0, 1.34* 0.1f, 0.1).translated( 0.5,  0.0).rotated( 0.2),
+            new Image(1, 1.34* 0.1f, 0.1).translated( 0.0,  0.5).rotated(-0.2),
+            new Image(2, 1.34* 0.1f, 0.1).translated( 0.4,  0.2).rotated( 0.5),
+            new Image(3, 1.34* 0.1f, 0.1).translated(-0.5, -0.5).rotated(-0.7),
+            new Image(4, 1.34* 0.1f, 0.1).translated(-0.4,  0.1).rotated( 0.0),
+            new Image(5, 1.34* 0.1f, 0.1).translated(-0.6, -0.5).rotated(-0.4),
+            new Image(6, 1.34* 0.1f, 0.1).translated(-0.4,  0.5).rotated( 1.0),
+        };
+        
+        final Scene scene = new Scene ()
+        {            
+            synchronized public void render (Content content)
             {
-                
+                for(Image image : images)
+                {
+                    content.addImage( image );
+                }
             }
         };
         

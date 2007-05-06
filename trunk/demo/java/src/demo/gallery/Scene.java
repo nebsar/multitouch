@@ -19,6 +19,8 @@
 
 package demo.gallery;
 
+import java.util.Collection;
+
 /**
  * @author Michael Nischt
  * @version 0.1
@@ -30,7 +32,7 @@ public interface Scene
     
     static public interface Content
     {
-        //void setImages(Image... images);
+        void addImage(Image images);
         //void setTouches(Touch... touches);
     }
 }

@@ -1,10 +1,19 @@
 /*
- * Image.java
+ * Copyright (C) 2007 Deutsche Telekom AG Laboratories
  *
- * Created on May 5, 2007, 12:37:59 PM
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
  *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
 package demo.gallery;
@@ -14,22 +23,97 @@ import static java.lang.Math.cos;
 import static java.lang.Math.sin;
 
 /**
- *
- * @author gestalt
+ * @author Michael Nischt
+ * @version 0.1
  */
-public interface Image
+final public class Image
 {
-    double getContent ();
+    // <editor-fold defaultstate="collapsed" desc=" Variables ">
     
-    double getCenterX ();
-    double getCenterY ();
-    
-    double getExtentX ();
-    double getExtentY ();
-    
-    double getOrientation ();  
-    
+    private final int content;
+    private final double centerX, centerY;
+    private final double extentX, extentY;
+    private final double orientation;
 
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc=" Initializers ">    
+
+    public Image(int content, double extentX, double extentY)
+    {
+        this.content = content;
+        this.extentX = extentX;
+        this.extentY = extentY;
+        this.centerX = 0.0;
+        this.centerY = 0.0;
+        this.orientation = 0.0;
+    }    
+    
+    private Image(int content, double extentX, double extentY, double centerX, double centerY, double orientation)
+    {
+        this.extentX = extentX;
+        this.extentY = extentY;
+        this.content = content;
+        this.centerX = centerX;
+        this.centerY = centerY;
+        this.orientation = orientation;
+    }
+    
+    // </editor-fold>
+    
+    // <editor-fold defaultstate="collapsed" desc=" Properties ">    
+    
+    public int getContent()
+    { 
+        return content;
+    }
+
+    public double getCenterX()
+    {
+        return centerX;
+    }
+
+    public double getCenterY()
+    {
+        return centerY;
+    }
+
+    public double getExtentX()
+    {
+        return extentX;
+    }
+
+    public double getExtentY()
+    {
+        return extentY;
+    }
+
+    public double getOrientation()
+    {
+        return orientation;
+    }
+    
+    // </editor-fold>
+    
+    // <editor-fold defaultstate="collapsed" desc=" Methods ">
+    
+    public Image translated(double x, double y)
+    {
+        return new Image(content, extentX, extentY, centerX+x, centerY+y, orientation);
+    }
+
+    public Image rotated(double amount)
+    {
+        return new Image(content, extentX, extentY, centerX, centerY, (orientation + amount) % 1.0 );
+    }
+    
+    public Image scaled(double ratio)
+    {
+        return new Image(content, extentX*ratio, extentY*ratio, centerX, centerY, orientation);
+    }    
+    
+    // </editor-fold>
+    
     final static public class Utils
     {
         static public Bounds bounds (Image image)
