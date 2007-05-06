@@ -91,9 +91,10 @@ public class LabelsTest {
         }
         
         final Labels labels = new Labels(copy);
-        assertEquals(labels.getCount(), 0);        
-        assertEquals(labels.count(), bounds.length);
-        assertEquals(labels.getCount(), bounds.length);
+        final int count = labels.count();
+        assertEquals(count, 0);        
+        assertEquals(count, bounds.length);
+        assertEquals(count, bounds.length);
         assertTrue(
             "Update doesn't behave as identity for a neutral image", 
             Arrays.deepEquals(image, copy)
@@ -109,10 +110,11 @@ public class LabelsTest {
         }
         
         final Labels labels = new Labels(copy);
-        assertEquals(labels.getCount(), 0);
+        final int count = labels.count();
+        assertEquals(count, 0);
         final int[][] b = labels.bounds();
         Arrays.deepEquals(bounds, b);        
-        assertEquals(labels.getCount(), bounds.length);
+        assertEquals(count, bounds.length);
         assertTrue(
             "Update doesn't behave as identity for a neutral image", 
             Arrays.deepEquals(image, copy)
