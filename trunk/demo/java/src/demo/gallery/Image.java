@@ -104,7 +104,7 @@ final public class Image
 
     public Image rotated(double amount)
     {
-        return new Image(content, extentX, extentY, centerX, centerY, (orientation + amount) % 1.0 );
+        return new Image(content, extentX, extentY, centerX, centerY, (orientation + amount) );
     }
     
     public Image scaled(double ratio)
@@ -121,9 +121,10 @@ final public class Image
             final double cX = image.getCenterX();
             final double cY = image.getCenterY();
 
-            double rot = - image.getOrientation();
-            final double cos = ( float ) cos ( rot );
-            final double sin = ( float ) sin ( rot );
+            double rot = Math.PI * image.getOrientation();
+            
+            final double cos = cos ( rot );
+            final double sin = sin ( rot );
             
             final double extX = image.getExtentX();
             final double extY = image.getExtentY();
@@ -138,15 +139,16 @@ final public class Image
                         x -= cX;
                         y -= cY;
                     }
-                    {
-                        final double xNew =  cos*x + sin*y;
-                        final double yNew =  cos*y - sin*x;
+                    
+                    {                        
+                        final double xNew =  cos*x - sin*y;
+                        final double yNew =  cos*y + sin*x;
                         
                         x = xNew;
                         y = yNew;
                     }
-                    
-                    return ( abs( x ) < extX ) && ( abs( y ) < extY );                    
+                                        
+                    return ( abs(x) <= extX ) && ( abs(y) <= extY );
                 }
             };
         }

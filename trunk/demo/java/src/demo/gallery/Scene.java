@@ -19,7 +19,7 @@
 
 package demo.gallery;
 
-import java.util.Collection;
+import java.util.Iterator;
 
 /**
  * @author Michael Nischt
@@ -27,12 +27,17 @@ import java.util.Collection;
  */
 public interface Scene
 {
-    //void update (Touch ... touches);
-    void render (Content content);
+    void control (Input input);
+    void view (Content content);
+    
+    static public interface Input
+    {
+        Iterator<Touch> getTouches();
+    }    
     
     static public interface Content
     {
-        void addImage(Image images);
-        //void setTouches(Touch... touches);
+        void addImage(Image image);
+        void addTouch(Touch touch);
     }
 }

@@ -19,6 +19,7 @@
 package demo.gallery;
 
 import static demo.gallery.Touch.Utils.distance;
+import static demo.gallery.Touch.Utils.distanceSquared;
 import de.telekom.laboratories.multitouch.util.Moments2D;
 
 
@@ -125,8 +126,12 @@ public class Manipulator
         
         private void scale(Scalable scalable)
         {
-            final double from = from(), to = to();
+            final double from  = from(), to = to();
             final double scale = (from > 0.0 && to > 0.0) ? ( to / from ) : 1.0;
+            if(scale != 1.0)
+            {                                                
+                System.out.println("to(" + to + ")  / from(" + from + "): " + scale);   
+            }
             scalable.scale ( scale );
         }
         
@@ -164,6 +169,49 @@ public class Manipulator
             moments.clear();
         }
         
+        // postion + rotation
+        private void foo(double[] values)
+        {
+            // Mass is given by the 0th moment
+            final double mass = moments.getMoment(0,0);
+
+            if(mass <= 0.0001)
+            {
+                values[0] = values[1] = values[2] = 0.0;
+                return;
+            }
+            
+            // Centre of mass is given by the 1st moments        
+            final double x = moments.getMoment(1, 0) / mass;
+            final double y = moments.getMoment(0, 1) / mass; 
+            
+            // Teh centered 2nd moments build the intertia (tensor)
+
+            // special case for: moments.from(s, -centerX, -centerY)
+            final double uXX = moments.getMoment(2,0) - x*moments.getMoment(1, 0); 
+            final double uXY = moments.getMoment(1,1) - x*moments.getMoment(0, 1);
+            final double uYY = moments.getMoment(0,2) - y*moments.getMoment(0, 1);
+
+            // final double[][] inertiaTensor = 
+            // {
+            //   {  uXX, -uXY }, 
+            //   { -uXY, -uYY }, 
+            // };
+
+            final double inertia = uXX + uYY; // == uZZ with z = (x^2 + y^2)^(1/2)
+
+            // The orientation of an object is defined as the axis of minimum inertia. 
+            // This is the axis of the least 2nd moment, the orientation of which is                
+            final double uXY2 = 2*uXY;
+            final double uXXsubUYY = uXX-uYY;
+
+            final double orientation = Math.atan2(uXY2, uXXsubUYY + Math.sqrt( uXXsubUYY*uXXsubUYY + uXY2*uXY2 ) );
+            
+            values[0] = x;
+            values[1] = y;
+            values[2] = orientation;
+        }
+        
         // </editor-fold>
     }
     
@@ -196,59 +244,20 @@ public class Manipulator
         
         private void apply(Translatable translatable, Rotatable rotatable)
         {
-            final double x = 0.0, y = 0.0;
-            final double rot = 0.0;
+            final double[] values = new double[3];
             
-            // <editor-fold defaultstate="collapsed" desc=" moments code ">
+            to.foo(values);
+            double x = values[0], y = values[1];            
+            double rot = values[2];
             
-//            // Mass is given by the 0th moment
-//            mass = moments.getMoment(0,0);
-//
-//            // Centre of mass is given by the 1st moments        
-//            x = moments.getMoment(1, 0) / mass;
-//            y = moments.getMoment(0, 1) / mass; 
-//            
-//            final double x = getX(), y = getY();
-//
-//            // Teh centered 2nd moments build the intertia (tensor)
-//
-//            // special case for: moments.from(s, -centerX, -centerY)
-//            final double uXX = moments.getMoment(2,0) - x*moments.getMoment(1, 0); 
-//            final double uXY = moments.getMoment(1,1) - x*moments.getMoment(0, 1);
-//            final double uYY = moments.getMoment(0,2) - y*moments.getMoment(0, 1);
-//
-//            // final double[][] inertiaTensor = 
-//            // {
-//            //   {  uXX, -uXY }, 
-//            //   { -uXY, -uYY }, 
-//            // };
-//
-//            inertia = uXX + uYY; // == uZZ with z = (x^2 + y^2)^(1/2)
-//
-//            // The orientation of an object is defined as the axis of minimum inertia. 
-//            // This is the axis of the least 2nd moment, the orientation of which is                
-//            final double uXY2 = 2*uXY;
-//            final double uXXsubUYY = uXX-uYY;
-//
-//            orientation = Math.atan2(uXY2, uXXsubUYY + Math.sqrt( uXXsubUYY*uXXsubUYY + uXY2*uXY2 ) );            
-            
-            // </editor-fold>
-            
+            from.foo(values);            
+            x -= values[0];
+            y -= values[1];
+            rot -= values[2];
+                                  
             translatable.translate ( x, y );
-            rotatable.rotate ( rot );
-        }
-        
-//        private void translate(Translatable translatable)
-//        {
-//            final double x = 0.0, y = 0.0;
-//            translatable.translate ( x, y );
-//        }
-//        
-//        private void rotate(Rotatable rotatable)
-//        {
-//            final double amount = 0.0;
-//            rotatable.rotate ( amount );
-//        }        
+            //rotatable.rotate ( rot );
+        }              
         
         // </editor-fold>
     }    
