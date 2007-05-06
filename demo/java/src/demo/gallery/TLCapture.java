@@ -16,7 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package de.telekom.laboratories.multitouch.demo.gallery;
+package demo.gallery;
 
 import java.nio.ByteBuffer;
 
@@ -30,7 +30,7 @@ class TLCapture {
     
     public static interface TL {                
         
-        void flip(boolean x);
+        //void flip(boolean x);
         void capture(int width, int height, ByteBuffer data);
     }
     

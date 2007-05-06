@@ -14,7 +14,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-package de.telekom.laboratories.multitouch.demo.gallery;
+package demo.gallery;
 
 
 import de.telekom.laboratories.capture.Aquire;
@@ -28,9 +28,9 @@ import static javax.media.opengl.GL.*;
 
 
 import javax.media.opengl.GL;
-import de.telekom.laboratories.multitouch.demo.opengl.Mask;
-import static de.telekom.laboratories.multitouch.demo.opengl.ProgramUtils.*;
-import de.telekom.laboratories.multitouch.demo.opengl.Video;
+import utils.opengl.Mask;
+import static utils.opengl.ProgramUtils.*;
+import utils.opengl.Video;
 import de.telekom.laboratories.multitouch.util.Labels;
 
 
