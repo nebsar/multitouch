@@ -18,48 +18,133 @@
 
 package demo.gallery;
 
-import java.nio.ByteBuffer;
+import static java.util.Collections.unmodifiableList;
+import java.util.ArrayList;
+import java.util.Iterator;
+
+
+import de.telekom.laboratories.multitouch.util.Labels;
+import java.util.List;
 
 /**
  * @author Michael Nischt
  * @version 0.1
  */
-class TLCapture {
-
-    // <editor-fold defaultstate="collapsed" desc=" TL ">
-    
-    public static interface TL {                
-        
-        //void flip(boolean x);
-        void capture(int width, int height, ByteBuffer data);
-    }
-    
-    // </editor-fold>
-    
+class TLCapture
+{
     
     // <editor-fold defaultstate="collapsed" desc=" Variables ">
     
-    private final int width, height;    
+    final private Scene scene;
+    final private int width, height;
     
+    final private byte[] diff;
+    
+    final private int[][] image;
+    final private Labels labels;
+    
+    private boolean start = false;
+    private int index;
+        
     // </editor-fold>
     
     // <editor-fold defaultstate="collapsed" desc=" Initializers ">
     
-    public TLCapture(int width, int height) {
+    public TLCapture (Scene scene, int width, int height)
+    {
+        if( scene == null ) throw new NullPointerException ();
         if(width <= 0 || height <= 0)
         {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException ();
         }
+        this.scene = scene;
         this.width = width;
         this.height = height;
+        
+        diff = new byte[width*height];
+        image = new int[width][height];
+        labels = new Labels ( image );
     }
     
     // </editor-fold>
-
+    
     // <editor-fold defaultstate="collapsed" desc=" Methods ">
     
-    public void capture(TL tl) {
-        tl.capture(width, height, null);
+    public void capture (byte[] data)
+    {
+        if(!start) // x*30 = x sec with 30fps
+        {        
+            if(++index < 30*1)//5)
+            {              
+                //System.out.println(index);
+                return;
+            } else {
+                start = true;                
+                System.arraycopy(data, 0, diff, 0, diff.length);
+                System.out.println(start);
+            }
+        }        
+        
+        for(int y=0; y<height; y++)
+        {
+            final int off = y*width;
+            for(int x=0; x<width; x++)
+            {
+                final int index =  off+x;
+                data[index] = (byte) Math.max ( 0, (0xFF & data[index]) - (0xFF & diff[index]) );
+            }
+        }
+        
+        
+        //int sum = 0;
+        final int threshold = 20;
+        for(int y=0; y<height; y++) {
+            final int[] row = image[y];
+            final int off = y*width;
+            for(int x=0; x<width; x++) {
+                final int value = (0xff & data[off+x]);
+                if(value > threshold) {
+                    row[x] = (int) (value * 255.0f / (threshold+(0xFF & diff[index]))) ; //value;
+                    //sum ++;
+                } else {
+                    row[x] = 0;
+                }
+            }
+        }        
+        
+        final List<Touch> touchList = new ArrayList<Touch>();
+        
+        //sum = 0;
+        //int index = 0;
+        final int[][] bounds = labels.bounds();
+        for(int[] b : bounds) {
+            index++;
+            int width  = (b[2]-b[0]);
+            int height = (b[3]-b[1]);                        
+            if(width > 10 && height > 10) {                            
+                //System.out.printf("%d %d %d %d\n", b[0], b[1], b[2], b[3]);                
+                //sum++;
+                
+                final double x = 2.0 * ( (width  / 2.0 + b[0] ) / this.width  ) - 1.0;
+                final double y = 2.0 * ( (height / 2.0 + b[1] ) / this.height ) - 1.0;
+                final Touch touch = new Touch( x, y );
+                //System.out.println( touch.getX() + " " + touch.getY() );
+                touchList.add( touch );
+            }
+        }        
+        
+        //if(!touchList.isEmpty())
+        //    System.out.println(touchList.size());
+        
+        final Scene.Input input = new Scene.Input ()
+        {
+            public Iterator<Touch> getTouches ()
+            {
+                return unmodifiableList ( touchList ).iterator ();
+            }
+            
+        };
+        scene.control (input);
     }
     
     // </editor-fold>

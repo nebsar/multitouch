@@ -202,10 +202,125 @@ class GLRenderer {
     
     // </editor-fold>
 
+    // <editor-fold defaultstate="collapsed" desc=" Touches ">
+    
+    final static private class Touches 
+    {        
+        // <editor-fold defaultstate="collapsed" desc=" Variables ">
+        
+        // resources
+        private int program, buffer;
+                                
+        // animatables
+        private int transformLOC;
+        private float[] transform = 
+        {
+            1,0,0,0,
+            0,1,0,0,
+            0,0,1,0,
+            0,0,0,1,
+        };
+                
+        // </editor-fold>
+        
+        // <editor-fold defaultstate="collapsed" desc=" Methods ">
+        
+        public void render(GL gl, Touch... instances) {
+            render ( gl, asList(instances) );
+        }
+        public void render(GL gl, Iterable<? extends Touch> instances) {
+            
+            final int vSize  = 4*2; //size(float)*(2)
+            final int vCount = 4*8+2;
+            
+            // <editor-fold defaultstate="collapsed" desc=" program ">
+            
+            if(!gl.glIsProgram(program)) {                
+                final Class c = getClass();
+                final String base = c.getPackage().getName().replace(".", "/");
+                program = program(gl, 
+                        c.getResource(format("/%s/Touch.vert", base)),
+                        c.getResource(format("/%s/Touch.frag", base)));
+                
+                
+                transformLOC = gl.glGetUniformLocation( program, "transform" );
+                final int textureLOC = gl.glGetUniformLocation( program, "texture" );
+            }
+            
+            // </editor-fold>
+            
+            // <editor-fold defaultstate="collapsed" desc=" buffer ">
+
+            if(!gl.glIsBuffer(buffer)) {
+                
+                final FloatBuffer vertexData = ByteBuffer.allocateDirect( vSize * vCount ).order(nativeOrder()).asFloatBuffer();
+                
+                vertexData.put( 0.0f ).put( 0.0f );
+                final int steps = vCount-2;
+                for(int i=0; i<=steps; i++)
+                {
+                    final float angle = 2.0f * ((float) Math.PI) * i / (float)steps;
+                    
+                    vertexData.put( (float) Math.cos( angle ) ).put( (float) Math.sin( angle ) );
+                }
+                vertexData.rewind();
+
+                final int[] buffers = new int[1];
+                gl.glGenBuffers(1, buffers, 0);
+
+                buffer = buffers[0];
+                gl.glBindBuffer(GL_ARRAY_BUFFER, buffer);
+                gl.glBufferData(GL_ARRAY_BUFFER, vertexData.capacity()*4, vertexData, GL_STATIC_DRAW);
+                gl.glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
+            }
+            
+            // </editor-fold>
+                        
+            gl.glUseProgram(program);                               
+            
+            gl.glEnableClientState(GL_VERTEX_ARRAY);
+            gl.glBindBuffer(GL_ARRAY_BUFFER, buffer);
+            gl.glVertexPointer(2, GL_FLOAT, vSize, 0);            
+            
+            // <editor-fold defaultstate="collapsed" desc=" instances ">
+            
+            for(Touch instance : instances) 
+            {                
+                gl.glMatrixMode(GL_MODELVIEW);
+                gl.glLoadIdentity();
+
+                gl.glTranslated(instance.getX(), instance.getY(), 0.0);
+                gl.glScaled(0.025,0.025, 1.0);
+                gl.glGetFloatv(GL_TRANSPOSE_MODELVIEW_MATRIX, transform, 0);
+                                
+                if(transformLOC >= 0) 
+                {                    
+                    final boolean transpose = true;
+                    gl.glUniformMatrix4fv(transformLOC, 1, transpose, transform, 0);
+                }                
+                gl.glDrawArrays(GL_TRIANGLE_FAN, 0 , vCount);
+                                
+            }
+            
+            // </editor-fold>
+            
+            gl.glBindTexture(GL_TEXTURE_2D, 0);            
+            gl.glBindBuffer(GL_ARRAY_BUFFER, 0);            
+            gl.glDisableClientState(GL_VERTEX_ARRAY_POINTER);            
+            
+            gl.glUseProgram(0);        
+        }
+        
+        // </editor-fold>
+    }
+    
+    // </editor-fold>
+
     
     // <editor-fold defaultstate="collapsed" desc=" Variables ">
     
-    final private Images images = new Images();    
+    final private Images  images  = new Images();    
+    final private Touches touches = new Touches();
     final private Mask mask = new Mask(0.5f);
     final private Video video = new Video(768, 768, Video.Format.LUMINANCE);    
     
@@ -226,26 +341,32 @@ class GLRenderer {
     
     // <editor-fold defaultstate="collapsed" desc=" Methods ">
     
-    @SuppressWarnings("unchecked")
+    //@SuppressWarnings("unchecked")
     public void render(GL gl, int width, int height) {                
         
-        final Collection<Image> rImages = new ArrayList<Image>();
+        final Collection<Image> imageList = new ArrayList<Image>();
+        final Collection<Touch> touchList = new ArrayList<Touch>();
                 
-        rImages.add(new Image(-1, 0.2, 0.2));        
+        imageList.add(new Image(-1, 0.2, 0.2));        
         {
             final Scene.Content content = new Scene.Content()
             {
                 public void addImage(Image image)
                 {
                     if(image != null) {
-                        rImages.add(image);
+                        imageList.add(image);
                     }
-                }            
+                }
+                public void addTouch(Touch touch)
+                {
+                    if(touch != null) {
+                        touchList.add(touch);
+                    }
+                }                
             };
             
-            scene.render(content);
-        }
-        
+            scene.view(content);
+        }        
         gl.glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
         gl.glShadeModel(GL_SMOOTH);
                 
@@ -274,22 +395,26 @@ class GLRenderer {
         
         gl.glDepthMask(true);        
         
-        video.render(gl);        
+        final boolean showVideo = false;
+        if(showVideo)
+        {
+            video.render(gl);        
+        }
+        else
+        {   // optional
+            gl.glMatrixMode(GL_PROJECTION);
+            gl.glLoadIdentity();
+            gl.glMatrixMode(GL_MODELVIEW);
+            gl.glLoadIdentity();
         
-        //{   // optional
-        //    gl.glMatrixMode(GL_PROJECTION);
-        //    gl.glLoadIdentity();
-        //    gl.glMatrixMode(GL_MODELVIEW);
-        //    gl.glLoadIdentity();
-        //
-        //    gl.glColor4f(0f, 0f, 0f, 1.0f);
-        //    gl.glBegin(GL_TRIANGLE_FAN);
-        //    gl.glVertex2f( +1.0f, +1.0f );
-        //    gl.glVertex2f( -1.0f, +1.0f );
-        //    gl.glVertex2f( -1.0f, -1.0f );
-        //    gl.glVertex2f( +1.0f, -1.0f );
-        //    gl.glEnd();
-        //}        
+            gl.glColor4f(0f, 0f, 0f, 1.0f);
+            gl.glBegin(GL_TRIANGLE_FAN);
+            gl.glVertex2f( +1.0f, +1.0f );
+            gl.glVertex2f( -1.0f, +1.0f );
+            gl.glVertex2f( -1.0f, -1.0f );
+            gl.glVertex2f( +1.0f, -1.0f );
+            gl.glEnd();
+        }        
         
         // <editor-fold defaultstate="collapsed" desc=" images ">
         
@@ -300,7 +425,8 @@ class GLRenderer {
         gl.glBlendEquation(GL_FUNC_ADD);
         gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
             
-        images.render(gl, rImages);
+        images .render (gl, imageList);
+        touches.render (gl, touchList);        
         
         gl.glDisable(GL_DEPTH_TEST);
         gl.glDisable(GL_BLEND);

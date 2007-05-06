@@ -43,7 +43,9 @@ final public class Touch
     {
         public static double distanceSquared (Touch from, Touch to)
         {
-            return from.x*to.x + from.y*to.y;
+            final double x = to.x-from.x;
+            final double y = to.y-from.y;
+            return x*x + y*y;
         }
         
         public static double distance (Touch from, Touch to)
