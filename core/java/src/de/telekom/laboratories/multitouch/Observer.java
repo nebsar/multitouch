@@ -1,4 +1,6 @@
 /*
+ * Copyright (C) 2007 Deutsche Telekom AG Laboratories
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
@@ -11,27 +13,31 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
 package de.telekom.laboratories.multitouch;
 
-import java.util.EventObject;
-
 /**
- *
+ * 
+ * @param Touch 
  * @author Michael Nischt
  * @version 0.1
  */
-public class TouchEvent extends EventObject {
+public interface Observer<Touch>
+{
+    void touchBegin  (Touch touch);
+    void touchEnd    (Touch touch);
+    void touchUpdate (Touch last, Touch current);
     
-    public TouchEvent(TouchSurface source) {
-        super(source);
-    }
-
-    @Override
-    public TouchSurface getSource() {
-        return (TouchSurface) super.getSource();
+    // <editor-fold defaultstate="collapsed" desc=" Adapter ">
+    
+    public static class Adapter<Touch> implements Observer<Touch>
+    {
+        public void touchBegin  (Touch touch) {}
+        public void touchEnd    (Touch touch) {}
+        public void touchUpdate (Touch last, Touch current) {}
     }
     
+    // </editor-fold>
 }
