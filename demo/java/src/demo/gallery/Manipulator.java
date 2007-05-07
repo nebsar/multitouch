@@ -66,7 +66,7 @@ public class Manipulator
     {
         // <editor-fold defaultstate="collapsed" desc=" Attributes ">
         
-        private Touch last = new Touch (0.0, 0.0);
+        private Touch last;
         private double distance;
         
         // </editor-fold>
@@ -75,7 +75,10 @@ public class Manipulator
         
         private void point (Touch current)
         {
-            distance += distance ( last, current );
+            if( last != null) 
+            {
+                distance += distance ( last, current );
+            }
             last = current;
         }
         
@@ -86,7 +89,7 @@ public class Manipulator
         
         private void reset ()
         {
-            last = new Touch (0.0, 0.0);
+            last = null;
             distance = 0.0;
         }
         
@@ -133,7 +136,14 @@ public class Manipulator
 //                System.out.println("to(" + to + ")  / from(" + from + "): " + scale);   
 //            }
             scalable.scale ( scale );
+//            final double ext = to - from;
+//            if(ext != 0.0)
+//            {
+//                System.out.println("to(" + to + ")  - from(" + from + ") = " + ext);
+//            }
+            //scalable.scale ( ext );
         }
+            
         
         private void reset ()
         {
