@@ -99,12 +99,12 @@ public final class Application
         
         public void rotate (double amount)
         {
-            this.rot += rot;
+            this.rot += amount;
         }
         
         public void scale (double ratio)
         {
-            this.scale *= scale;
+            this.scale *= ratio;
         }
         
         private void add (Touch last, Touch current)
@@ -121,16 +121,11 @@ public final class Application
         {
             manipulator.manipulate (this);
             
-            //            if(x != 0.0 || y != 0.0)
-            //            {
-            //                System.out.println(x + " " + y);
-            //            }
-            
             image = image.translated (x, y);
-            //if(image.getExtX() >= 0.01 && image.getExtY() >= 0.01)
-            //{
-            image = image.scaled (scale);
-            //}
+            if(scale >= 1.0 || (image.getExtentX() > 0.15 || image.getExtentY() > 0.15) )
+            {            
+                image = image.scaled (scale);
+            }
             
             x = y = rot = 0.0;
             scale = 1.0;

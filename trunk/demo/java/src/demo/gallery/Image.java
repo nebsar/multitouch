@@ -111,6 +111,12 @@ final public class Image
     {
         return new Image(content, extentX*ratio, extentY*ratio, centerX, centerY, orientation);
     }    
+
+    public Image extended(double amount)
+    {
+        return new Image(content, extentX+amount, extentY+amount, centerX, centerY, orientation);
+    }    
+    
     
     // </editor-fold>
     
