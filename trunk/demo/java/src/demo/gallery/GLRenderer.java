@@ -321,7 +321,7 @@ class GLRenderer {
     
     final private Images  images  = new Images();    
     final private Touches touches = new Touches();
-    final private Mask mask = new Mask(0.5f);
+    final private Mask mask = new Mask(0.0f);
     final private Video video = new Video(768, 768, Video.Format.LUMINANCE);    
     
     final private Scene scene;

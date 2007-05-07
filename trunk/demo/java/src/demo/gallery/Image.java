@@ -141,8 +141,8 @@ final public class Image
                     }
                     
                     {                        
-                        final double xNew =  cos*x - sin*y;
-                        final double yNew =  cos*y + sin*x;
+                        final double xNew =  cos*x + sin*y;
+                        final double yNew =  cos*y - sin*x;
                         
                         x = xNew;
                         y = yNew;
