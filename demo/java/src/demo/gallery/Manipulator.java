@@ -130,17 +130,15 @@ public class Manipulator
         private void scale(Scalable scalable)
         {
             final double from  = from(), to = to();
+            
             final double scale = (from > 0.0 && to > 0.0) ? ( to / from ) : 1.0;
 //            if(scale != 1.0)
-//            {                                                
 //                System.out.println("to(" + to + ")  / from(" + from + "): " + scale);   
-//            }
             scalable.scale ( scale );
+            
 //            final double ext = to - from;
 //            if(ext != 0.0)
-//            {
 //                System.out.println("to(" + to + ")  - from(" + from + ") = " + ext);
-//            }
             //scalable.scale ( ext );
         }
             
@@ -258,15 +256,25 @@ public class Manipulator
             
             to.foo(values);
             double x = values[0], y = values[1];            
-            double rot = values[2];
+            double rot2 = values[2];
             
             from.foo(values);            
             x -= values[0];
             y -= values[1];
-            rot -= values[2];
+            
+            double rot1 = values[2];
+            
+            final double deg45 = Math.PI / 4.0;
+            if(rot1 > deg45 && rot2 < -deg45)
+                rot2 += Math.PI;
+            
+            if(rot2 > deg45 && rot1 < -deg45)
+                rot1 += Math.PI;
+                        
+            double rot = (rot2 - rot1);
                                   
             translatable.translate ( x, y );
-            //rotatable.rotate ( rot );
+            rotatable.rotate ( rot );
         }              
         
         // </editor-fold>

@@ -93,18 +93,18 @@ public final class Application
         
         public void translate (double x, double y)
         {
-            this.x += x;
-            this.y += y;
+            this.x = x;
+            this.y = y;
         }
         
         public void rotate (double amount)
         {
-            this.rot += amount;
+            this.rot = amount;
         }
         
         public void scale (double ratio)
         {
-            this.scale *= ratio;
+            this.scale = ratio;
         }
         
         private void add (Touch last, Touch current)
@@ -122,6 +122,9 @@ public final class Application
             manipulator.manipulate (this);
             
             image = image.translated (x, y);
+            
+            image = image.rotated(this.rot / Math.PI);
+            
             if(scale >= 1.0 || (image.getExtentX() > 0.15 || image.getExtentY() > 0.15) )
             {            
                 image = image.scaled (scale);
