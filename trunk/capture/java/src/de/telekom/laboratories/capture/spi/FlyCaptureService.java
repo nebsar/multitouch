@@ -81,7 +81,9 @@ public class FlyCaptureService extends CaptureService
             {
                 public void run()
                 {
+                    try {
                     FlyCaptureNative.releaseDeviceHandle(handle);
+                    } catch(Exception e) {}
                 }
             };
 
