@@ -31,9 +31,11 @@ import java.util.List;
  * @version 0.1
  */
 class TLCapture
-{
-    
+{    
     // <editor-fold defaultstate="collapsed" desc=" Variables ">
+    
+    final static private int THRESHOLD_INTENSITY = 20;
+    final static private int THRESHOLD_SIZE      = 5;
     
     final private Scene scene;
     final private int width, height;
@@ -97,14 +99,13 @@ class TLCapture
         
         
         //int sum = 0;
-        final int threshold = 20;
         for(int y=0; y<height; y++) {
             final int[] row = image[y];
             final int off = y*width;
             for(int x=0; x<width; x++) {
                 final int value = (0xff & data[off+x]);
-                if(value > threshold) {
-                    row[x] = (int) (value * 255.0f / (threshold+(0xFF & diff[index]))) ; //value;
+                if(value > THRESHOLD_INTENSITY) {
+                    row[x] = (int) (value * 255.0f / (THRESHOLD_INTENSITY+(0xFF & diff[index]))) ; //value;
                     //sum ++;
                 } else {
                     row[x] = 0;
@@ -121,7 +122,7 @@ class TLCapture
             index++;
             int width  = (b[2]-b[0]);
             int height = (b[3]-b[1]);                        
-            if(width > 10 && height > 10) {                            
+            if(width > THRESHOLD_SIZE && height > THRESHOLD_SIZE) {                            
                 //System.out.printf("%d %d %d %d\n", b[0], b[1], b[2], b[3]);                
                 //sum++;
                 

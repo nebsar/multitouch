@@ -128,10 +128,10 @@ public class Manipulator
         {
             final double from  = from(), to = to();
             final double scale = (from > 0.0 && to > 0.0) ? ( to / from ) : 1.0;
-            if(scale != 1.0)
-            {                                                
-                System.out.println("to(" + to + ")  / from(" + from + "): " + scale);   
-            }
+//            if(scale != 1.0)
+//            {                                                
+//                System.out.println("to(" + to + ")  / from(" + from + "): " + scale);   
+//            }
             scalable.scale ( scale );
         }
         

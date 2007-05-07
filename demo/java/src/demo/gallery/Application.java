@@ -229,13 +229,16 @@ public final class Application
                                 final Bounds bounds = bounds ( manipulators[i].getImage() ); // TODO: do no re-create every time
                                 if(bounds.contain ( last ) || bounds.contain ( current ))
                                 {
-                                    System.out.printf ("(%f %f) -> (%f %f)\n", last.getX (), last.getY (), current.getX (), current.getY () );
+                                    //System.out.printf ("(%f %f) -> (%f %f)\n", last.getX (), last.getY (), current.getX (), current.getY () );
                                     manipulators[i].add ( last, current );
                                     if( i >= touched)
                                     {
                                         //swap image and manipulator ( touched, i );
                                         final ImageAndManipulator tmp = manipulators[i];
-                                        manipulators[i] = manipulators[touched];
+                                        for(int t=i; t>touched; t--)
+                                        {
+                                            manipulators[t] = manipulators[t-1];
+                                        }
                                         manipulators[touched] = tmp;
                                         touched++;
                                     }
