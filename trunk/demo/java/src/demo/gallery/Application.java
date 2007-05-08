@@ -148,17 +148,17 @@ public final class Application
     
     public static void main (String... args)
     {
-        final double ext = 0.2;
+        final double ext = 0.15, rot = -0.33;
         
         final Image[] images =
         {
-            new Image (0, 1.34* ext, ext).translated ( 0.5,  0.0).rotated ( 0.2),
-            new Image (1, 1.34* ext, ext).translated ( 0.0,  0.5).rotated (-0.2),
-            new Image (2, 1.34* ext, ext).translated ( 0.4,  0.2).rotated ( 0.5),
-            new Image (3, 1.34* ext, ext).translated (-0.5, -0.5).rotated (-0.7),
-            new Image (4, 1.34* ext, ext).translated (-0.4,  0.1).rotated ( 0.0),
-            new Image (5, 1.34* ext, ext).translated (-0.6, -0.5).rotated (-0.4),
-            new Image (6, 1.34* ext, ext).translated (-0.4,  0.5).rotated ( 1.0),
+            new Image (0, 1.5* ext, ext).translated (0.4,  -0.5).rotated ( rot ), //0.2),
+            new Image (1, 1.5* ext, ext).translated (0.5,  -0.3).rotated ( rot ), //-0.2),
+            new Image (2, 1.5* ext, ext).translated (0.5,  -0.15).rotated ( rot ), // 0.5),
+            new Image (3, 1.5* ext, ext).translated (0.75,  0.0).rotated ( rot ), //-0.7),
+            new Image (4, 1.5* ext, ext).translated (0.7,  +0.3).rotated ( rot ), // 0.0),
+            new Image (5, 1.5* ext, ext).translated (0.4,  +0.6).rotated ( rot ), //-0.4),
+            new Image (6, 1.5* ext, ext).translated (0.2,  +0.7).rotated ( rot ), // 1.0),
         };
         
         final ImageAndManipulator[] manipulators = ImageAndManipulator.array (images);
