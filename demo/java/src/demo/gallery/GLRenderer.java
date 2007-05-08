@@ -53,9 +53,16 @@ class GLRenderer {
         
         private static final String[] images = 
         {
-            "Play",
-            "Preview-Shadow",
-            //"Preview"
+            "play",
+            "3sat",
+            "ard",
+            "ard2",
+            "arte",
+            "dsf",
+            "dsf2",
+            "rtl",
+            "sat1",
+            
         };        
         
         // resources
@@ -347,7 +354,7 @@ class GLRenderer {
         final Collection<Image> imageList = new ArrayList<Image>();
         final Collection<Touch> touchList = new ArrayList<Touch>();
                 
-        imageList.add(new Image(-1, 0.2, 0.2));        
+        imageList.add(new Image(-1, 0.4, 0.4).rotated(-0.33));        
         {
             final Scene.Content content = new Scene.Content()
             {
