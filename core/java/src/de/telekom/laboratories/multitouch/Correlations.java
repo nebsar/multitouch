@@ -26,60 +26,18 @@ import java.util.List;
  * @author Michael Nischt
  * @version 0.1
  */
-final public class Correlations {
-
+final public class Correlations 
+{
     // <editor-fold defaultstate="collapsed" desc=" unique ">
     
-    static public <Touch, Quality> Correlation<Touch> unique(final Matcher<? super Touch, Quality> matcher)
+    static public <Touch, Quality> Correlation<Touch> unique(Matcher<? super Touch, Quality> matcher)
     {
-        return new Correlation<Touch> ()
-        {
-            // <editor-fold defaultstate="collapsed" desc=" Attributes ">
-
-            private List<Nearest<Touch, Quality>> lastList    = new ArrayList<Nearest<Touch, Quality>>();
-            private List<Nearest<Touch, Quality>> currentList = new ArrayList<Nearest<Touch, Quality>>();
-
-            // </editor-fold>
-
-            // <editor-fold defaultstate="collapsed" desc=" Methods ">
-
-            public void reset ()
+        // <editor-fold defaultstate="collapsed" desc=" Unique: doEvents ">
+        
+        return new Nearest.Base<Touch, Quality> (matcher)
+        {   
+            protected void doEvents (Observer<? super Touch> observer)
             {
-                lastList.clear();
-                currentList.clear();
-            }
-
-            public void touch (Touch touch)
-            {
-                currentList.add( new Nearest<Touch, Quality>(touch) );
-            }
-
-
-            public void nextFrame (Observer<? super Touch> observer)
-            {
-                // calculate matches
-                for (Nearest<Touch, Quality> last : lastList)
-                {
-                    for (Nearest<Touch, Quality> current : currentList)
-                    {               
-                        final Quality quality = matcher.match ( last.touch, current.touch );
-
-                        // no match
-                        if(quality == null) continue;
-                        // potential matches
-                        if(last.quality == null || matcher.compare(quality, last.quality) <= 0)
-                        {
-                            last.nearest = current;
-                            last.quality = quality;
-                        }                            
-                        if(current.quality == null || matcher.compare(quality, current.quality) <= 0)
-                        {
-                            current.nearest = last;
-                            current.quality = quality;
-                        }                                                    
-                    }
-                }
-
                 // begin
                 for (Nearest<Touch, Quality> last : lastList)
                 {                                                
@@ -118,7 +76,158 @@ final public class Correlations {
                     {
                         observer.touchBegin( current.touch );
                     }
-                }                      
+                }                               
+            }
+        };
+        
+        // </editor-fold>
+    }
+
+    // </editor-fold>
+    
+    // <editor-fold defaultstate="collapsed" desc=" best ">
+    
+    static public <Touch, Quality> Correlation<Touch> best(Matcher<? super Touch, Quality> matcher)
+    {
+        // <editor-fold defaultstate="collapsed" desc=" Best: doEvents ">
+        
+        return new Nearest.Base<Touch, Quality> (matcher)
+        {   
+            protected void doEvents (Observer<? super Touch> observer)
+            {
+                // begin
+                for (Nearest<Touch, Quality> last : lastList)
+                {                                                
+                    if ( last.nearest == null )
+                    {
+                        observer.touchEnd( last.touch );
+                    }                        
+                }
+
+                // update
+                {
+                    if(lastList.size() < currentList.size())
+                    {
+                        for (Nearest<Touch, Quality> last : lastList)
+                        {
+                            if ( last.matches() )
+                            {
+                                observer.touchUpdate( last.touch, last.nearest.touch );
+                            }
+                        }
+                    } 
+                    else
+                    {
+                        for (Nearest<Touch, Quality> current : currentList)
+                        {
+                            if ( current.matches() )
+                            {
+                                observer.touchUpdate( current.nearest.touch, current.touch );
+                            }
+                        }                  
+                    }
+                    
+                    
+                    for (Nearest<Touch, Quality> last : lastList)
+                    {
+                        if ( last.nearest != null && !last.matches() )
+                        {
+                            observer.touchUpdate( last.touch, last.nearest.touch );
+                        }
+                    }
+                    for (Nearest<Touch, Quality> current : currentList)
+                    {
+                        if ( current.nearest != null && !current.matches() )
+                        {
+                            observer.touchUpdate( current.nearest.touch, current.touch );
+                        }
+                    }
+                }
+
+                // end
+                for (Nearest<Touch, Quality> current : currentList)
+                {
+                    if ( current.nearest == null )
+                    {
+                        observer.touchBegin( current.touch );
+                    }
+                }                               
+            }
+        };
+        
+        // </editor-fold>
+    }
+
+    // </editor-fold>    
+
+    // <editor-fold defaultstate="collapsed" desc=" Nearest ">
+
+    static final private class Nearest<Touch, Quality>
+    {        
+        // <editor-fold defaultstate="collapsed" desc=" Base ">
+
+        static abstract private class Base<Touch, Quality> 
+                implements Correlation<Touch>
+        {
+            // <editor-fold defaultstate="collapsed" desc=" Attributes ">
+
+            final private Matcher<? super Touch, Quality> matcher;
+            protected List<Nearest<Touch, Quality>> lastList    = new ArrayList<Nearest<Touch, Quality>>();
+            protected List<Nearest<Touch, Quality>> currentList = new ArrayList<Nearest<Touch, Quality>>();
+
+            // </editor-fold>
+
+            // <editor-fold defaultstate="collapsed" desc=" Initializers ">
+            
+            protected Base(final Matcher<? super Touch, Quality> matcher) {
+                if(matcher == null) throw new NullPointerException();
+                this.matcher = matcher;
+            }
+            
+            // </editor-fold>
+            
+            // <editor-fold defaultstate="collapsed" desc=" Methods ">
+
+            abstract protected void doEvents(Observer<? super Touch> observer);
+            
+            public void reset ()
+            {
+                lastList.clear();
+                currentList.clear();
+            }
+
+            public void touch (Touch touch)
+            {
+                currentList.add( new Nearest<Touch, Quality>(touch) );
+            }
+
+
+            public void nextFrame (Observer<? super Touch> observer)
+            {
+                // calculate matches
+                for (Nearest<Touch, Quality> last : lastList)
+                {
+                    for (Nearest<Touch, Quality> current : currentList)
+                    {               
+                        final Quality quality = matcher.match ( last.touch, current.touch );
+
+                        // no match
+                        if(quality == null) continue;
+                        // potential matches
+                        if(last.quality == null || matcher.compare(quality, last.quality) <= 0)
+                        {
+                            last.nearest = current;
+                            last.quality = quality;
+                        }                            
+                        if(current.quality == null || matcher.compare(quality, current.quality) <= 0)
+                        {
+                            current.nearest = last;
+                            current.quality = quality;
+                        }                                                    
+                    }
+                }
+                
+                doEvents(observer);
 
                 {
                     final List<Nearest<Touch, Quality>> tmp = currentList;                    
@@ -133,14 +242,12 @@ final public class Correlations {
                 }                                        
             }
 
-            // </editor-fold>
-        };                        
-    }        
+            // </editor-fold>       
+        }    
 
-    // <editor-fold defaultstate="collapsed" desc=" Nearest ">
-
-    static final private class Nearest<Touch, Quality>
-    {
+        // </editor-fold>
+        
+        
         // <editor-fold defaultstate="collapsed" desc=" Attributes ">
 
         final private Touch touch;
@@ -179,6 +286,4 @@ final public class Correlations {
     }
 
     // </editor-fold>        
-    
-    // </editor-fold>
 }
