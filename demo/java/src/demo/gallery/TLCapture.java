@@ -34,7 +34,7 @@ class TLCapture
 {    
     // <editor-fold defaultstate="collapsed" desc=" Variables ">
     
-    final static private int THRESHOLD_INTENSITY = 20;
+    final static private int THRESHOLD_INTENSITY = 15;
     final static private int THRESHOLD_SIZE      = 5;
     
     final private Scene scene;
@@ -92,8 +92,8 @@ class TLCapture
             final int off = y*width;
             for(int x=0; x<width; x++)
             {
-                final int index =  off+x;
-                data[index] = (byte) Math.max ( 0, (0xFF & data[index]) - (0xFF & diff[index]) );
+                final int ndx =  off+x;
+                data[ndx] = (byte) Math.max ( 0, (0xFF & data[ndx]) - (0xFF & diff[ndx]) );
             }
         }
         
@@ -103,9 +103,10 @@ class TLCapture
             final int[] row = image[y];
             final int off = y*width;
             for(int x=0; x<width; x++) {
-                final int value = (0xff & data[off+x]);
+                final int ndx =  off+x;
+                final int value = (0xff & data[ndx]);
                 if(value > THRESHOLD_INTENSITY) {
-                    row[x] = (int) (value * 255.0f / (THRESHOLD_INTENSITY+(0xFF & diff[index]))) ; //value;
+                    row[x] = (int) (value * 255.0f / (THRESHOLD_INTENSITY+(0xFF & diff[ndx]))) ; //value;
                     //sum ++;
                 } else {
                     row[x] = 0;
@@ -119,7 +120,6 @@ class TLCapture
         //int index = 0;
         final int[][] bounds = labels.bounds();
         for(int[] b : bounds) {
-            index++;
             int width  = (b[2]-b[0]);
             int height = (b[3]-b[1]);                        
             if(width > THRESHOLD_SIZE && height > THRESHOLD_SIZE) {                            
