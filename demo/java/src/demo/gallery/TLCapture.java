@@ -34,7 +34,7 @@ class TLCapture
 {    
     // <editor-fold defaultstate="collapsed" desc=" Variables ">
     
-    final static private int THRESHOLD_INTENSITY = 15;
+    final static private int THRESHOLD_INTENSITY = 20;
     final static private int THRESHOLD_SIZE      = 5;
     
     final private Scene scene;
@@ -106,7 +106,7 @@ class TLCapture
                 final int ndx =  off+x;
                 final int value = (0xff & data[ndx]);
                 if(value > THRESHOLD_INTENSITY) {
-                    row[x] = (int) (value * 255.0f / (THRESHOLD_INTENSITY+(0xFF & diff[ndx]))) ; //value;
+                    row[x] = (int) (value * 255.0f / (255 - (THRESHOLD_INTENSITY+(0xFF & diff[ndx])))) ; //value;
                     //sum ++;
                 } else {
                     row[x] = 0;
