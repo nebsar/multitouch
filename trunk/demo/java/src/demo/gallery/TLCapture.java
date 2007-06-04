@@ -64,7 +64,7 @@ class TLCapture
         this.height = height;
         
         diff = new byte[width*height];
-        image = new int[width][height];
+        image = new int[height][width];
         labels = new Labels ( image );
     }
     
@@ -93,7 +93,7 @@ class TLCapture
             for(int x=0; x<width; x++)
             {
                 final int ndx =  off+x;
-                data[ndx] = (byte) Math.max ( 0, (0xFF & data[ndx]) - (0xFF & diff[ndx]) );
+                data[ndx] = (byte) Math.max ( 0, (0xFFFFFFFF & data[ndx]) - (0xFFFFFFFF & diff[ndx]) );
             }
         }
         
@@ -113,26 +113,36 @@ class TLCapture
                 }
             }
         }        
+        //System.out.println(sum);
         
         final List<Touch> touchList = new ArrayList<Touch>();
+        
+        double xScale = 1.0f;
+        double yScale = 1.0f;
+        
+        if(width >= height) xScale = width / (double) height;
+        else yScale = height / (double) width;
         
         //sum = 0;
         //int index = 0;
         final int[][] bounds = labels.bounds();
         for(int[] b : bounds) {
-            int width  = (b[2]-b[0]);
-            int height = (b[3]-b[1]);                        
+            int width  = (b[2]-b[0]+1);
+            int height = (b[3]-b[1]+1);                        
             if(width > THRESHOLD_SIZE && height > THRESHOLD_SIZE) {                            
                 //System.out.printf("%d %d %d %d\n", b[0], b[1], b[2], b[3]);                
                 //sum++;
                 
                 final double x = 2.0 * ( (width  / 2.0 + b[0] ) / this.width  ) - 1.0;
                 final double y = 2.0 * ( (height / 2.0 + b[1] ) / this.height ) - 1.0;
-                final Touch touch = new Touch( x, y );
+                final Touch touch = new Touch( x*xScale, y*yScale );
                 //System.out.println( touch.getX() + " " + touch.getY() );
                 touchList.add( touch );
+            } else {
+                ;//System.out.println(width + " x " + height);
             }
-        }        
+        }   
+        //System.out.println(touchList.size());
         
         //if(!touchList.isEmpty())
         //    System.out.println(touchList.size());
