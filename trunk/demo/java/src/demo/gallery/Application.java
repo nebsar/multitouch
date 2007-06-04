@@ -50,23 +50,23 @@ import de.telekom.laboratories.multitouch.Observer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import quicktime.Errors;
-
-import static quicktime.std.StdQTConstants.kComponentVideoCodecType;
-import static quicktime.std.StdQTConstants.seqGrabRecord;
-import static quicktime.std.StdQTConstants.seqGrabPreview;
-import static quicktime.std.StdQTConstants.seqGrabPlayDuringRecord;
-import static quicktime.std.StdQTConstants.seqGrabDontMakeMovie;
-import static quicktime.qd.QDConstants.k32RGBAPixelFormat;
-import quicktime.QTException;
-import quicktime.QTSession;
-import quicktime.qd.PixMap;
-import quicktime.qd.QDGraphics;
-import quicktime.qd.QDRect;
-import quicktime.std.sg.SGDeviceList;
-import quicktime.std.sg.SGVideoChannel;
-import quicktime.std.sg.SequenceGrabber;
-import quicktime.util.RawEncodedImage;
+ 
+//import static quicktime.std.StdQTConstants.kComponentVideoCodecType;
+//import static quicktime.std.StdQTConstants.seqGrabRecord;
+//import static quicktime.std.StdQTConstants.seqGrabPreview;
+//import static quicktime.std.StdQTConstants.seqGrabPlayDuringRecord;
+//import static quicktime.std.StdQTConstants.seqGrabDontMakeMovie;
+//import static quicktime.qd.QDConstants.k32RGBAPixelFormat;
+//import quicktime.Errors;
+//import quicktime.QTException;
+//import quicktime.QTSession;
+//import quicktime.qd.PixMap;
+//import quicktime.qd.QDGraphics;
+//import quicktime.qd.QDRect;
+//import quicktime.std.sg.SGDeviceList;
+//import quicktime.std.sg.SGVideoChannel;
+//import quicktime.std.sg.SequenceGrabber;
+//import quicktime.util.RawEncodedImage;
 
 import static demo.gallery.Touch.Utils.distance;
 import static demo.gallery.Touch.Utils.distanceSquared;
@@ -87,42 +87,42 @@ public final class Application
 
     // <editor-fold defaultstate="collapsed" desc=" Util ">
     
-    static private String[] devices ()
-    {
-        try
-        {
-            QTSession.open ();
-            SequenceGrabber grabber = new SequenceGrabber ();
-            SGVideoChannel channel = new SGVideoChannel (grabber);
-            
-            SGDeviceList deviceList = channel.getDeviceList (0);  // flags is 0
-            String listing[] = new String[deviceList.getCount ()];
-            for (int i = 0; i < deviceList.getCount (); i++)
-            {
-                listing[i] = deviceList.getDeviceName (i).getName ();
-            }
-            // properly shut down the channel so the app can use it again
-            grabber.disposeChannel (channel);
-            QTSession.close ();
-            return listing;
-            
-        }
-        catch (QTException qte)
-        {
-            int errorCode = qte.errorCode ();
-            if (errorCode == Errors.couldntGetRequiredComponent)
-            {
-                throw new RuntimeException ("Couldn't find any capture devices, " +
-                        "read the video reference for more info.",qte);
-            }
-            else
-            {
-                qte.printStackTrace ();
-                throw new RuntimeException ("Problem listing capture devices, " +
-                        "read the video reference for more info.", qte);
-            }
-        }
-    }   
+//    static private String[] devices ()
+//    {
+//        try
+//        {
+//            QTSession.open ();
+//            SequenceGrabber grabber = new SequenceGrabber ();
+//            SGVideoChannel channel = new SGVideoChannel (grabber);
+//            
+//            SGDeviceList deviceList = channel.getDeviceList (0);  // flags is 0
+//            String listing[] = new String[deviceList.getCount ()];
+//            for (int i = 0; i < deviceList.getCount (); i++)
+//            {
+//                listing[i] = deviceList.getDeviceName (i).getName ();
+//            }
+//            // properly shut down the channel so the app can use it again
+//            grabber.disposeChannel (channel);
+//            QTSession.close ();
+//            return listing;
+//            
+//        }
+//        catch (QTException qte)
+//        {
+//            int errorCode = qte.errorCode ();
+//            if (errorCode == Errors.couldntGetRequiredComponent)
+//            {
+//                throw new RuntimeException ("Couldn't find any capture devices, " +
+//                        "read the video reference for more info.",qte);
+//            }
+//            else
+//            {
+//                qte.printStackTrace ();
+//                throw new RuntimeException ("Problem listing capture devices, " +
+//                        "read the video reference for more info.", qte);
+//            }
+//        }
+//    }   
     
     // </editor-fold>
     
@@ -512,160 +512,22 @@ public final class Application
                     {
                         // <editor-fold defaultstate="collapsed" desc=" PtGrey - Windows ">
                         
-                        //final Device[] cameras = Device.Registry.getLocalRegistry ().getDevices ();
-                        //final Device camera = cameras[0];
-                        //                        
-                        //final Aquire aquire = new Aquire ()
-                        //{
-                        //    //final TLCapture capture = new TLCapture (scene, width, height);
-                        //    //final byte[]  image  = new byte[width *height];
-                        //
-                        //    final byte[] target  = new byte[width * height];
-                        //
-                        //
-                        //    public void capture (ByteBuffer buffer)
-                        //    {
-                        //        for(int i=0; i<height; i++)
-                        //        {
-                        //            buffer.position ((height-(i+1))*1024 + (1024-width)/2);
-                        //            buffer.get (target, i*width, width);
-                        //        }
-                        //
-                        //        final boolean m = true;
-                        //        if(m)
-                        //        {
-                        //            final int w = width-1;
-                        //            for(int y=0; y<height; y++)
-                        //            {
-                        //                final int off = y*width;
-                        //                for(int x=0; x<width; x++)
-                        //                {
-                        //                    image[off+x] = target[off-x+w];
-                        //                }
-                        //            }
-                        //        }
-                        //        else
-                        //        {
-                        //            for(int y=0; y<height; y++)
-                        //            {
-                        //                final int off = y*width;
-                        //                for(int x=0; x<width; x++)
-                        //                {
-                        //                    image[off+x] = target[off+x];
-                        //                }
-                        //            }
-                        //        }
-                        //
-                        //        capture.capture (image);
-                        //    }
-                        //};
-                        //
-                        //final VideoMode mode = new VideoMode (1024, 768, VideoMode.Format.LUMINACE_8, 30.0f);
-                        //camera.connect (mode, aquire);
-                        //while(true)
-                        //{
-                        //    camera.capture ();
-                        //}
+                        final Device[] cameras = Device.Registry.getLocalRegistry ().getDevices ();
+                        final Device camera = cameras[0];
+                                                
+                        final Aquire aquire = new Aquire ()
+                        {                        
+                            final byte[] target  = new byte[width * height];                        
                         
-                        // </editor-fold>
-                        
-                        // <editor-fold defaultstate="collapsed" desc=" Quicktime - MacOSX ">
-                        
-                        final Thread cleanUp = new Thread ()
-                        {
-                            @Override
-                            public void run ()
+                            public void capture (ByteBuffer buffer)
                             {
-                                try
-                                { //if(QTSession.isInitialized()) 
-                                      QTSession.close (); }
-                                catch(Exception e)
-                                {}
-                            }
-                        };
-                                
-                        try 
-                        {          
-                            Runtime.getRuntime().addShutdownHook(cleanUp); 
-                            //if(!QTSession.isInitialized()) 
-                            //QTSession.close ();
-                            QTSession.open();
-                            
-                    
-                            final QDRect size = new QDRect ( width, height );
-                            // vc.getSrcVideoBounds();
-
-                            //if (quicktime.util.EndianOrder.isNativeLittleEndian())
-                            //{
-                            //    gfx = new QDGraphics(k32BGRAPixelFormat, size);
-                            //} else {
-                            //    gfx = new QDGraphics(kDefaultPixelFormat, size);
-                            //}    
-                            
-                            final QDGraphics gfx = new QDGraphics (k32RGBAPixelFormat, size);
-                                                        
-                            final SequenceGrabber sg = new SequenceGrabber ();
-                            sg.setGWorld (gfx, null);
-                            //sg.setDataOutput (null, seqGrabDontMakeMovie);
-                            {
-
-                                final SGVideoChannel  vc = new SGVideoChannel (sg);
-                                //vc.setDevice ( device );
-                                vc.setBounds ( size );
-                                vc.setUsage ( seqGrabPreview );   // 2
-                                //| seqGrabRecord );// 1
-                                //| seqGrabPlayDuringRecord );// ?
-                                //vc.setCompressorType ( kComponentVideoCodecType );
-                                vc.setFrameRate ( 0 );
-                                //vc.settingsDialog();                        
-                            }
-
-                            //sg.prepare(true, false);
-                            sg.startPreview ();
-
-                            final int[] rgbaPixels  = new int[width * height]; 
-                            final byte[] target     = new byte[width * height]; 
-                            
-                            final PixMap pixMap = gfx.getPixMap();
-                            final RawEncodedImage raw = pixMap.getPixelData();
-
-                            final int rowBytes  = raw.getRowBytes();
-                            final int rawWidth  = rowBytes / 4; // 4 == R-G-B-A
-                            final int rawHeight = raw.getSize() / rowBytes;                        
-
-                            if (width  != rawWidth) throw new IllegalStateException();    
-                            if (height != rawHeight) throw new IllegalStateException();                                
-                            
-                            
-                            while(QTSession.isInitialized ())
-                            {
-                                //if(!sg.isRecordMode()) continue;
-                                sg.idle (); //sg.idleMore ();
-                                raw.copyToArray(0, rgbaPixels, 0, width * height);
-
-
-                                for(int h=0; h<height; h++)
+                                for(int i=0; i<height; i++)
                                 {
-                                    final int sRow = ( (height-(h+1))*width );
-                                    final int tRow = ( h*width );
-                                    
-                                    for(int w=0; w<width; w++)
-                                    {
-                                        final int rgba = rgbaPixels[sRow+w];
-                                        final int r = (0xFF000000 & rgba) >> 24;
-                                        final int g = (0x00FF0000 & rgba) >> 16;
-                                        final int b = (0x0000FF00 & rgba) >> 8;
-                                        target[tRow+w] = (byte) ((0.257 * r) + (0.504 * g) + (0.098 * b));
-//                                        final int r = (0xFF000000 & rgba) >> 24;
-//                                        final int g = (0x00FF0000 & rgba) >> 16;
-//                                        final int b = (0x0000FF00 & rgba) >> 8;
-//                                        target[tRow+w] = (byte) ((r+g+b)/3);
-                                        
-                                        
-                                    }                                    
+                                    buffer.position ((height-(i+1))*width);
+                                    buffer.get (target, i*width, width);
                                 }
                         
-                                final boolean m = true; // mirror
+                                final boolean m = true;
                                 if(m)
                                 {
                                     final int w = width-1;
@@ -680,19 +542,146 @@ public final class Application
                                 }
                                 else
                                 {
-                                   System.arraycopy(target, 0, image, 0, image.length);
-                                }                                
-                                capture.capture(image);
-                                
-                            }            
-                        } 
-                        catch(QTException qte)
+                                    System.arraycopy(target, 0, image, 0, image.length);
+                                }
+                        
+                                capture.capture (image);
+                            }
+                        };
+                        
+                        final VideoMode mode = new VideoMode (width, height, VideoMode.Format.LUMINACE_8, 30.0f);
+                        camera.connect (mode, aquire);
+                        while(true)
                         {
-                            System.out.println("Qucktime Error");
-                            qte.printStackTrace();
-                            //if(QTSession.isInitialized()) 
-                            QTSession.close (); 
+                            camera.capture ();
                         }
+                        
+                        // </editor-fold>
+                        
+                        // <editor-fold defaultstate="collapsed" desc=" Quicktime - MacOSX ">
+                        
+                        //final Thread cleanUp = new Thread ()
+                        //{
+                        //@Override
+                        //public void run ()
+                        //{
+                        //    try
+                        //    { //if(QTSession.isInitialized()) 
+                        //          QTSession.close (); }
+                        //    catch(Exception e)
+                        //    {}
+                        //}
+                        //};
+                        //
+                        //try 
+                        //{          
+                        //Runtime.getRuntime().addShutdownHook(cleanUp); 
+                        ////if(!QTSession.isInitialized()) 
+                        ////QTSession.close ();
+                        //QTSession.open();
+                        //
+                        //
+                        //final QDRect size = new QDRect ( width, height );
+                        //// vc.getSrcVideoBounds();
+                        //
+                        ////if (quicktime.util.EndianOrder.isNativeLittleEndian())
+                        ////{
+                        ////    gfx = new QDGraphics(k32BGRAPixelFormat, size);
+                        ////} else {
+                        ////    gfx = new QDGraphics(kDefaultPixelFormat, size);
+                        ////}    
+                        //
+                        //final QDGraphics gfx = new QDGraphics (k32RGBAPixelFormat, size);
+                        //
+                        //final SequenceGrabber sg = new SequenceGrabber ();
+                        //sg.setGWorld (gfx, null);
+                        ////sg.setDataOutput (null, seqGrabDontMakeMovie);
+                        //{
+                        //
+                        //    final SGVideoChannel  vc = new SGVideoChannel (sg);
+                        //    //vc.setDevice ( device );
+                        //    vc.setBounds ( size );
+                        //    vc.setUsage ( seqGrabPreview );   // 2
+                        //    //| seqGrabRecord );// 1
+                        //    //| seqGrabPlayDuringRecord );// ?
+                        //    //vc.setCompressorType ( kComponentVideoCodecType );
+                        //    vc.setFrameRate ( 0 );
+                        //    //vc.settingsDialog();                        
+                        //}
+                        //
+                        ////sg.prepare(true, false);
+                        //sg.startPreview ();
+                        //
+                        //final int[] rgbaPixels  = new int[width * height]; 
+                        //final byte[] target     = new byte[width * height]; 
+                        //
+                        //final PixMap pixMap = gfx.getPixMap();
+                        //final RawEncodedImage raw = pixMap.getPixelData();
+                        //
+                        //final int rowBytes  = raw.getRowBytes();
+                        //final int rawWidth  = rowBytes / 4; // 4 == R-G-B-A
+                        //final int rawHeight = raw.getSize() / rowBytes;                        
+                        //
+                        //if (width  != rawWidth) throw new IllegalStateException();    
+                        //if (height != rawHeight) throw new IllegalStateException();                                
+                        //
+                        //
+                        //while(QTSession.isInitialized ())
+                        //{
+                        //    //if(!sg.isRecordMode()) continue;
+                        //    sg.idle (); //sg.idleMore ();
+                        //    raw.copyToArray(0, rgbaPixels, 0, width * height);
+                        //
+                        //
+                        //    for(int h=0; h<height; h++)
+                        //    {
+                        //        final int sRow = ( (height-(h+1))*width );
+                        //        final int tRow = ( h*width );
+                        //
+                        //        for(int w=0; w<width; w++)
+                        //        {
+                        //            final int rgba = rgbaPixels[sRow+w];
+                        //            final int r = (0xFF000000 & rgba) >> 24;
+                        //            final int g = (0x00FF0000 & rgba) >> 16;
+                        //            final int b = (0x0000FF00 & rgba) >> 8;
+                        //            target[tRow+w] = (byte) ((0.257 * r) + (0.504 * g) + (0.098 * b));
+                        ////                                        final int r = (0xFF000000 & rgba) >> 24;
+                        ////                                        final int g = (0x00FF0000 & rgba) >> 16;
+                        ////                                        final int b = (0x0000FF00 & rgba) >> 8;
+                        ////                                        target[tRow+w] = (byte) ((r+g+b)/3);
+                        //
+                        //
+                        //        }                                    
+                        //    }
+                        //
+                        //    final boolean m = true; // mirror
+                        //    if(m)
+                        //    {
+                        //        final int w = width-1;
+                        //        for(int y=0; y<height; y++)
+                        //        {
+                        //            final int off = y*width;
+                        //            for(int x=0; x<width; x++)
+                        //            {
+                        //                image[off+x] = target[off-x+w];
+                        //            }
+                        //        }
+                        //    }
+                        //    else
+                        //    {
+                        //       System.arraycopy(target, 0, image, 0, image.length);
+                        //    }                                
+                        //    capture.capture(image);
+                        //
+                        //}            
+                        //} 
+                        //catch(QTException qte)
+                        //{
+                        //System.out.println("Qucktime Error");
+                        //qte.printStackTrace();
+                        ////if(QTSession.isInitialized()) 
+                        //QTSession.close (); 
+                        //}
                         // </editor-fold>
                     }
                 };
