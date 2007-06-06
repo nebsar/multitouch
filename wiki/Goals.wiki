@@ -1,4 +1,4 @@
-#summary Project Goals
+#summary the goals of this project.
 #labels overview,goals,idea
 
 = Project Goals =
