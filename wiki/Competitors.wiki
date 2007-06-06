@@ -1,0 +1,9 @@
+#Listing of related software libraries and tools.
+
+= Other Related Software (Libraries & Tools) =
+
+  * [http://www.whitenoiseaudio.com/touchlib/ Touchlib] (open source)
+  * [http://open-ftir.sourceforge.net/ OpenFTIR] (open source)
+  * [http://vvvv.org/ vvvv : a multipurpose toolkit]
+
+
