@@ -1,5 +1,5 @@
+#summary Pictures and Videos
 #labels Media,Pictures,Videos
-#Pictures and Videos
 
 = Pictures and Videos =
 
@@ -7,7 +7,16 @@
 
 Video(s) from the first FTIR Workshop, which took place at the [http://ifgi.uni-muenster.de/deutsch/ Institute for Geoinformatics], Münster, from June 7-9, 2007.
 
-[http://www.cs.ncl.ac.uk/people/home.php?name=P.L.Olivier@newcastle.ac.uk Patrick Oliver] from Newcastle University is using his nose to interact with the Multi-Touch Wall running our little image browsing demo:
+ [http://lh6.google.com/image/Michael.Nischt/Rm1OnqFODiI/AAAAAAAAANI/l-LsF4EpsAs/s144/NoseTouch.jpg]
+ 
+ [http://www.youtube.com/watch?v=ExeqE9PNaIA Click here to watch.]
 
-[http://lh6.google.com/image/Michael.Nischt/Rm1OnqFODiI/AAAAAAAAANI/l-LsF4EpsAs/NoseTouch.jpg  http://www.youtube.com/watch?v=ExeqE9PNaIA]
-[http://www.youtube.com/watch?v=ExeqE9PNaIA Click to watch]
+
+
+
+
+
+
+
+
+
