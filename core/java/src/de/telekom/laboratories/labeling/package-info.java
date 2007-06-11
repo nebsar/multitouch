@@ -16,28 +16,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package de.telekom.laboratories.multitouch;
 
-/**
- * 
- * @param Touch 
- * @author Michael Nischt
- * @version 0.1
- */
-public interface Observer<Touch>
-{
-    void touchBegin  (Touch touch);
-    void touchEnd    (Touch touch);
-    void touchUpdate (Touch last, Touch current);
-    
-    // <editor-fold defaultstate="collapsed" desc=" Adapter ">
-    
-    public static class Adapter<Touch> implements Observer<Touch>
-    {
-        public void touchBegin  (Touch touch) {}
-        public void touchEnd    (Touch touch) {}
-        public void touchUpdate (Touch last, Touch current) {}
-    }
-    
-    // </editor-fold>
-}
+package de.telekom.laboratories.labeling;
+

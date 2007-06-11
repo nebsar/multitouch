@@ -51,7 +51,7 @@ public interface Observer<Feature>
      */
     final Observer IGNORE = new Adapter() {};
     
-    // <editor-fold defaultstate="collapsed" desc=" Blind ">
+    // <editor-fold defaultstate="collapsed" desc=" Adapter ">
     
     /**
      * A implementation, which ignores the notification with the primary usage to implemeoverride 
