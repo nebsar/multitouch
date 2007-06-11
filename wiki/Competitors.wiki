@@ -4,5 +4,6 @@
 
   * [http://www.whitenoiseaudio.com/touchlib/ Touchlib] (open source)
   * [http://open-ftir.sourceforge.net/ OpenFTIR] (open source)
-  * [http://vvvv.org/ vvvv : a multipurpose toolkit] (free for non-commercial use)
-
+  * [http://vvvv.org/ vvvv: a multipurpose toolkit] (free for non-commercial use)
+  * [http://mtg.upf.edu/reactable/ Reactable] (open source)
+  * [http://www.libavg.de/ Ain't vector graphics] (open source)
