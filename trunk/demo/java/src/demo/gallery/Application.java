@@ -24,7 +24,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableList;
 import static javax.media.opengl.GL.*;
-import static de.telekom.laboratories.multitouch.Correlations.unique;
+import static de.telekom.laboratories.tracking.Trackers.uniqueMatch;
 
 import java.awt.Dimension;
 import java.awt.EventQueue;
@@ -44,9 +44,9 @@ import net.monoid.util.FPSCounter;
 
 import de.telekom.laboratories.capture.Device;
 import de.telekom.laboratories.capture.VideoMode;
-import de.telekom.laboratories.multitouch.Correlation;
-import de.telekom.laboratories.multitouch.Matcher;
-import de.telekom.laboratories.multitouch.Observer;
+import de.telekom.laboratories.tracking.Tracker;
+import de.telekom.laboratories.tracking.Matcher;
+import de.telekom.laboratories.tracking.Observer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -236,7 +236,7 @@ public final class Application
         {
             final List<Touch> touchList = new ArrayList<Touch>();
             
-            final Correlation<Touch> correlation = unique ( new Matcher<Touch,Double>()
+            final Tracker<Touch> tracker = uniqueMatch ( new Matcher<Touch,Double>()
             {
                 public Double match (Touch a, Touch b)
                 {
@@ -273,22 +273,22 @@ public final class Application
                     {
                         final Touch touch = touchIt.next ();
                         touchList.add (touch);
-                        correlation.touch (touch);
+                        tracker.track (touch);
                     }
                     
                     //System.out.println(touchList.size());
                     
-                    correlation.nextFrame ( new Observer.Adapter<Touch>()
+                    tracker.nextFrame ( new Observer.Adapter<Touch>()
                     {
                         private int touched; // = 0;
                         
 //                        @Override
-//                        public void touchBegin (Touch current)
+//                        public void startedTracking (Touch current)
 //                        {
 //                            System.out.printf ("begin: (%f %f)\n", current.getX (), current.getY () );
 //                        }
                         @Override
-                        public void touchUpdate (Touch last, Touch current)
+                        public void updatedTracking (Touch last, Touch current)
                         {
                             //System.out.printf ("update: (%f %f) -> (%f %f)\n", last.getX (), last.getY (), current.getX (), current.getY () );
                             for(int i=0; i<manipulators.length; i++)
