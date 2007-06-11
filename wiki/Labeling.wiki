@@ -1,1 +1,4 @@
 #summary Labeling Concepts
+#labels Labeling
+
+= Connected Components =
