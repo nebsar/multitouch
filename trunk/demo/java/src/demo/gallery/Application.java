@@ -388,7 +388,7 @@ public final class Application
                     // <editor-fold defaultstate="collapsed" desc=" AWT / SWING ">
                     
                     final GraphicsDevice[] graphicsDevices = GraphicsEnvironment.getLocalGraphicsEnvironment ().getScreenDevices ();
-                    final GraphicsDevice   graphicsDevice  = graphicsDevices[max (0, min (screen, graphicsDevices.length))];
+                    final GraphicsDevice   graphicsDevice  = graphicsDevices[max (0, min (screen, graphicsDevices.length-1))];
                     
                     final Frame frame = new Frame ("T-Demo", graphicsDevice.getDefaultConfiguration ());
                     frame.setSize (width, height);
