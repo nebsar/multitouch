@@ -18,7 +18,6 @@
 
 package de.telekom.laboratories.tracking;
 
-import de.telekom.laboratories.multitouch.*;
 
 /**
  * An interface for tracking and correlating features.
