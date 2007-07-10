@@ -59,6 +59,7 @@ public class OSCTrackerClient {
             
             // Note: listing is done in another Thread, because blocking IO is used by JavaOSC, 
             // therefore we have to buffer and synchronize the listener callbacks            
+            @Override
             public void acceptMessage(Date time, OSCMessage message)
             {
                 //Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
@@ -81,6 +82,7 @@ public class OSCTrackerClient {
             
             // Note: listing is done in another Thread, because blocking IO is used by JavaOSC, 
             // therefore we have to buffer and synchronize the listener callbacks            
+            @Override
             public void acceptMessage(Date time, OSCMessage message)
             {
                 //Thread.currentThread().setPriority(Thread.MAX_PRIORITY);

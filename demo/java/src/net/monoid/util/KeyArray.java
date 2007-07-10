@@ -1,8 +1,4 @@
 /*
- * KeyArray.java
- *
- * Created on March 2, 2006, 6:23 PM
- *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2

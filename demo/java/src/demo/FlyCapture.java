@@ -47,6 +47,7 @@ class FlyCapture extends Capture implements Aquire
         camera.connect(mode, (Aquire) this);
     }
 
+    @Override
     public void capture(ByteBuffer buffer)
     {
         final int width = getWidth();
@@ -58,6 +59,7 @@ class FlyCapture extends Capture implements Aquire
         }
     }
 
+    @Override
     public void capture(byte[] image, EnumSet<Flip> flip)
     {
         final int width = getWidth(), height = getHeight();        

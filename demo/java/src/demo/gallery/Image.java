@@ -137,6 +137,7 @@ final public class Image
             
             return new Bounds ()
             {
+                @Override
                 public boolean contain(Touch touch)
                 {               
                     double x = touch.getX();

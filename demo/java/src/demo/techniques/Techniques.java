@@ -216,7 +216,8 @@ public class Techniques {
         // <editor-fold defaultstate="collapsed" desc=" Graphcis ">
 
         final Runnable graphics = new Runnable()
-        {
+        {            
+            @Override
             public void run()
             {
                 
