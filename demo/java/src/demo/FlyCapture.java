@@ -43,20 +43,21 @@ class FlyCapture extends Capture implements Aquire
 
         camera = Device.Registry.getLocalRegistry().getDevices()[0];
 
-        final VideoMode mode = new VideoMode(width, height, LUMINACE_8, 30.0f);
+        final VideoMode mode = new VideoMode(width, height, LUMINACE_8, 100.0f);
         camera.connect(mode, (Aquire) this);
     }
 
     @Override
     public void capture(ByteBuffer buffer)
     {
-        final int width = getWidth();
-        final int height = getHeight();
-
-        for (int i = 0; i < height; i++) {
-            buffer.position((height - (i + 1)) * width);
-            buffer.get(target, i * width, width);
-        }
+        buffer.get(target);
+//        final int width = getWidth();
+//        final int height = getHeight();
+//
+//        for (int i = 0; i < height; i++) {
+//            buffer.position((height - (i + 1)) * width);
+//            buffer.get(target, i * width, width);
+//        }
     }
 
     @Override
@@ -67,6 +68,7 @@ class FlyCapture extends Capture implements Aquire
         
         camera.capture();
 
+        //System.arraycopy(target, 0, image, 0, image.length);
         copy(target, image, flip);
     }
 }
