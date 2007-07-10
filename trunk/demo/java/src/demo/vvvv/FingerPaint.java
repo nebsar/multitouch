@@ -543,6 +543,7 @@ public class FingerPaint {
             private float opacity = 0.5f;
             
             
+            @Override
             public void init(GLAutoDrawable drawable) {
                 if(animator != null) {
                     animator.stop();
@@ -565,6 +566,7 @@ public class FingerPaint {
                 
             }
             
+            @Override
             public void display(GLAutoDrawable drawable) {                                
                 
                 // <editor-fold defaultstate="collapsed" desc=" Tracking ">
@@ -691,9 +693,11 @@ public class FingerPaint {
             }
             
             
+            @Override
             public void displayChanged(GLAutoDrawable drawable, boolean modeChanged, boolean deviceChanged) {
             }
             
+            @Override
             public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
                 
                 final GL gl = drawable.getGL();
@@ -734,6 +738,7 @@ public class FingerPaint {
             private Brush brush;
             private int color = 0;
             
+            @Override
             public void mouseDragged(MouseEvent e)
             {
                 if(!brushes.isEmpty()) {
@@ -742,6 +747,7 @@ public class FingerPaint {
                 }
             }            
 
+            @Override
             public void mousePressed(MouseEvent e)
             {
                 final Brush brush = new Brush();
@@ -753,6 +759,7 @@ public class FingerPaint {
 
                 brushes.add(brush);
             }
+            @Override
             public void mouseReleased(MouseEvent e)
             {
                 brushes.clear();
@@ -765,7 +772,7 @@ public class FingerPaint {
                 if (height <= 0.0f) // avoid a divide by zero error!
                     height = 1.0f;           
                 
-                final float ratio = (float) width / (float) height;
+                final float ratio = width / (float) height;
                 
                 float x = 2.0f * (+ (e.getX() / width)  - 0.5f);
                 float y = 2.0f * (- (e.getY() / height) + 0.5f);

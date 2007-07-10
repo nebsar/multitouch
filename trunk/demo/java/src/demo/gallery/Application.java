@@ -136,17 +136,20 @@ public final class Application
             this.image = image;
         }
         
+        @Override
         public void translate (double x, double y)
         {
             this.x = x;
             this.y = y;
         }
         
+        @Override
         public void rotate (double amount)
         {
             this.rot = amount;
         }
         
+        @Override
         public void scale (double ratio)
         {
             this.scale = ratio;
@@ -223,18 +226,21 @@ public final class Application
             
             final Tracker<Touch> tracker = uniqueMatch ( new Matcher<Touch,Double>()
             {
+                @Override
                 public Double match (Touch a, Touch b)
                 {
                     final double distance = distance (a, b);
                     return ( distance <= 0.1 ) ? distance : null;
                 }
                 
+                @Override
                 public int compare (Double a, Double b)
                 {
                     return a.compareTo (b);
                 }
             });
             
+            @Override
             synchronized public void view (Content content)
             {
                 for(int i=manipulators.length-1; i>=0; i--)
@@ -247,7 +253,8 @@ public final class Application
                     content.addTouch ( touch );
                 }
             }
-            
+           
+            @Override
             synchronized public void control (Input input)
             {
                 touchList.clear ();
@@ -319,6 +326,7 @@ public final class Application
             
             final Runnable init = new Runnable ()
             {
+                @Override
                 public void run ()
                 {
                     final GLRenderer renderer = new GLRenderer (scene);
@@ -346,6 +354,7 @@ public final class Application
                     
                     canvas.addGLEventListener (new GLEventListener ()
                     {
+                        @Override
                         public void init (GLAutoDrawable drawable)
                         {
                             if(!animator.isAnimating ())
@@ -353,14 +362,17 @@ public final class Application
                                 animator.start ();
                             }
                         }
+                        @Override
                         public void display (GLAutoDrawable drawable)
                         {
                             fpsCounter.nextFrame ();
                             renderer.render (drawable.getGL (), drawable.getWidth (), drawable.getHeight ());
                         }
+                        @Override
                         public void reshape (GLAutoDrawable drawable, int x, int y, int width, int height)
                         {
                         }
+                        @Override
                         public void displayChanged (GLAutoDrawable drawable, boolean modeChanged, boolean deviceChanged)
                         {
                         }
@@ -411,6 +423,7 @@ public final class Application
                         
                         private final String title = frame.getTitle ();
                         
+                        @Override
                         public void averageFramesElapsed (FPSCounter.Event e)
                         {
                             frame.setTitle (String.format ("%s  %f(AVG) %f(AGG)", title, e.getAverageFps (), e.getAggregateFps ()));

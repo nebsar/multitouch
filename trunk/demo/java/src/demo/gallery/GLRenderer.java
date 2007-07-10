@@ -358,12 +358,14 @@ class GLRenderer {
         {
             final Scene.Content content = new Scene.Content()
             {
+                @Override
                 public void addImage(Image image)
                 {
                     if(image != null) {
                         imageList.add(image);
                     }
                 }
+                @Override
                 public void addTouch(Touch touch)
                 {
                     if(touch != null) {

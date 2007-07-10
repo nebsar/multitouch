@@ -20,7 +20,6 @@ package utils.opengl;
 
 import static java.lang.String.*;
 import static java.nio.ByteOrder.*;
-import java.nio.ByteOrder;
 import static javax.media.opengl.GL.*;
 import static utils.opengl.ProgramUtils.*;
 
@@ -38,28 +37,28 @@ public class Video {
     
     public enum Format {
         LUMINANCE {
-            public int size() { return 1; }
-            int glFormat()   { return GL_LUMINANCE; }
-            int glType()     { return GL_UNSIGNED_BYTE; } 
-            int glInternal() { return GL_LUMINANCE; }
+            @Override public int size() { return 1; }
+            @Override int glFormat()   { return GL_LUMINANCE; }
+            @Override int glType()     { return GL_UNSIGNED_BYTE; } 
+            @Override int glInternal() { return GL_LUMINANCE; }
         },
         LUMINANCE_ALPHA {
-            public int size() { return 2; }
-            int glFormat()   { return GL_LUMINANCE_ALPHA; }
-            int glType()     { return GL_UNSIGNED_BYTE; } 
-            int glInternal() { return GL_LUMINANCE_ALPHA; }
+            @Override public int size() { return 2; }
+            @Override int glFormat()   { return GL_LUMINANCE_ALPHA; }
+            @Override int glType()     { return GL_UNSIGNED_BYTE; } 
+            @Override int glInternal() { return GL_LUMINANCE_ALPHA; }
         },
         RGB {
-            public int size() { return 3; }
-            int glFormat()   { return GL_RGB; }
-            int glType()     { return GL_UNSIGNED_BYTE; } 
-            int glInternal() { return GL_RGB; }
+            @Override public int size() { return 3; }
+            @Override int glFormat()   { return GL_RGB; }
+            @Override int glType()     { return GL_UNSIGNED_BYTE; } 
+            @Override int glInternal() { return GL_RGB; }
         },
         RGBA {
-            public int size() { return 4; }
-            int glFormat()   { return GL_RGBA; }
-            int glType()     { return GL_UNSIGNED_BYTE; } 
-            int glInternal() { return GL_RGBA; }
+            @Override public int size() { return 4; }
+            @Override int glFormat()   { return GL_RGBA; }
+            @Override int glType()     { return GL_UNSIGNED_BYTE; } 
+            @Override int glInternal() { return GL_RGBA; }
         };
         
         public abstract int size(); // in bytes

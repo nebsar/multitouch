@@ -121,7 +121,8 @@ class QuicktimeCapture extends Capture
             throw new RuntimeException("Couldn't initialize Quicktime Device", e);
         }        
     }
-    
+
+    @Override
     public void capture(byte[] image, EnumSet<Flip> flip)
     {
         final int width = getWidth(), height = getHeight();        

@@ -149,6 +149,7 @@ class TLCapture
         
         final Scene.Input input = new Scene.Input ()
         {
+            @Override
             public Iterator<Touch> getTouches ()
             {
                 return unmodifiableList ( touchList ).iterator ();
