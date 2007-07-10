@@ -1,17 +1,25 @@
 /*
- * QuicktimeCapture.java
- * 
- * Created on Jul 10, 2007, 10:38:40 AM
- * 
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright (C) 2007 Deutsche Telekom AG Laboratories
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
 package demo;
 
-import java.util.EnumSet;
-import quicktime.QTException;
 import static java.lang.Runtime.getRuntime;
+import java.util.EnumSet;
 
 import static quicktime.std.StdQTConstants.kComponentVideoCodecType;
 import static quicktime.std.StdQTConstants.seqGrabRecord;
@@ -19,6 +27,7 @@ import static quicktime.std.StdQTConstants.seqGrabPreview;
 import static quicktime.std.StdQTConstants.seqGrabPlayDuringRecord;
 import static quicktime.std.StdQTConstants.seqGrabDontMakeMovie;
 import static quicktime.qd.QDConstants.k32RGBAPixelFormat;
+import quicktime.QTException;
 import quicktime.QTSession;
 import quicktime.qd.PixMap;
 import quicktime.qd.QDGraphics;
@@ -27,12 +36,11 @@ import quicktime.std.sg.SGVideoChannel;
 import quicktime.std.sg.SequenceGrabber;
 import quicktime.util.RawEncodedImage;
 
-
+import static demo.Capture.Flip;
 /**
- *
- * @author gestalt
+ * @author Michael Nischt
  * @version 0.1
- */;
+ */
 class QuicktimeCapture extends Capture
 {
     static
