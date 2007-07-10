@@ -105,7 +105,8 @@ public class Video {
     }
     
     public void update(Stream stream) {
-        synchronized(this) {
+        //synchronized(this) 
+        {
             this.stream = stream;
         }
     }
@@ -201,7 +202,7 @@ public class Video {
         
         // <editor-fold defaultstate="collapsed" desc=" update ">
                 
-        synchronized(this) 
+        //synchronized(this) 
         {
             if(stream != null) {
                 gl.glBindTexture(GL_TEXTURE_2D, texture);     

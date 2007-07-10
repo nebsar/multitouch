@@ -18,7 +18,9 @@
 
 package demo.gallery;
 
-import static java.lang.Math.*;
+import static java.lang.Math.min;
+import static java.lang.Math.max;
+import static java.util.EnumSet.allOf;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
@@ -52,6 +54,7 @@ import de.telekom.laboratories.tracking.Observer;
 import demo.Capture;
 import static demo.Capture.startDevice;
 import static demo.Capture.Flip.VERTICAL;
+import static demo.Capture.Flip.HORIZONTAL;
 
 import static demo.gallery.Touch.Utils.distance;
 import static demo.gallery.Touch.Utils.distanceSquared;
@@ -387,7 +390,7 @@ public final class Application
                     final GraphicsDevice[] graphicsDevices = GraphicsEnvironment.getLocalGraphicsEnvironment ().getScreenDevices ();
                     final GraphicsDevice   graphicsDevice  = graphicsDevices[max (0, min (screen, graphicsDevices.length-1))];
                     
-                    final Frame frame = new Frame ("T-Demo", graphicsDevice.getDefaultConfiguration ());
+                    final Frame frame = new Frame ("T-Demo: Image Browsing", graphicsDevice.getDefaultConfiguration ());
                     frame.setSize (width, height);
                     
                     frame.add (canvas);
@@ -511,13 +514,13 @@ public final class Application
                         Capture device = startDevice(width, height);
                         while(this == currentThread())
                         {
-                            device.capture (image, VERTICAL);
+                            device.capture (image, allOf(Capture.Flip.class));
                             capture.capture(image);
                         }
                     }
                 };
                 t.setDaemon (true);
-                t.setPriority ((Thread.NORM_PRIORITY + Thread.MAX_PRIORITY)/2);
+                t.setPriority (Thread.NORM_PRIORITY);//(Thread.NORM_PRIORITY + Thread.MAX_PRIORITY)/2);
                 t.start ();
                 
                 
