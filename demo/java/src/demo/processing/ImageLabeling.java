@@ -23,7 +23,7 @@ import de.telekom.laboratories.multitouch.util.Labels;
 
 /**
  *
- * @author gestalt
+ * @author Michael Nischt
  * @version 0.1
  */
 public class ImageLabeling 

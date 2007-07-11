@@ -48,7 +48,7 @@ abstract public class Capture
         
     public int getWidth()  { return width; }
     public int getHeight() { return height; }
-        
+                
     protected void copy(byte[] src, byte[] dst, EnumSet<Flip> flip)
     {            
         //final int widht = getWidth(), height = getHeight();
@@ -108,5 +108,8 @@ abstract public class Capture
     public static Capture startDevice(int width, int height)
     {
         return new FlyCapture(width, height);
-    }        
+    }
+    
+    public abstract void dispose();
+    public abstract boolean isDisposed();
 }

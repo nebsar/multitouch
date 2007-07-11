@@ -63,8 +63,8 @@ class QuicktimeCapture extends Capture
     
     private final byte[] target;
     private final int[] rgbaPixels; 
-    private final SequenceGrabber sg;
-    private final RawEncodedImage raw;
+    private SequenceGrabber sg;
+    private RawEncodedImage raw;
     
     QuicktimeCapture(int width, int height)
     {    
@@ -121,7 +121,7 @@ class QuicktimeCapture extends Capture
             throw new RuntimeException("Couldn't initialize Quicktime Device", e);
         }        
     }
-
+    
     @Override
     public void capture(byte[] image, EnumSet<Flip> flip)
     {
@@ -155,4 +155,25 @@ class QuicktimeCapture extends Capture
         copy(target, image, flip);       
     }
 
+    @Override
+    public void dispose()
+    {
+        try
+        {
+            sg.release();
+            sg.disposeQTObject();
+            raw.disposeQTObject();     
+        } 
+        catch(QTException e) {}
+        sg = null;
+        raw = null;
+    }
+    
+    @Override
+    public boolean isDisposed()
+    {
+        return sg == null;
+    }
+    
+    
 }
