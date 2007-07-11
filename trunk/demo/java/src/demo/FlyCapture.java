@@ -71,4 +71,17 @@ class FlyCapture extends Capture implements Aquire
         //System.arraycopy(target, 0, image, 0, image.length);
         copy(target, image, flip);
     }
+    
+    @Override
+    public void dispose() 
+    {
+        camera.disconnect();
+    }
+
+    @Override
+    public boolean isDisposed() 
+    {
+        return !camera.isConnected();
+    }
+
 }
