@@ -18,14 +18,14 @@
 package demo.tuio;
 
 import java.awt.AWTException;
-import java.awt.CheckboxMenuItem;
 import java.awt.Dimension;
+import java.awt.DisplayMode;
+import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
 import java.awt.SystemTray;
-import java.awt.Toolkit;
 import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -38,7 +38,6 @@ import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
-import javax.swing.JToggleButton;
 import javax.swing.WindowConstants;
 import static java.awt.EventQueue.invokeAndWait;
 
@@ -76,11 +75,11 @@ public class VisualServer
             @Override
             public void windowClosed(WindowEvent e)
             {
-                if ( server == null || !server.isRunning() ) 
-                {
-                    exit();
-                    return;
-                }
+//                if ( server == null || !server.isRunning() ) 
+//                {
+//                    exit();
+//                    return;
+//                }
 
                 if (!systemTray()) {
                     floatingWindow();
@@ -103,8 +102,8 @@ public class VisualServer
                 try {
                     server = new Server(e.getHost(), e.getPort());
                     try {
-                        server.start(1024, 768);
-                        jFrame.dispose();
+                        //server.start(1024, 768);
+                        jFrame.dispose();                        
                     }
                     catch (Exception exception) {
                         e.cancel("Could not initialze Camera!");
@@ -125,8 +124,11 @@ public class VisualServer
         jFrame.pack();
         jFrame.setResizable(false);
         {
-            final Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-            jFrame.setLocation(Math.max(0, (d.width / 2) - (jFrame.getWidth() / 2)), Math.max(0, (d.height / 2) - (jFrame.getHeight() / 1)));
+            final DisplayMode d = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDisplayMode();
+            jFrame.setLocation(Math.max(0, (d.getWidth() / 2) - (jFrame.getWidth() / 2)), Math.max(0, (d.getHeight() / 2) - (jFrame.getHeight() / 2)  - 50));
+            // that following has problems with multiple graphics devices (screens):
+            //final Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+            //jFrame.setLocation(Math.max(0, (d.width / 2) - (jFrame.getWidth() / 2)), Math.max(0, (d.height / 2) - (jFrame.getHeight() / 1)));
         }
         jFrame.setVisible(true);
     }
