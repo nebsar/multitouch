@@ -24,11 +24,13 @@ import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.MenuItem;
+import java.awt.MenuShortcut;
 import java.awt.PopupMenu;
 import java.awt.SystemTray;
 import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
@@ -65,21 +67,22 @@ public class VisualServer
         }
 
 
-        final JFrame jFrame = new JFrame("Multi-T-ouch: TUIO Server");
-        jFrame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        final ServerForm form = new ServerForm();
+        form.setTitle("Multi-T-ouch: TUIO Server");
+        form.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         
-        if (icon != null) jFrame.setIconImage(icon);                
+        if (icon != null) form.setIconImage(icon);                
         
-        jFrame.addWindowListener(new WindowAdapter() 
+        form.addWindowListener(new WindowAdapter() 
         {
             @Override
             public void windowClosed(WindowEvent e)
             {
-//                if ( server == null || !server.isRunning() ) 
-//                {
-//                    exit();
-//                    return;
-//                }
+                if ( server == null || !server.isRunning() ) 
+                {
+                    exit();
+                    return;
+                }
 
                 if (!systemTray()) {
                     floatingWindow();
@@ -87,50 +90,16 @@ public class VisualServer
             }
         });
 
-        final JServerPanel jInetSocketAddressPanel = new JServerPanel();
-        jInetSocketAddressPanel.addServerPanelListener(new JServerPanel.Listener() {
-
-            @Override
-            public void cancelled(JServerPanel.Event e)
-            {
-                System.exit(0);
-            }
-
-            @Override
-            public void finished(JServerPanel.Event e)
-            {
-                try {
-                    server = new Server(e.getHost(), e.getPort());
-                    try {
-                        //server.start(1024, 768);
-                        jFrame.dispose();                        
-                    }
-                    catch (Exception exception) {
-                        e.cancel("Could not initialze Camera!");
-                        return;
-                    }
-                }
-                catch (UnknownHostException uhe) {
-                    e.cancel("Unkown Host!");
-                }
-                catch (SocketException se) {
-                    e.cancel("Could not initialze network.");
-                }
-            }
-        });
-        jFrame.getContentPane().add(jInetSocketAddressPanel);
-
-
-        jFrame.pack();
-        jFrame.setResizable(false);
+        form.pack();
+        form.setResizable(false);
         {
             final DisplayMode d = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDisplayMode();
-            jFrame.setLocation(Math.max(0, (d.getWidth() / 2) - (jFrame.getWidth() / 2)), Math.max(0, (d.getHeight() / 2) - (jFrame.getHeight() / 2)  - 50));
+            form.setLocation(Math.max(0, (d.getWidth() / 2) - (form.getWidth() / 2)), Math.max(0, (d.getHeight() / 2) - (form.getHeight() / 2)  - 50));
             // that following has problems with multiple graphics devices (screens):
             //final Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
             //jFrame.setLocation(Math.max(0, (d.width / 2) - (jFrame.getWidth() / 2)), Math.max(0, (d.height / 2) - (jFrame.getHeight() / 1)));
         }
-        jFrame.setVisible(true);
+        form.setVisible(true);
     }
 
     // <editor-fold defaultstate="collapsed" desc=" System Tray ">
@@ -164,9 +133,8 @@ public class VisualServer
             }
         });
 
-        final MenuItem exitItem = new MenuItem("MultiTouch: TUIO Server");
+        final MenuItem exitItem = new MenuItem("Exit");
         exitItem.addActionListener(exitListener);
-
 
         //popup.add(cameraItem);
         //popup.addSeparator();
