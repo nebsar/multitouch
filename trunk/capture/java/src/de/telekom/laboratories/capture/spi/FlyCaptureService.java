@@ -228,6 +228,7 @@ public class FlyCaptureService extends CaptureService
                     throw new IllegalStateException("Device is not connected");
                 }                
                 this.aquire = null;
+                FlyCaptureNative.disconnect(ref.handle); //@Untested
             }
         }
                
