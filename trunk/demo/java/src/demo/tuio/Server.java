@@ -18,6 +18,9 @@
 
 package demo.tuio;
 
+import com.illposed.osc.OSCBundle;
+import com.illposed.osc.OSCMessage;
+import com.illposed.osc.OSCPacket;
 import static java.util.EnumSet.noneOf;
 import java.util.EnumSet;
 
@@ -40,8 +43,12 @@ import demo.Capture;
 import static demo.tuio.Touch.matcher;
 
 import com.illposed.osc.OSCPortOut;
-import de.telekom.laboratories.tracking.Matcher;
 import de.telekom.laboratories.tracking.Observer;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 
 
@@ -52,8 +59,6 @@ import de.telekom.laboratories.tracking.Observer;
  */
 public class Server 
 {    
-
-    
     // <editor-fold defaultstate="collapsed" desc=" Variables ">
     
     private final Observer<Touch> observerProxy = new Observer<Touch>()
@@ -161,25 +166,139 @@ public class Server
         camera.dispose();
         camera = null;
     }
-    
+
+    private static class Alive
+    {
+        private final SortedSet<Integer> ids = new TreeSet<Integer>();
+        
+        public int spawn() 
+        {
+            final int min = ids.first(), max = ids.last();
+            final int id = (min > 0) ? (min-1) : (max+1);
+            return id;
+        }
+
+        public void die(int id) 
+        {
+            ids.remove(id);
+        }
+
+        public Object[] toArray()
+        {
+            final Object[] alive = new Object[ids.size()+1];
+            int index = 0;
+            alive[index++] = "alive";
+            for(int id : ids)
+            {
+                alive[index++] = id;
+            }
+            return alive;
+        }
+    }
+
+    class Update
+    {
+        int id;
+        boolean dirty; // only update if true
+        private float motionAcceleration;
+        private float rotationAcceleration;
+        Update(int id) 
+        {
+            this.id = id;
+            dirty = true;
+        }
+    }
+
+    private final Alive alive = new Alive();
+    private final Map<Touch, Update> touches = new HashMap<Touch, Update>();
+    private boolean sendAlive = false;
+    private int updated = 0;
+    private int frame = 0;
+
     private void startedTracking(Touch current)
     {
-
+        touches.put(current, new Update( alive.spawn() ) );
+        updated++;
     }
 
     private void updatedTracking(Touch last, Touch current)
     {
-
+        final Update update = touches.remove(last);
+        update.dirty = true;
+        //TODO: update accelrations
+        touches.put( current, update ); 
+        updated++;
     }
 
     private void finishedTracking(Touch last)
     {
-
+        final Update update= touches.remove( last );
+        alive.die(update.id);
+        sendAlive = true;
     }      
     
     private void sendFrame()
     {
+        if(updated > 0)
+        {
+            final OSCPacket[] setPkgs = new OSCPacket[updated];
+            int index=0;
+            for(Map.Entry<Touch,Update> entry : touches.entrySet())
+            {
+                final Update update = entry.getValue();
+
+                if(!update.dirty) continue;
+                else update.dirty = false;
+
+                final Touch touch = entry.getKey();
+
+                setPkgs[index++] = new OSCMessage("/tuio/2Dcur", new Object[] 
+                { "set", 
+                    update.id, touch.getX(), touch.getY(), 
+                    update.motionAcceleration, update.rotationAcceleration 
+                } );
+            }
+
+            try 
+            {
+                sender.send(new OSCBundle(setPkgs));
+            }
+            catch(IOException ioe)
+            {
+                stop();
+            }
+
+            updated = 0;
+        }
+
+
+        if(sendAlive)
+        {
+            OSCPacket aliveMsg = new OSCMessage("/tuio/2Dcur",
+                alive.toArray()
+            );
+            try 
+            {
+                sender.send(aliveMsg);
+            }
+            catch(IOException ioe)
+            {
+                stop();
+            }            
+        }
+
+        OSCPacket fseqMsg = new OSCMessage("/tuio/2Dcur",
+            new Object[] { "fseq", (++frame % Integer.MAX_VALUE) }
+        );
         
+        try 
+        {
+            sender.send(fseqMsg);
+        }
+        catch(IOException ioe)
+        {
+            stop();
+        }        
     }
     
     // </editor-fold>
