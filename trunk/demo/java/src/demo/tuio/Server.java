@@ -274,7 +274,7 @@ public class Server
 
         if(sendAlive)
         {
-            OSCPacket aliveMsg = new OSCMessage("/tuio/2Dcur",
+            final OSCPacket aliveMsg = new OSCMessage("/tuio/2Dcur",
                 alive.toArray()
             );
             try 
@@ -287,7 +287,7 @@ public class Server
             }            
         }
 
-        OSCPacket fseqMsg = new OSCMessage("/tuio/2Dcur",
+        final OSCPacket fseqMsg = new OSCMessage("/tuio/2Dcur",
             new Object[] { "fseq", (++frame % Integer.MAX_VALUE) }
         );
         
