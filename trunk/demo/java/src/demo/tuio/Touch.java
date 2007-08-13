@@ -19,7 +19,6 @@
 package demo.tuio;
 
 import de.telekom.laboratories.tracking.Matcher;
-import demo.processing.*;
 
 /**
  * @author Michael Nischt
