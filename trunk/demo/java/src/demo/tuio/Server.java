@@ -84,6 +84,7 @@ public class Server
     
     private final OSCPortOut sender;
     private Capture camera;
+    private TLCapture capture;;
     private Tracker<Touch> tracker;
     
     // </editor-fold>
@@ -133,6 +134,7 @@ public class Server
     {        
         if(isRunning()) throw new IllegalStateException("Server already started!");                               
         
+        capture = new TLCapture(width, height);
         camera = startDevice(width, height);
         final byte[] image = new byte[width*height];
         
@@ -150,6 +152,8 @@ public class Server
                 if(!isRunning()) throw new IllegalStateException("Server is not running!");
                 
                 camera.capture(image, flip);  
+                final Touch[] touches = capture.capture(image);
+                for(Touch t : touches) tracker.track(t);
                 
                 tracker.nextFrame(Server.this.observerProxy);
                 
@@ -173,8 +177,14 @@ public class Server
         
         public int spawn() 
         {
+            if(ids.isEmpty()) 
+            {
+                ids.add(1);
+                return 1;
+            }
             final int min = ids.first(), max = ids.last();
-            final int id = (min > 0) ? (min-1) : (max+1);
+            final int id = (min > 1) ? (min-1) : (max+1);
+            ids.add(id);
             return id;
         }
 
@@ -238,9 +248,11 @@ public class Server
     }      
     
     private void sendFrame()
-    {
+    {        
         if(updated > 0)
         {
+            System.out.println("send: " + updated);
+            
             final OSCPacket[] setPkgs = new OSCPacket[updated];
             int index=0;
             for(Map.Entry<Touch,Update> entry : touches.entrySet())
@@ -302,4 +314,14 @@ public class Server
     }
     
     // </editor-fold>
+    
+    public static void main(String... args) throws Exception
+    {
+        Server server;
+        if(args != null && args.length > 0) server = new Server(Integer.parseInt(args[0]));
+        else server = new Server();
+        
+        final Runnable run = server.start(1024, 768, true ,true);
+        while(true) run.run();
+    }
 }
