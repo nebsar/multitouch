@@ -167,9 +167,9 @@ public class Server
                 Server.this.sendFrame();
                 
                 
-//                System.out.print("previous: " + previous);
-//                System.out.println("\t\tcurrent: " + touches.length);
-//                System.out.println();
+                //System.out.print("previous: " + previous);
+                //System.out.println("\t\tcurrent: " + touches.length);
+                //System.out.println();
                 previous = touches.length;
             }
         };
@@ -282,7 +282,7 @@ public class Server
     private void startedTracking(Touch current)
     {
         final Update update = new Update( alive.spawn() );
-        //System.out.println("start: " + update.id);
+        if(DEBUG) System.out.println("start: " + update.id);
         touches.put(current, update);
         
         updated++;
@@ -292,7 +292,7 @@ public class Server
     private void updatedTracking(Touch last, Touch current)
     {        
         final Update update = touches.remove(last);
-        //System.out.println("update: " + update.id);
+        if(DEBUG) System.out.println("update: " + update.id);
         update.dirty = true;
         //TODO: update accelrations
         touches.put( current, update ); 
@@ -302,7 +302,7 @@ public class Server
     private void finishedTracking(Touch last)
     {        
         final Update update= touches.remove( last );
-        //System.out.println("end: " + update.id);
+        if(DEBUG) System.out.println("end: " + update.id);
         alive.die(update.id);        
         sendAlive = true;
     }      
@@ -341,7 +341,7 @@ public class Server
         
         if(updated > 0)
         {
-            //System.out.println("frame: " + updated);
+            if(DEBUG) System.out.println("frame msgs: " + updated);
             
             final OSCPacket[] setPkgs = new OSCPacket[updated];
             int index=0;
@@ -354,7 +354,7 @@ public class Server
 
                 final Touch touch = entry.getKey();
 
-                System.out.println("send id: " + update.id);
+                //System.out.println("send id: " + update.id);
                 
                 setPkgs[index++] = new OSCMessage("/tuio/2Dcur", new Object[] 
                 { "set", 
@@ -379,8 +379,11 @@ public class Server
     
     // </editor-fold>
     
+    private static boolean DEBUG = false;
+    
     public static void main(String... args) throws Exception
     {
+        if(args != null && asList(args).contains("-debug") ) Server.DEBUG = true;
         if(args != null && asList(args).contains("-fps") ) Server.PRINT_FPS = true;
         if(args != null && asList(args).contains("-id") ) Server.INCREMENTING_IDS = false;
             
