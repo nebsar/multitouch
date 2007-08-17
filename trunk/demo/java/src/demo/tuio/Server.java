@@ -225,7 +225,8 @@ public class Server
         @Override
         public int spawn() 
         {            
-            final int id = (ids.isEmpty()) ? 1 : ids.last()+1;
+            int id = (ids.isEmpty()) ? 1 : ids.last()+1;
+            if(id < 0) id = 1;
             ids.add(id);
             return id;
         }
@@ -365,8 +366,8 @@ public class Server
     
     public static void main(String... args) throws Exception
     {
-        if(args != null && asList(args).contains("fps") ) Server.PRINT_FPS = true;
-        if(args != null && asList(args).contains("id.incr") ) Server.INCREMENTING_IDS = true;
+        if(args != null && asList(args).contains("-fps") ) Server.PRINT_FPS = true;
+        if(args != null && asList(args).contains("-id.incr") ) Server.INCREMENTING_IDS = true;
             
         Server server;
         if(args != null && args.length > 0) server = new Server(Integer.parseInt(args[0]));
