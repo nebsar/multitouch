@@ -40,15 +40,21 @@ import static demo.Capture.Flip.HORIZONTAL;
 import static demo.Capture.Flip.VERTICAL;
 import demo.Capture;
 
+import static java.lang.System.out;
+import static java.util.Arrays.asList;
 import static demo.tuio.Touch.matcher;
 
 import com.illposed.osc.OSCPortOut;
 import de.telekom.laboratories.tracking.Observer;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import net.monoid.util.FPSCounter;
+import net.monoid.util.FPSCounter.Event;
 
 
 
@@ -173,7 +179,8 @@ public class Server
 
     private static class Alive
     {
-        private final SortedSet<Integer> ids = new TreeSet<Integer>();
+        protected final SortedSet<Integer> ids = new TreeSet<Integer>();
+        protected final Set<Integer> dead = new HashSet<Integer>();
         
         public int spawn() 
         {
@@ -190,11 +197,15 @@ public class Server
 
         public void die(int id) 
         {
-            ids.remove(id);
+            dead.add(id);
         }
 
-        public Object[] toArray()
+        
+        public Object[] nextFrame()
         {
+            ids.removeAll(dead);
+            dead.clear();
+            
             final Object[] alive = new Object[ids.size()+1];
             int index = 0;
             alive[index++] = "alive";
@@ -203,9 +214,23 @@ public class Server
                 alive[index++] = id;
             }
             return alive;
+            
         }
     }
 
+    private static class AliveSimple extends Alive
+    {
+        private int next;  //=0;
+        
+        @Override
+        public int spawn() 
+        {            
+            final int id = (ids.isEmpty()) ? 1 : ids.last()+1;
+            ids.add(id);
+            return id;
+        }
+    }    
+    
     class Update
     {
         int id;
@@ -219,7 +244,28 @@ public class Server
         }
     }
 
-    private final Alive alive = new Alive();
+    
+    private static boolean PRINT_FPS = false;
+    private final FPSCounter fpsCounter = fpsCounter();
+    
+    private final static FPSCounter fpsCounter()
+    {
+        final FPSCounter fpsCounter = new FPSCounter();
+        fpsCounter.addFPSCounterListener(new FPSCounter.Listener()
+        {
+            public void averageFramesElapsed(FPSCounter.Event e)
+            {
+                if(PRINT_FPS)
+                {
+                    out.printf("FPS:  %f (AVG)  %f (AGG)\n", e.getAverageFps(), e.getAggregateFps() );
+                }
+            }
+        });  
+        return fpsCounter;
+    };
+      
+    private static boolean INCREMENTING_IDS = false;
+    private final Alive alive = INCREMENTING_IDS ? new AliveSimple() : new Alive();
     private final Map<Touch, Update> touches = new HashMap<Touch, Update>();
     private boolean sendAlive = false;
     private int updated = 0;
@@ -229,6 +275,7 @@ public class Server
     {
         touches.put(current, new Update( alive.spawn() ) );
         updated++;
+        sendAlive = true;
     }
 
     private void updatedTracking(Touch last, Touch current)
@@ -248,7 +295,36 @@ public class Server
     }      
     
     private void sendFrame()
-    {        
+    {                
+        try 
+        {
+            final OSCPacket fseqMsg = new OSCMessage("/tuio/2Dcur",
+                new Object[] { "fseq", (++frame % Integer.MAX_VALUE) }
+            );        
+            
+            sender.send(fseqMsg);
+        }
+        catch(IOException ioe)
+        {
+            stop();
+        }                
+        
+        if(sendAlive)
+        {
+            final OSCPacket aliveMsg = new OSCMessage("/tuio/2Dcur",
+                alive.nextFrame()
+            );
+            try 
+            {
+                sender.send(aliveMsg);
+            }
+            catch(IOException ioe)
+            {
+                stop();
+            }
+            sendAlive = false;
+        }        
+        
         if(updated > 0)
         {
             System.out.println("send: " + updated);
@@ -283,40 +359,15 @@ public class Server
             updated = 0;
         }
 
-
-        if(sendAlive)
-        {
-            final OSCPacket aliveMsg = new OSCMessage("/tuio/2Dcur",
-                alive.toArray()
-            );
-            try 
-            {
-                sender.send(aliveMsg);
-            }
-            catch(IOException ioe)
-            {
-                stop();
-            }            
-        }
-
-        final OSCPacket fseqMsg = new OSCMessage("/tuio/2Dcur",
-            new Object[] { "fseq", (++frame % Integer.MAX_VALUE) }
-        );
-        
-        try 
-        {
-            sender.send(fseqMsg);
-        }
-        catch(IOException ioe)
-        {
-            stop();
-        }        
     }
     
     // </editor-fold>
     
     public static void main(String... args) throws Exception
     {
+        if(args != null && asList(args).contains("fps") ) Server.PRINT_FPS = true;
+        if(args != null && asList(args).contains("id.incr") ) Server.INCREMENTING_IDS = true;
+            
         Server server;
         if(args != null && args.length > 0) server = new Server(Integer.parseInt(args[0]));
         else server = new Server();
