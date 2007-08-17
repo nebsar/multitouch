@@ -44,9 +44,9 @@ final public class Trackers
         return new Nearest.Base<Feature, Quality> (matcher) {
             @Override
             protected void doEvents(Observer<? super Feature> observer) {
-                // begin
+                // end
                 for (Nearest<Feature, Quality> last : lastList) {
-                    if ( !last.matches() ) {
+                    if ( !last.uniqueMatch() ) {
                         observer.finishedTracking( last.touch );
                     }
                 }
@@ -54,21 +54,21 @@ final public class Trackers
                 // update
                 if(lastList.size() < currentList.size()) {
                     for (Nearest<Feature, Quality> last : lastList) {
-                        if ( last.matches() ) {
+                        if ( last.uniqueMatch() ) {
                             observer.updatedTracking( last.touch, last.nearest.touch );
                         }
                     }
                 } else {
                     for (Nearest<Feature, Quality> current : currentList) {
-                        if ( current.matches() ) {
+                        if ( current.uniqueMatch() ) {
                             observer.updatedTracking( current.nearest.touch, current.touch );
                         }
                     }
                 }
                 
-                // end
+                // start
                 for (Nearest<Feature, Quality> current : currentList) {
-                    if ( !current.matches() ) {
+                    if ( !current.uniqueMatch() ) {
                         observer.startedTracking( current.touch );
                     }
                 }
@@ -95,7 +95,7 @@ final public class Trackers
         return new Nearest.Base<Feature, Quality> (matcher) {
             @Override
             protected void doEvents(Observer<? super Feature> observer) {
-                // begin
+                // end
                 for (Nearest<Feature, Quality> last : lastList) {
                     if ( last.nearest == null ) {
                         observer.finishedTracking( last.touch );
@@ -106,13 +106,13 @@ final public class Trackers
                 {
                     if(lastList.size() < currentList.size()) {
                         for (Nearest<Feature, Quality> last : lastList) {
-                            if ( last.matches() ) {
+                            if ( last.uniqueMatch() ) {
                                 observer.updatedTracking( last.touch, last.nearest.touch );
                             }
                         }
                     } else {
                         for (Nearest<Feature, Quality> current : currentList) {
-                            if ( current.matches() ) {
+                            if ( current.uniqueMatch() ) {
                                 observer.updatedTracking( current.nearest.touch, current.touch );
                             }
                         }
@@ -120,17 +120,17 @@ final public class Trackers
                     
                     
                     for (Nearest<Feature, Quality> last : lastList) {
-                        if ( last.nearest != null && !last.matches() ) {
+                        if ( last.nearest != null && !last.uniqueMatch() ) {
                             observer.updatedTracking( last.touch, last.nearest.touch );
                         }
                     }
                     for (Nearest<Feature, Quality> current : currentList) {
-                        if ( current.nearest != null && !current.matches() ) {
+                        if ( current.nearest != null && !current.uniqueMatch() ) {
                             observer.updatedTracking( current.nearest.touch, current.touch );
                         }
                     }
                 }
-                // end
+                // begin
                 for (Nearest<Feature, Quality> current : currentList) {
                     if ( current.nearest == null ) {
                         observer.startedTracking( current.touch );
@@ -187,13 +187,14 @@ final public class Trackers
                     final Quality quality = matcher.match( last.touch, current.touch );
                     
                     // no match
-                    if(quality == null) continue;
+                    if(quality == null) { continue; }
                     // potential matches
-                    if(last.quality == null || matcher.compare(quality, last.quality) <= 0) {
+                    if(last.quality == null || matcher.compare(quality, last.quality) > 0) {
                         last.nearest = current;
                         last.quality = quality;
                     }
-                    if(current.quality == null || matcher.compare(quality, current.quality) <= 0) {
+                    if(current.quality == null || matcher.compare(quality, current.quality) > 0) 
+                    {
                         current.nearest = last;
                         current.quality = quality;
                     }
@@ -271,7 +272,7 @@ final public class Trackers
         }
         
         
-        private boolean matches() {
+        private boolean uniqueMatch() {
             return (nearest != null) && (this == nearest.nearest);
         }
         
