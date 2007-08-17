@@ -28,7 +28,7 @@ final public class Touch
 {
     private static class TouchMatcher implements Matcher<Touch,Float>
     {
-        private final float threshold = 0.1f;
+        private final float threshold = Float.MAX_VALUE;//0.1f;
         private final float xScale, yScale;
 
         private TouchMatcher(int width, int height)
@@ -50,14 +50,15 @@ final public class Touch
         {            
             float x = xScale*( b.getX() - a.getX() );
             float y = yScale*( b.getY() - a.getY() );
-            float distance = (float) Math.sqrt(x*x+y+y);
+            float distance = (float) Math.sqrt(x*x+y*y);
+            assert(distance >= 0.0f);
             return (distance  <= threshold ) ? distance : null;
         }
 
         @Override
         public int compare (Float a, Float b)
         {
-            return a.compareTo (b);
+            return b.compareTo (a);
         }                    
     }
     

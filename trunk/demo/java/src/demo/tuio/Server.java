@@ -29,6 +29,7 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 
 import static de.telekom.laboratories.tracking.Trackers.uniqueMatch;
+import static de.telekom.laboratories.tracking.Trackers.bestMatch;
 import de.telekom.laboratories.tracking.Tracker;
 
 
@@ -152,6 +153,8 @@ public class Server
 
         return new Runnable()
         {
+                
+            int previous = 0;
             @Override
             public void run()
             {
@@ -159,16 +162,19 @@ public class Server
                 
                 camera.capture(image, flip);  
                 final Touch[] touches = capture.capture(image);
-                for(Touch t : touches) tracker.track(t);
-                
+                for(Touch t : touches) tracker.track(t);                
                 tracker.nextFrame(Server.this.observerProxy);
-                
                 Server.this.sendFrame();
+                
+                
+//                System.out.print("previous: " + previous);
+//                System.out.println("\t\tcurrent: " + touches.length);
+//                System.out.println();
+                previous = touches.length;
             }
         };
-        
-        
     } 
+
     
     public void stop() 
     {
@@ -225,7 +231,8 @@ public class Server
         @Override
         public int spawn() 
         {            
-            int id = (ids.isEmpty()) ? 1 : ids.last()+1;
+            ++next;
+            int id = next;
             if(id < 0) id = 1;
             ids.add(id);
             return id;
@@ -234,7 +241,7 @@ public class Server
     
     class Update
     {
-        int id;
+        final int id;
         boolean dirty; // only update if true
         private float motionAcceleration;
         private float rotationAcceleration;
@@ -265,7 +272,7 @@ public class Server
         return fpsCounter;
     };
       
-    private static boolean INCREMENTING_IDS = false;
+    private static boolean INCREMENTING_IDS = true;
     private final Alive alive = INCREMENTING_IDS ? new AliveSimple() : new Alive();
     private final Map<Touch, Update> touches = new HashMap<Touch, Update>();
     private boolean sendAlive = false;
@@ -274,14 +281,18 @@ public class Server
 
     private void startedTracking(Touch current)
     {
-        touches.put(current, new Update( alive.spawn() ) );
+        final Update update = new Update( alive.spawn() );
+        //System.out.println("start: " + update.id);
+        touches.put(current, update);
+        
         updated++;
         sendAlive = true;
     }
 
     private void updatedTracking(Touch last, Touch current)
-    {
+    {        
         final Update update = touches.remove(last);
+        //System.out.println("update: " + update.id);
         update.dirty = true;
         //TODO: update accelrations
         touches.put( current, update ); 
@@ -289,14 +300,16 @@ public class Server
     }
 
     private void finishedTracking(Touch last)
-    {
+    {        
         final Update update= touches.remove( last );
-        alive.die(update.id);
+        //System.out.println("end: " + update.id);
+        alive.die(update.id);        
         sendAlive = true;
     }      
     
     private void sendFrame()
-    {                
+    {       
+        fpsCounter.nextFrame();
         try 
         {
             final OSCPacket fseqMsg = new OSCMessage("/tuio/2Dcur",
@@ -328,7 +341,7 @@ public class Server
         
         if(updated > 0)
         {
-            System.out.println("send: " + updated);
+            //System.out.println("frame: " + updated);
             
             final OSCPacket[] setPkgs = new OSCPacket[updated];
             int index=0;
@@ -341,6 +354,8 @@ public class Server
 
                 final Touch touch = entry.getKey();
 
+                System.out.println("send id: " + update.id);
+                
                 setPkgs[index++] = new OSCMessage("/tuio/2Dcur", new Object[] 
                 { "set", 
                     update.id, touch.getX(), touch.getY(), 
@@ -367,7 +382,7 @@ public class Server
     public static void main(String... args) throws Exception
     {
         if(args != null && asList(args).contains("-fps") ) Server.PRINT_FPS = true;
-        if(args != null && asList(args).contains("-id.incr") ) Server.INCREMENTING_IDS = true;
+        if(args != null && asList(args).contains("-id") ) Server.INCREMENTING_IDS = false;
             
         Server server;
         if(args != null && args.length > 0) server = new Server(Integer.parseInt(args[0]));

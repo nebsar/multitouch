@@ -239,7 +239,7 @@ public final class Application
                 @Override
                 public int compare (Double a, Double b)
                 {
-                    return a.compareTo (b);
+                    return b.compareTo (a);
                 }
             });
             
