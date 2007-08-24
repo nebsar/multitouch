@@ -41,7 +41,7 @@ import processing.core.PApplet;
  */
 public class MultitouchTest extends PApplet {
 
-    private final static int CAPTURE_WIDTH = 640, CAPTURE_HEIGHT = 480;
+    private final static int CAPTURE_WIDTH = 1024, CAPTURE_HEIGHT = 768;
         
     private final byte[] image = new byte[CAPTURE_WIDTH*CAPTURE_HEIGHT];
     private final ImageLabeling imageLabels = new ImageLabeling(CAPTURE_WIDTH, CAPTURE_HEIGHT);
@@ -51,7 +51,7 @@ public class MultitouchTest extends PApplet {
         public Double match (Touch a, Touch b)
         {
             final double distance = distance (a, b);
-            return ( distance <= 0.1 ) ? distance : null;
+            return ( distance <= 0.1 ) ? -distance : null;
         }
 
         public int compare (Double a, Double b)
@@ -59,8 +59,7 @@ public class MultitouchTest extends PApplet {
             return a.compareTo (b);
         }
     });   
-    
-    
+        
     private final Queue<Touch> renderQueue = new LinkedList<Touch>();
     private Capture device;
     
@@ -68,7 +67,7 @@ public class MultitouchTest extends PApplet {
     
     @Override
     public void setup() {
-        size(640, 480);
+        size(1024, 768);
         this.device = startDevice(CAPTURE_WIDTH, CAPTURE_HEIGHT);
     }
 
@@ -84,8 +83,8 @@ public class MultitouchTest extends PApplet {
         color(0);
         while( (next = renderQueue.poll()) != null)
         {
-            final float x = 480 * (0.5f * ( next.getX() + 1.0f )); 
-            final float y = 480 * (0.5f * ( next.getY() + 1.0f ));
+            final float x = CAPTURE_WIDTH * (0.5f * ( next.getX() + 1.0f )); 
+            final float y = CAPTURE_HEIGHT * (0.5f * ( next.getY() + 1.0f ));
          
             final float radius = 5;
             
