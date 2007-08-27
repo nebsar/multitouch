@@ -354,7 +354,8 @@ public class Server
 
                 final Touch touch = entry.getKey();
 
-                //System.out.println("send id: " + update.id);
+                if(DEBUG)
+                    System.out.printf("update id: %d (x=%f,y=%f)\n", update.id, touch.getX(), touch.getY() );
                 
                 setPkgs[index++] = new OSCMessage("/tuio/2Dcur", new Object[] 
                 { "set", 
