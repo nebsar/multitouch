@@ -320,8 +320,8 @@ public final class Application
         };
         
         {
-            final int width = 640, height = 480;
-            //final int width = 1024, height = 768;
+            //final int width = 640, height = 480;
+            final int width = 1024, height = 768;
             final boolean fullscreen = true;
             final int screen = 1;
             
@@ -514,7 +514,7 @@ public final class Application
                         Capture device = startDevice(width, height);
                         while(this == currentThread())
                         {
-                            device.capture (image, allOf(Capture.Flip.class));
+                            device.capture (image, Capture.Flip.VERTICAL);//allOf(Capture.Flip.class));
                             capture.capture(image);
                         }
                     }
