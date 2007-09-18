@@ -18,6 +18,8 @@
 
 package utils.opengl;
 
+import static java.lang.String.format;
+
 import static java.nio.ByteOrder.nativeOrder;
 import static javax.media.opengl.GL.*;
 
@@ -65,6 +67,14 @@ public class ProgramUtils {
         } catch(IOException e) {
             throw new GLException( String.format( "Could not read resource: %s", url.toString() ) );
         }
+    }
+    
+    public static int program(GL gl, Class<?> c) throws GLException
+    {
+        final String base = c.getName().replace(".", "/");
+        return program(gl, 
+                c.getResource(format("/%s.vert", base)),
+                c.getResource(format("/%s.frag", base)));
     }
     
     public static int program(GL gl, URL vertexShader, URL fragmentShader) throws GLException {
