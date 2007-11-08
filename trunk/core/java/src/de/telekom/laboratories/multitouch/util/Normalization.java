@@ -32,8 +32,8 @@ package de.telekom.laboratories.multitouch.util;
  * @author Michael Nischt
  * @version 0.1
  */
-abstract class Normalization {    
-    
+abstract class Normalization 
+{    
     // <editor-fold defaultstate="collapsed" desc=" Properties ">
     
     public abstract int getOffset();
