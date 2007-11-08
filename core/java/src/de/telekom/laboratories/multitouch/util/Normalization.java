@@ -32,7 +32,7 @@ package de.telekom.laboratories.multitouch.util;
  * @author Michael Nischt
  * @version 0.1
  */
-public abstract class Normalization {    
+abstract class Normalization {    
     
     // <editor-fold defaultstate="collapsed" desc=" Properties ">
     
