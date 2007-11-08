@@ -28,6 +28,8 @@ import java.util.List;
  */
 final public class Trackers 
 {
+    private Trackers() {}
+    
     // <editor-fold defaultstate="collapsed" desc=" uniqueMatch ">
     
     /**
