@@ -45,16 +45,12 @@ public interface Observer<Feature>
      * @param last the feature not present anymore
      */
     void finishedTracking (Feature last);
-    
-    /**
-     * A stateless object, which ignores all notification.
-     */
-    final Observer IGNORE = new Adapter() {};
-    
+        
     // <editor-fold defaultstate="collapsed" desc=" Adapter ">
     
     /**
-     * A implementation, which ignores the notification with the primary usage to implemeoverride 
+     * A implementation, which ignores the notification, 
+     * but makes it easier to implement a single method only.
      * @param Feature the type of the objects to be tracked.
      */
     static abstract public class Adapter<Feature> implements Observer<Feature>
@@ -67,6 +63,14 @@ public interface Observer<Feature>
         public void startedTracking  (Feature current) {}        
         public void updatedTracking  (Feature last, Feature current) {}
         public void finishedTracking (Feature last) {}
+        
+        /**
+         * A stateless object, which ignores all notification.
+         */
+        public static <Feature> Observer<Feature> ignore()
+        {
+            return new Adapter<Feature>() {};
+        }        
     }
     
     // </editor-fold>
