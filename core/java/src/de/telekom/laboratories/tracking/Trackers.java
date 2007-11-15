@@ -190,12 +190,22 @@ final public class Trackers
                     
                     // no match
                     if(quality == null) { continue; }
+                    
+                    
+                    int c;
+                    
                     // potential matches
-                    if(last.quality == null || matcher.compare(quality, last.quality) > 0) {
+                    if( (last.quality == null)
+                     || ((c = matcher.compare(quality, last.quality)) > 0)
+                     || ((c == 0) && last.uniqueMatch())) 
+                    {
                         last.nearest = current;
                         last.quality = quality;
-                    }
-                    if(current.quality == null || matcher.compare(quality, current.quality) > 0) 
+                    }                        
+                        
+                    if( (current.quality == null)
+                     || ((c = matcher.compare(quality, current.quality)) > 0)
+                     || ((c == 0) && current.uniqueMatch()))
                     {
                         current.nearest = last;
                         current.quality = quality;
