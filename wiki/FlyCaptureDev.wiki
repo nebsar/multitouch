@@ -57,15 +57,13 @@ Linking Options
 {{{
 -g -IC:/Program\ Files/Point\ Grey\ Research/PGR\ FlyCapture/include
 }}}
-if using cygwin, then tell gcc to create mingw binaries, whichrun with cywin installation:
+if using cygwin, then tell gcc to create mingw binaries, whichrun without cywin installation:
 {{
 -mno-cygwin
 }}
 
 
 "C:/Program Files/Point Grey Research/PGR FlyCapture/lib/libPGRFlyCapture.a" "C:/Program Files/Point Grey Research/PGR FlyCapture/lib/libpgrflycapturegui.a"
-
-
 
 
 
