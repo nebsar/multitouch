@@ -62,15 +62,7 @@ public interface Observer<Feature>
         
         public void startedTracking  (Feature current) {}        
         public void updatedTracking  (Feature last, Feature current) {}
-        public void finishedTracking (Feature last) {}
-        
-        /**
-         * A stateless object, which ignores all notification.
-         */
-        public static <Feature> Observer<Feature> ignore()
-        {
-            return new Adapter<Feature>() {};
-        }        
+        public void finishedTracking (Feature last) {}        
     }
     
     // </editor-fold>

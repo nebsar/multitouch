@@ -30,69 +30,40 @@ final public class Trackers
 {
     private Trackers() {}
     
-    // <editor-fold defaultstate="collapsed" desc=" uniqueMatch ">
-    
+        
+    // <editor-fold defaultstate="collapsed" desc=" bestMatch ">    
+
     /**
-     * Returns an implementation, which correlates two features, if they match mutually with the highest quality.
-     * Therefore the correlation is always symmetric.
-     * @param matcher provides a qulaity measure how well two features match.
-     * @return An implementation, which uniquely correlates features.
-     */
-    static public <Feature, Quality> Tracker<Feature> uniqueMatch(Matcher<? super Feature, Quality> matcher)
-            //static public <Feature, Quality> Tracker<Feature> uniqueMatch(Matcher<? super Feature, Quality> matcher)
+     * Returns an implementation, which correlates two features, if the matching quality is maximal regarding one of them. 
+     * this is the case iff there is no other match with higher quality.
+     * 
+     * @param matcher provides a quality measure how well two features match.
+     * @return An implementation, which correlates two features, if they match best.
+     */     
+    static public <Feature, Quality> Tracker<Feature> bestMatch(Matcher<? super Feature, Quality> matcher)
     {
-        // <editor-fold defaultstate="collapsed" desc=" Unique: doEvents ">
-        
-        return new Nearest.Base<Feature, Quality> (matcher) {
-            @Override
-            protected void doEvents(Observer<? super Feature> observer) {
-                // end
-                for (Nearest<Feature, Quality> last : lastList) {
-                    if ( !last.uniqueMatch() ) {
-                        observer.finishedTracking( last.touch );
-                    }
-                }
-                
-                // update
-                if(lastList.size() < currentList.size()) {
-                    for (Nearest<Feature, Quality> last : lastList) {
-                        if ( last.uniqueMatch() ) {
-                            observer.updatedTracking( last.touch, last.nearest.touch );
-                        }
-                    }
-                } else {
-                    for (Nearest<Feature, Quality> current : currentList) {
-                        if ( current.uniqueMatch() ) {
-                            observer.updatedTracking( current.nearest.touch, current.touch );
-                        }
-                    }
-                }
-                
-                // start
-                for (Nearest<Feature, Quality> current : currentList) {
-                    if ( !current.uniqueMatch() ) {
-                        observer.startedTracking( current.touch );
-                    }
-                }
-            }
-        };
-        
-        // </editor-fold>
+        return bestMatch(matcher, false);
     }
     
-    // </editor-fold>
-    
-    // <editor-fold defaultstate="collapsed" desc=" bestMatch ">
-    
     /**
-     * Returns an implementation, which correlates two features, if there is no other feature with a higher matching quality regarding one of them.
-     * @param matcher provides a qulaity measure how well two features match.
-     * @return An implementation, which correlates two features, if it is the best match for one.
-     */
-    static public <Feature, Quality> Tracker<Feature> bestMatch(Matcher<? super Feature, Quality> matcher)
-            //static public <Feature, Quality> Tracker<Feature> bestMatch(Matcher<? super Feature, Quality> matcher)
+     * Returns an implementation, which correlates two features, if the matching quality is maximal.
+     * This can be the case only for one feature in the pair or for both.<br/><br/>
+     * 
+     * Note: Requiring a mutual match, features are only merged/split, iff the matching is of exactly the same quality.
+     * Else, it is sufficient that there is no other match with higher quality.
+     * @param matcher provides a quality measure how well two features match.
+     * @param mutual specifies whether the quality must be mutually equal for a pair to match successfully.
+     * @return An implementation, which correlates two features, if they match best.
+     */    
+    static public <Feature, Quality> Tracker<Feature> bestMatch(Matcher<? super Feature, Quality> matcher, boolean mutual)
     {
-        // <editor-fold defaultstate="collapsed" desc=" Best: doEvents ">
+        if(mutual) return bestMutualMatch(matcher);
+        else return bestSingleMatch(matcher);
+    }
+    
+    static private <Feature, Quality> Tracker<Feature> bestSingleMatch(Matcher<? super Feature, Quality> matcher)
+    {
+        // <editor-fold defaultstate="collapsed" desc=" doEvents ">
         
         return new Nearest.Base<Feature, Quality> (matcher) {
             @Override
@@ -143,6 +114,61 @@ final public class Trackers
         
         // </editor-fold>
     }
+
+    static private <Feature, Quality> Tracker<Feature> bestMutualMatch(Matcher<? super Feature, Quality> matcher)
+    {
+        // <editor-fold defaultstate="collapsed" desc=" doEvents ">
+        
+        return new Nearest.Base<Feature, Quality> (matcher) {
+            @Override
+            protected void doEvents(Observer<? super Feature> observer) {
+                // end
+                for (Nearest<Feature, Quality> last : lastList) {
+                    if ( !last.equalMatch(matcher) ) {
+                        observer.finishedTracking( last.touch );
+                    }
+                }
+                
+                // update
+                {
+                    if(lastList.size() < currentList.size()) {
+                        for (Nearest<Feature, Quality> last : lastList) {
+                            if ( last.uniqueMatch() ) {
+                                observer.updatedTracking( last.touch, last.nearest.touch );
+                            }
+                        }
+                    } else {
+                        for (Nearest<Feature, Quality> current : currentList) {
+                            if ( current.uniqueMatch() ) {
+                                observer.updatedTracking( current.nearest.touch, current.touch );
+                            }
+                        }
+                    }
+                    
+                    
+                    for (Nearest<Feature, Quality> last : lastList) {
+                        if ( !last.uniqueMatch() && last.equalMatch(matcher) ) {
+                            observer.updatedTracking( last.touch, last.nearest.touch );
+                        }
+                    }
+                    for (Nearest<Feature, Quality> current : currentList) {
+                        if ( !current.uniqueMatch() && current.equalMatch(matcher) ) {
+                            observer.updatedTracking( current.nearest.touch, current.touch );
+                        }
+                    }
+                }
+                // begin
+                for (Nearest<Feature, Quality> current : currentList) {
+                    if ( !current.equalMatch(matcher) ) {
+                        observer.startedTracking( current.touch );
+                    }
+                }
+            }
+        };
+        
+        // </editor-fold>
+    }
+    
     // </editor-fold>
     
     // <editor-fold defaultstate="collapsed" desc=" Nearest ">
@@ -156,7 +182,7 @@ final public class Trackers
         {
             // <editor-fold defaultstate="collapsed" desc=" Attributes ">
             
-            final private Matcher<? super Feature, Quality> matcher;
+            final protected Matcher<? super Feature, Quality> matcher;
             protected List<Nearest<Feature, Quality>> lastList    = new ArrayList<Nearest<Feature, Quality>>();
             protected List<Nearest<Feature, Quality>> currentList = new ArrayList<Nearest<Feature, Quality>>();
             
@@ -260,7 +286,7 @@ final public class Trackers
         // <editor-fold defaultstate="collapsed" desc=" Attributes ">
         
         final private Feature touch;
-        private Nearest<Feature, ?> nearest;
+        private Nearest<Feature, Quality> nearest;
         private Quality quality = null;//Double.MAX_VALUE; // squared
         
         // </editor-fold>
@@ -287,6 +313,18 @@ final public class Trackers
         private boolean uniqueMatch() {
             return (nearest != null) && (this == nearest.nearest);
         }
+        
+        private boolean equalMatch(final Matcher<? super Feature, Quality> matcher) {
+            //return (nearest != null) && (matcher.compare(this.quality, nearest.nearest.quality) == 0);
+            //
+            // (this == nearest.nearest)
+            // implies 
+            // (matcher.compare(this.quality, nearest.nearest.quality) == 0)
+            //
+            // so the following should be a good 'early-out' optimization:
+            //
+            return (nearest != null) && ((this == nearest.nearest) || (matcher.compare(this.quality, nearest.nearest.quality) == 0));
+        }        
         
         // </editor-fold>
     }
