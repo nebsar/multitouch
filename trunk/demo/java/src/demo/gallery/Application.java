@@ -26,7 +26,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableList;
 import static javax.media.opengl.GL.*;
-import static de.telekom.laboratories.tracking.Trackers.uniqueMatch;
+import static de.telekom.laboratories.tracking.Trackers.bestMatch;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -227,7 +227,7 @@ public final class Application
         {
             final List<Touch> touchList = new ArrayList<Touch>();
             
-            final Tracker<Touch> tracker = uniqueMatch ( new Matcher<Touch,Double>()
+            final Tracker<Touch> tracker = bestMatch ( new Matcher<Touch,Double>()
             {
                 @Override
                 public Double match (Touch a, Touch b)
@@ -241,7 +241,7 @@ public final class Application
                 {
                     return b.compareTo (a);
                 }
-            });
+            }, true);
             
             @Override
             synchronized public void view (Content content)

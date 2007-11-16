@@ -28,7 +28,6 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
-import static de.telekom.laboratories.tracking.Trackers.uniqueMatch;
 import static de.telekom.laboratories.tracking.Trackers.bestMatch;
 import de.telekom.laboratories.tracking.Tracker;
 
@@ -149,7 +148,7 @@ public class Server
         if(flipHorizontal)  flip.add(HORIZONTAL);
         if(flipVertical)    flip.add(VERTICAL);
         
-        tracker = uniqueMatch( matcher(width, height) );
+        tracker = bestMatch( matcher(width, height), true );
 
         return new Runnable()
         {
