@@ -18,7 +18,7 @@
 
 package de.telekom.laboratories.multitouch.util;
 
-import java.util.Arrays;
+import static java.util.Arrays.deepEquals;
 import junit.framework.JUnit4TestAdapter;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -33,43 +33,80 @@ import static org.junit.Assert.*;
  */
 public class LabelsTest {
     
+    // <editor-fold defaultstate="collapsed" desc=" Example ">
+    
+    private interface Example
+    {
+        int[][] image();
+        int[][] bounds();
+    }
+    
+    // </editor-fold> 
+    
     // <editor-fold defaultstate="collapsed" desc=" Attributes ">
     
-//    private final static int[][] image =
-//    {
-//        {  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 },
-//        {  0,  1,  0,  1,  0,  2,  2,  2,  0,  3,  3,  3,  0 },
-//        {  0,  1,  0,  1,  0,  2,  0,  0,  0,  3,  0,  3,  0 },
-//        {  0,  1,  0,  1,  0,  2,  2,  2,  0,  3,  3,  3,  0 },
-//        {  0,  1,  0,  1,  0,  0,  0,  2,  0,  3,  0,  3,  0 },
-//        {  0,  1,  1,  1,  0,  2,  2,  2,  0,  3,  0,  3,  0 },
-//        {  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 },  
-//    };
-//    
-//    private final static int[][] bounds =
-//    {
-//        {  1,  1,  3,  5 },
-//        {  5,  1,  7,  5 },
-//        {  9,  1, 11,  5 },
-//    };    
-//    
-    
-    private final static int[][] image =
+    private final Example[] examples =
     {
-        {  0,  0,  0,  0,  0,  0,  0 },
-        {  0,  1,  1,  1,  1,  1,  0 },
-        {  0,  1,  0,  0,  0,  1,  0 },
-        {  0,  1,  0,  2,  0,  1,  0 },
-        {  0,  1,  0,  0,  0,  1,  0 },
-        {  0,  1,  1,  1,  1,  1,  0 },
-        {  0,  0,  0,  0,  0,  0,  0 },  
-    };
-    
-    private final static int[][] bounds =
-    {
-        {  1,  1,  5,  5 },
-        {  3,  3,  3,  3 },
-    };      
+        new Example()
+        {
+            private final int[][] image =
+            {
+                {  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 },
+                {  0,  1,  0,  1,  0,  2,  2,  2,  0,  3,  3,  3,  0 },
+                {  0,  1,  0,  1,  0,  2,  0,  0,  0,  3,  0,  3,  0 },
+                {  0,  1,  0,  1,  0,  2,  2,  2,  0,  3,  3,  3,  0 },
+                {  0,  1,  0,  1,  0,  0,  0,  2,  0,  3,  0,  3,  0 },
+                {  0,  1,  1,  1,  0,  2,  2,  2,  0,  3,  0,  3,  0 },
+                {  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 },  
+            };
+
+            private final int[][] bounds =
+            {
+                {  1,  1,  3,  5 },
+                {  5,  1,  7,  5 },
+                {  9,  1, 11,  5 },
+            };              
+            
+            public int[][] image()
+            {
+                return image;
+            }
+            
+            public int[][] bounds()
+            {
+                return bounds;
+            }            
+        },
+        new Example()
+        {
+            private final int[][] image =
+            {
+                {  0,  0,  0,  0,  0,  0,  0 },
+                {  0,  1,  1,  1,  1,  1,  0 },
+                {  0,  1,  0,  0,  0,  1,  0 },
+                {  0,  1,  0,  2,  0,  1,  0 },
+                {  0,  1,  0,  0,  0,  1,  0 },
+                {  0,  1,  1,  1,  1,  1,  0 },
+                {  0,  0,  0,  0,  0,  0,  0 },  
+            };
+
+            private final int[][] bounds =
+            {
+                {  1,  1,  5,  5 },
+                {  3,  3,  3,  3 },
+            };               
+            
+            public int[][] image()
+            {
+                return image;
+            }
+            
+            public int[][] bounds()
+            {
+                return bounds;
+            }        
+        },        
+    };     
     
     // </editor-fold> 
         
@@ -83,7 +120,13 @@ public class LabelsTest {
     // <editor-fold defaultstate="collapsed" desc=" Methods ">
     
     @Test
-    public void testCount() {
+    public void testCount() 
+    {
+        for(final Example example : examples)
+            testCount( example.image(), example.bounds().length );
+    }
+    
+    private void testCount(int[][] image, int count) {
 
         final int[][] copy = image.clone();
         for(int i=0; i<copy.length; i++) {
@@ -91,33 +134,39 @@ public class LabelsTest {
         }
         
         final Labels labels = new Labels(copy);
-        final int count = labels.count();
-        assertEquals(count, 0);        
-        assertEquals(count, bounds.length);
-        assertEquals(count, bounds.length);
-        assertTrue(
+        final int c = labels.count();
+        assertEquals("Number of labels is wrong", c, count);
+        assertTrue
+        (
             "Update doesn't behave as identity for a neutral image", 
-            Arrays.deepEquals(image, copy)
+            deepEquals(image, copy)
         );
     }
     
     @Test
     public void testBounds() {
+        for(final Example example : examples)
+            testBounds( example.image(), example.bounds() );
+    }
+    
+    private void testBounds(int[][] image, int[][] bounds) {
 
         final int[][] copy = image.clone();
         for(int i=0; i<copy.length; i++) {
             copy[i] = image[i].clone();
         }
         
-        final Labels labels = new Labels(copy);
-        final int count = labels.count();
-        assertEquals(count, 0);
+        Labels labels;
+        
+        labels = new Labels(copy);
         final int[][] b = labels.bounds();
-        Arrays.deepEquals(bounds, b);        
-        assertEquals(count, bounds.length);
-        assertTrue(
+        
+        assertTrue("Bounds do not match", deepEquals(bounds, b));
+        
+        assertTrue
+        (
             "Update doesn't behave as identity for a neutral image", 
-            Arrays.deepEquals(image, copy)
+            deepEquals(image, copy)
         );
     }    
     
