@@ -37,7 +37,7 @@ import java.util.Arrays;
  * @author Michael Nischt
  * @version 0.1
  */
-public class Moments2D
+public class Moments2D implements Cloneable
 {
     // <editor-fold defaultstate="collapsed" desc=" Attributes ">
     
@@ -70,6 +70,16 @@ public class Moments2D
             moments[i] = new double[++i];
         }
         tmp = new double[degree];
+    }
+    
+    private Moments2D (Moments2D other)
+    {
+        moments = other.moments.clone();
+        for(int i=0; i<moments.length; i++)
+        {
+            moments[i] = other.moments[i].clone();
+        }
+        tmp = new double[moments.length];
     }
     
     // </editor-fold>
@@ -112,7 +122,6 @@ public class Moments2D
     // </editor-fold>
     
     // <editor-fold defaultstate="collapsed" desc=" Methods ">
-    
     
     public void clear ()
     {
@@ -161,6 +170,16 @@ public class Moments2D
                 ithMoments[i] *= factor;
             }
         }
+    }
+    
+    // </editor-fold>
+    
+    // <editor-fold defaultstate="collapsed" desc=" Cloneable ">
+    
+    @Override
+    public Moments2D clone()
+    {
+        return new Moments2D(this);
     }
     
     // </editor-fold>
