@@ -56,7 +56,7 @@ public class FlyCaptureService extends CaptureService
         
         try
         {
-            System.loadLibrary ("FlyCaptrueService");
+            System.loadLibrary ("FlyCaptureService");
             
             final Thread disposeAll = new Thread ()
             {
