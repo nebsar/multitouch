@@ -81,6 +81,9 @@ public class TouchInput
     
     private void drag(java.awt.Point move) 
     {        
+    	if(move.x == 0 && move.y == 0)
+    		return;
+    	
         final Globe globe = model.getGlobe();
         if (globe == null)
             return;
@@ -168,15 +171,15 @@ public class TouchInput
             @Override
             public void updatedTracking(Touch last, Touch current) 
             {
-                System.out.println("l: " + last.getX() + " " + last.getY());
-                System.out.println("c: " + current.getX() + " " + current.getY());
+                //System.out.println("l: " + last.getX() + " " + last.getY());
+                //System.out.println("c: " + current.getX() + " " + current.getY());
                 move.x += current.getX() - last.getX();
                 move.y += current.getY() - last.getY();
             }
         });       
                
         
-        System.out.println(move.x + " " + move.y);
+        //System.out.println(move.x + " " + move.y);
         drag(move);        
     }
     

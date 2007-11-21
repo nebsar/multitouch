@@ -6,34 +6,36 @@ All Rights Reserved.
 */
 package demo.worldwind;
 
-import gov.nasa.worldwind.*;
+import gov.nasa.worldwind.Model;
+import gov.nasa.worldwind.WorldWind;
 import gov.nasa.worldwind.avlist.AVKey;
 import gov.nasa.worldwind.awt.WorldWindowGLCanvas;
-import gov.nasa.worldwind.event.*;
-import gov.nasa.worldwind.examples.*;
-import gov.nasa.worldwind.geom.*;
-import gov.nasa.worldwind.layers.*;
-import gov.nasa.worldwind.layers.Earth.*;
-import gov.nasa.worldwind.render.*;
-import gov.nasa.worldwind.view.*;
+import gov.nasa.worldwind.examples.StatusBar;
+import gov.nasa.worldwind.view.OrbitView;
 
-import javax.swing.*;
-import javax.xml.parsers.*;
-import java.awt.*;
-import java.awt.font.*;
-import java.io.*;
-import java.util.*;
+import java.awt.BorderLayout;
+import java.awt.EventQueue;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
+
+import javax.swing.JLabel;
+
+import demo.Capture;
 
 /**
- * @author Tom Gaskins
+ * @author Tom Gaskins, Michael Nischt
  * @version $Id: AWT1Up.java 3209 2007-10-06 21:57:53Z tgaskins $
  */
 public class AWT1UpTouch
 {
-    private static class AWT1UpFrame extends javax.swing.JFrame
+    @SuppressWarnings("serial")
+	private static class AWT1UpFrame extends javax.swing.JFrame
     {
         private boolean fullscreen = true;
-        private int screen = 0;
+        private int screen = 1;
                 
         StatusBar statusBar;
         JLabel cursorPositionDisplay;
@@ -99,32 +101,32 @@ public class AWT1UpTouch
                 
                 Thread t = new Thread("Touch.Inputs")
                 {        
-                    private boolean even = true;
-                    
+                   	List<Touch> touches = new ArrayList<Touch>();
+                   	
                     private void frame()
                     {
-                        System.out.println("frame");
-                        if(even)
-                        {
-                            touchInput.advanceFrame(Collections.singleton(new Touch(0, -5)).iterator());
-                        }
-                        else
-                        {
-                            touchInput.advanceFrame(Collections.singleton(new Touch(0, +5)).iterator());
-                        }
-                        even = !even;                        
+                    	synchronized (touches) 
+                    	{
+                            touchInput.advanceFrame(touches.iterator()); 							
+						}
                     }
                     
                     @Override public void run ()
                     {
-                        while(true)
+                    	final int width = 1024, height = 768;
+                    	Capture capture = Capture.startDevice(width, height);
+                    	final byte[] image = new byte[width*height];
+                    	TLCapture tlCapture = new TLCapture(width, height);
+                    	
+                        while(Thread.currentThread() == this && !capture.isDisposed())
                         {
-                            try
-                            {
-                                sleep(1000);   
-                            }
-                            catch(InterruptedException ie) {}
-
+                        	capture.capture(image, EnumSet.allOf(Capture.Flip.class));
+                        	synchronized (touches) 
+                        	{
+                            	touches.clear();                        		
+                            	tlCapture.capture(image, touches);
+							}
+                        	
                             EventQueue.invokeLater(new Runnable() 
                             {
                                 public void run() 
