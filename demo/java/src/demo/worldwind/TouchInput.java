@@ -116,7 +116,7 @@ public class TouchInput
         @Override
         public int compare (Double a, Double b)
         {
-            return b.compareTo (a);
+            return a.compareTo (b);
         }
     }, true);
     

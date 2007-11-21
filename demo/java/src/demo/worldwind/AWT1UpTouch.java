@@ -8,23 +8,14 @@ package demo.worldwind;
 
 import gov.nasa.worldwind.*;
 import gov.nasa.worldwind.avlist.AVKey;
-import gov.nasa.worldwind.avlist.AVList;
 import gov.nasa.worldwind.awt.WorldWindowGLCanvas;
 import gov.nasa.worldwind.event.*;
 import gov.nasa.worldwind.examples.*;
-import gov.nasa.worldwind.formats.georss.GeoRSSParser;
 import gov.nasa.worldwind.geom.*;
-import gov.nasa.worldwind.globes.Globe;
 import gov.nasa.worldwind.layers.*;
 import gov.nasa.worldwind.layers.Earth.*;
-import gov.nasa.worldwind.pick.PickedObjectList;
 import gov.nasa.worldwind.render.*;
 import gov.nasa.worldwind.view.*;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.util.Map.Entry;
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 
 import javax.swing.*;
 import javax.xml.parsers.*;
@@ -32,7 +23,6 @@ import java.awt.*;
 import java.awt.font.*;
 import java.io.*;
 import java.util.*;
-import java.util.List;
 
 /**
  * @author Tom Gaskins
