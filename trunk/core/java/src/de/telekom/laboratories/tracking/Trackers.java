@@ -58,10 +58,10 @@ final public class Trackers
     static public <Feature, Quality> Tracker<Feature> bestMatch(Matcher<? super Feature, Quality> matcher, boolean mutual)
     {
         if(mutual) return bestMutualMatch(matcher);
-        else return bestSingleMatch(matcher);
+        else return bestEqualMatch(matcher);
     }
     
-    static private <Feature, Quality> Tracker<Feature> bestSingleMatch(Matcher<? super Feature, Quality> matcher)
+    static private <Feature, Quality> Tracker<Feature> bestEqualMatch(Matcher<? super Feature, Quality> matcher)
     {
         // <editor-fold defaultstate="collapsed" desc=" doEvents ">
         
@@ -70,7 +70,7 @@ final public class Trackers
             protected void doEvents(Observer<? super Feature> observer) {
                 // end
                 for (Nearest<Feature, Quality> last : lastList) {
-                    if ( last.nearest == null ) {
+                    if (! (last.uniqueMatch() || last.equalMatch(matcher)) ) {
                         observer.finishedTracking( last.touch );
                     }
                 }
@@ -79,33 +79,32 @@ final public class Trackers
                 {
                     if(lastList.size() < currentList.size()) {
                         for (Nearest<Feature, Quality> last : lastList) {
-                            if ( last.uniqueMatch() ) {
-                                observer.updatedTracking( last.touch, last.nearest.touch );
+                            if ( last.uniqueMatch() || last.equalMatch(matcher) ) {
+                                observer.updatedTracking( last.touch, last.linked() );
                             }
                         }
+                        for (Nearest<Feature, Quality> current : currentList) {
+                            if ( !current.uniqueMatch() && current.equalMatch(matcher) ) {
+                                observer.updatedTracking( current.linked(), current.touch );
+                            }
+                        }
+                        
                     } else {
                         for (Nearest<Feature, Quality> current : currentList) {
-                            if ( current.uniqueMatch() ) {
-                                observer.updatedTracking( current.nearest.touch, current.touch );
+                            if ( current.uniqueMatch() || current.equalMatch(matcher) ) {
+                                observer.updatedTracking( current.linked(), current.touch );
                             }
                         }
-                    }
-                    
-                    
-                    for (Nearest<Feature, Quality> last : lastList) {
-                        if ( last.nearest != null && !last.uniqueMatch() ) {
-                            observer.updatedTracking( last.touch, last.nearest.touch );
-                        }
-                    }
-                    for (Nearest<Feature, Quality> current : currentList) {
-                        if ( current.nearest != null && !current.uniqueMatch() ) {
-                            observer.updatedTracking( current.nearest.touch, current.touch );
-                        }
+                        for (Nearest<Feature, Quality> last : lastList) {
+                            if ( !last.uniqueMatch() && last.equalMatch(matcher) ) {
+                                observer.updatedTracking( last.touch, last.linked() );
+                            }
+                        }                        
                     }
                 }
                 // begin
                 for (Nearest<Feature, Quality> current : currentList) {
-                    if ( current.nearest == null ) {
+                    if (! (current.uniqueMatch() || current.equalMatch(matcher)) ) {
                         observer.startedTracking( current.touch );
                     }
                 }
@@ -124,7 +123,7 @@ final public class Trackers
             protected void doEvents(Observer<? super Feature> observer) {
                 // end
                 for (Nearest<Feature, Quality> last : lastList) {
-                    if ( !last.equalMatch(matcher) ) {
+                    if ( last.isolated() ) {
                         observer.finishedTracking( last.touch );
                     }
                 }
@@ -133,33 +132,33 @@ final public class Trackers
                 {
                     if(lastList.size() < currentList.size()) {
                         for (Nearest<Feature, Quality> last : lastList) {
-                            if ( last.uniqueMatch() ) {
-                                observer.updatedTracking( last.touch, last.nearest.touch );
+                            if ( !(last.isolated() || last.uniqueMatch()) ) {
+                                observer.updatedTracking( last.touch, last.linked() );
                             }
                         }
+                        for (Nearest<Feature, Quality> current : currentList) {
+                            if ( !current.isolated() ) {
+                                observer.updatedTracking( current.linked(), current.touch );
+                            }
+                        }
+                        
                     } else {
                         for (Nearest<Feature, Quality> current : currentList) {
-                            if ( current.uniqueMatch() ) {
-                                observer.updatedTracking( current.nearest.touch, current.touch );
+                            if ( !(current.isolated() || current.uniqueMatch()) ) {
+                                observer.updatedTracking( current.linked(), current.touch );
+                            }
+                        }
+                        for (Nearest<Feature, Quality> last : lastList) {
+                            if ( !last.isolated() ) {
+                                observer.updatedTracking( last.touch, last.linked() );
                             }
                         }
                     }
                     
-                    
-                    for (Nearest<Feature, Quality> last : lastList) {
-                        if ( !last.uniqueMatch() && last.equalMatch(matcher) ) {
-                            observer.updatedTracking( last.touch, last.nearest.touch );
-                        }
-                    }
-                    for (Nearest<Feature, Quality> current : currentList) {
-                        if ( !current.uniqueMatch() && current.equalMatch(matcher) ) {
-                            observer.updatedTracking( current.nearest.touch, current.touch );
-                        }
-                    }
                 }
                 // begin
                 for (Nearest<Feature, Quality> current : currentList) {
-                    if ( !current.equalMatch(matcher) ) {
+                    if ( current.isolated() ) {
                         observer.startedTracking( current.touch );
                     }
                 }
@@ -310,19 +309,21 @@ final public class Trackers
         }
         
         
+        private Feature linked() {
+            return nearest.touch;
+        }
+
+        
+        private boolean isolated() {
+            return (nearest == null);
+        }
+
         private boolean uniqueMatch() {
             return (nearest != null) && (this == nearest.nearest);
         }
         
-        private boolean equalMatch(final Matcher<? super Feature, Quality> matcher) {
-            //return (nearest != null) && (matcher.compare(this.quality, nearest.nearest.quality) == 0);
-            //
-            // (this == nearest.nearest)
-            // implies 
-            // (matcher.compare(this.quality, nearest.nearest.quality) == 0)
-            //
-            // so the following should be a good 'early-out' optimization:
-            //
+        private boolean equalMatch(final Matcher<? super Feature, Quality> matcher) 
+        {
             return (nearest != null) && ((this == nearest.nearest) || (matcher.compare(this.quality, nearest.nearest.quality) == 0));
         }        
         
@@ -331,3 +332,4 @@ final public class Trackers
     
     // </editor-fold>
 }
+
