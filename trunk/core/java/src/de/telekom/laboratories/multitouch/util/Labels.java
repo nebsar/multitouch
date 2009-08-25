@@ -161,14 +161,11 @@ public class Labels {
         } else {
             return apply();
         }
-    }
-    
+    }    
+
     private int union(int a, int b) {
-        if(a < b) {                 
-            return (labels[b] = a);
-        } else {//a > b)
-            return (labels[a] = b);
-        }     
+        assert(a < b);
+        return (labels[b] = Math.min(labels[b], a));
     }
     
     // </editor-fold>
