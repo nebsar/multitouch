@@ -162,10 +162,11 @@ public class Labels {
         }
     }    
 
-    private int union(int a, int b) {
-        return (a < b)
-            ?  (labels[b] = Math.min(labels[b], a))
-            :  (labels[a] = Math.min(labels[a], b));
+    private int union(int a, int b) 
+    {
+        int labelMin = Math.min(labels[a], labels[b]);
+        int valueMin = Math.min(a, b);
+        return labels[a] = labels[b] = Math.min(labelMin, valueMin);
     }
     
     // </editor-fold>
