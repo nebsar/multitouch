@@ -149,9 +149,8 @@ public class Labels {
     private int apply(int a) {
         return (a != 0) ? labels[a] : apply();
     }
-    private int apply(int a, int  b) {
-        assert(a <= b);
-        
+    private int apply(int a, int  b) 
+	{        
         if(a != 0 && b != 0) {
             return apply( union(a,b) );
         } else if( a != 0) {            
@@ -164,8 +163,9 @@ public class Labels {
     }    
 
     private int union(int a, int b) {
-        assert(a < b);
-        return (labels[b] = Math.min(labels[b], a));
+        return (a < b)
+            ?  (labels[b] = Math.min(labels[b], a))
+            :  (labels[a] = Math.min(labels[a], b));
     }
     
     // </editor-fold>
